@@ -7,6 +7,8 @@
 
 #include <IPCC_Impl.hpp>
 
+#include <limits>
+
 namespace lmp
 {
   namespace cc
