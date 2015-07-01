@@ -1,0 +1,36 @@
+
+#include "lmp_mgtif_ipcc.idl"
+#include "lmp_mgtif_neighbor.idl"
+
+module lmp_node
+{
+  exception No_Such_Entity {};
+  exception Entity_Already_Exists {};
+
+  interface Node
+  {
+    long getNodeId();
+    // factory for IPCCs
+    lmp_ipcc::IPCC createIPCC(
+      in long  localCCId,
+      in long  localAddress,
+      in short localPortNumber)
+      raises (Entity_Already_Exists);
+    lmp_ipcc::IPCC getIPCC(
+      in long  localCCId)
+      raises (No_Such_Entity);
+    void deleteIPCC(
+      in long  localCCId)
+      raises (No_Such_Entity);
+    lmp_neighbor::Neighbor createNeighbor(
+      in long  remoteNodeId)
+      raises (Entity_Already_Exists);
+    lmp_neighbor::Neighbor getNeighbor(
+      in long  remoteNodeId)
+      raises (No_Such_Entity);
+    void deleteNeighbor(
+      in long  remoteNodeId)
+      raises (No_Such_Entity);
+    void destroy();
+  };
+};

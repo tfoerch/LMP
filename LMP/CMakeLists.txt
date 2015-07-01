@@ -3,8 +3,10 @@
 # to the root binary directory of the project as ${LMP_BINARY_DIR}.
 cmake_minimum_required (VERSION 2.8.11)
 project (LMP)
-include_directories ("${PROJECT_SOURCE_DIR}/base" "${PROJECT_SOURCE_DIR}/cc")
+include_directories ("${PROJECT_SOURCE_DIR}/base" "${PROJECT_SOURCE_DIR}/cc" "${PROJECT_BINARY_DIR}/idl")
 
 add_subdirectory (cc)
 add_subdirectory (Test)
+add_subdirectory (idl)
+add_subdirectory (client)
 
