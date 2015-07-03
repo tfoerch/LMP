@@ -8,5 +8,6 @@ include_directories ("${PROJECT_SOURCE_DIR}/base" "${PROJECT_SOURCE_DIR}/cc" "${
 add_subdirectory (cc)
 add_subdirectory (Test)
 add_subdirectory (idl)
+add_subdirectory (server)
 add_subdirectory (client)
 

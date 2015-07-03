@@ -8,8 +8,8 @@ module lmp_ipcc
     void enable();
     void disable();
     void registerObserver(
-      in IPCCObserver   observer);
+      in lmp_ipcc_observer::IPCCObserver   observer);
     void deregisterObserver(
-      in IPCCObserver   observer);
+      in lmp_ipcc_observer::IPCCObserver   observer);
   };
 };
