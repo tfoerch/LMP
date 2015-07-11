@@ -24,10 +24,11 @@ add_custom_command(
 )
 
 add_library (
-lmp_mgtif
+lmp_mgtif SHARED
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_node.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_node_registry.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_neighbor.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc_observer.cpp )
 
+INSTALL(TARGETS lmp_mgtif DESTINATION lib)

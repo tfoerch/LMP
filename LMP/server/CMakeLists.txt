@@ -10,3 +10,4 @@ add_executable (LMPServer_T Mgt_Node.cpp Mgt_IPCC.cpp Mgt_Neighbor.cpp ServerMai
 # public include directories we will use those link directories when building
 target_link_libraries (LMPServer_T LINK_PUBLIC lmp_cc lmp_mgtif omniORB4 omnithread ${Boost_LIBRARIES} )
 
+INSTALL(TARGETS LMPServer_T DESTINATION bin)

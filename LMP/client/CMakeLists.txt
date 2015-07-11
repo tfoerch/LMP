@@ -10,3 +10,4 @@ add_executable (LMPClient_T Mgt_Client.cpp  Mgt_NodeRegistry.cpp)
 # public include directories we will use those link directories when building
 target_link_libraries (LMPClient_T LINK_PUBLIC lmp_cc lmp_mgtif omniORB4 omnithread ${Boost_LIBRARIES} )
 
+INSTALL(TARGETS LMPClient_T DESTINATION bin)

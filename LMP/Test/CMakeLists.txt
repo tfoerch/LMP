@@ -7,3 +7,4 @@ add_executable (LMP_T Test_IPCC_Observer.cpp  TestMain.cpp)
 # public include directories we will use those link directories when building
 target_link_libraries (LMP_T LINK_PUBLIC lmp_cc)
 
+INSTALL(TARGETS LMP_T DESTINATION bin)
