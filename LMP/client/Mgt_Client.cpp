@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE( test_case1 )
     else
     {
       // we are the child
-      const char serverPath[] = "/home/tom/workspace/LMPServer/Debug/LMPServer";
+      const char serverPath[] = "/home/tom/build/LMP/server/LMPServer_T";
       const char nodeIdOptStr[] = "--node-id";
       const char nodeRegistryOptStr[] = "--node-registry";
       ostringstream nodeIdStream;
