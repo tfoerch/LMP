@@ -24,13 +24,15 @@ void NodeRegistry_i::registerNode(
   ::lmp_node::Node_ptr  aNode)
 {
   cout << "node with node-id = " << aNode->getNodeId() << " registered" << endl;
-  theNodeByNodeIdMap.insert(NodeByNodeIdMap::value_type(aNode->getNodeId(), aNode));
+  theNodeByNodeIdMap.insert(NodeByNodeIdMap::value_type(aNode->getNodeId(), ::lmp_node::Node::_duplicate(aNode)));
 }
 
 void NodeRegistry_i::deregisterNode(
   ::lmp_node::Node_ptr  aNode)
 {
+  std::cout << "deregisterNode begin" << std::endl;
   theNodeByNodeIdMap.erase(aNode->getNodeId());
+  std::cout << "deregisterNode end" << std::endl;
 }
 
 ::CORBA::Boolean NodeRegistry_i::isNodeRegistered(
@@ -40,6 +42,19 @@ void NodeRegistry_i::deregisterNode(
 	( theNodeByNodeIdMap.find(nodeId) != theNodeByNodeIdMap.end() );
 }
 
+void NodeRegistry_i::shutdown()
+{
+  std::cout << "shutdown begin" << std::endl;
+  std::map<CORBA::Long, lmp_node::Node_var>::iterator  iter = theNodeByNodeIdMap.begin();
+  while (iter != theNodeByNodeIdMap.end())
+  {
+	::lmp_node::Node_var  node = iter->second;
+	++iter;
+	std::cout << "calling destroy" << std::endl;
+	node->destroy();
+	std::cout << "return from destroy" << std::endl;
+  }
+}
 
 } // end namespace LMP
 

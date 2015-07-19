@@ -1,4 +1,5 @@
 #include <lmp_mgtif_node.hpp>
+#include <lmp_mgtif_node_registry.hpp>
 
 #include <iostream>
 #include <map>
@@ -11,9 +12,10 @@ class Node_i : public POA_lmp_node::Node
 {
 public:
   Node_i(
-    CORBA::ORB_ptr           orb,
-    PortableServer::POA_ptr  poa,
-    ::CORBA::Long            nodeId);
+    CORBA::ORB_ptr                         orb,
+    PortableServer::POA_ptr                poa,
+    ::CORBA::Long                          nodeId,
+	::lmp_node_registry::NodeRegistry_ptr  aNodeRegistry);
   virtual ~Node_i();
   virtual ::CORBA::Long getNodeId();
   virtual ::lmp_ipcc::IPCC_ptr createIPCC(
@@ -32,14 +34,15 @@ public:
     ::CORBA::Long remoteNodeId);
   virtual void destroy();
 private:
-  typedef  std::map<CORBA::Long, ::lmp_ipcc::IPCC_ptr>      IPCCByCCIdMap;
-  typedef  std::map<CORBA::Long, ::lmp_neighbor::Neighbor_ptr>  NeighborByNodeIdMap;
+  typedef  std::map<CORBA::Long, ::lmp_ipcc::IPCC_var>          IPCCByCCIdMap;
+  typedef  std::map<CORBA::Long, ::lmp_neighbor::Neighbor_var>  NeighborByNodeIdMap;
 
-  CORBA::ORB_ptr           theORB;
-  PortableServer::POA_ptr  thePOA;
-  ::CORBA::Long            theNodeId;
-  IPCCByCCIdMap            theIPCCByCCId;
-  NeighborByNodeIdMap      theNeighborByNodeIdMap;
+  CORBA::ORB_ptr                         theORB;
+  PortableServer::POA_ptr                thePOA;
+  ::CORBA::Long                          theNodeId;
+  ::lmp_node_registry::NodeRegistry_var  theNodeRegistry;
+  IPCCByCCIdMap                          theIPCCByCCId;
+  NeighborByNodeIdMap                    theNeighborByNodeIdMap;
 };
 
 } // end namespace LMP

@@ -34,37 +34,40 @@ int main(int argc, char* argv[])
         try
         {
           CORBA::ORB_var orb = CORBA::ORB_init(argc, argv);
-
-          CORBA::Object_var poaObj = orb->resolve_initial_references("RootPOA");
-          PortableServer::POA_var poa = PortableServer::POA::_narrow(poaObj);
-          PortableServer::POAManager_var pman = poa->the_POAManager();
-          pman->activate();
-
-          lmp_node::Node_i* myNode = new lmp_node::Node_i(orb, poa, vm["node-id"].as<unsigned int>());
-
-          PortableServer::ObjectId_var myNodeId = poa->activate_object(myNode);
-
-          lmp_node::Node_var nodeObj = myNode->_this();
-          myNode->_remove_ref();
-
-          cout << "node-registry = " << vm["node-registry"].as<string>() << endl;
-          CORBA::Object_var nodeRegObj = orb->string_to_object(vm["node-registry"].as<string>().c_str());
-          lmp_node_registry::NodeRegistry_var nodeRegistry = lmp_node_registry::NodeRegistry::_narrow(nodeRegObj);
-
-          if( CORBA::is_nil(nodeRegistry) )
           {
-            cerr << "nodeRegistry: The peer reference is nil!" << endl;
-          }
-          else
-          {
-        	cout << "registerNode(nodeObj)" << endl;
-            nodeRegistry->registerNode(nodeObj);
+            CORBA::Object_var poaObj = orb->resolve_initial_references("RootPOA");
+            PortableServer::POA_var poa = PortableServer::POA::_narrow(poaObj);
+            PortableServer::POAManager_var pman = poa->the_POAManager();
+            pman->activate();
 
-            CORBA::String_var sior(orb->object_to_string(nodeObj));
-            cout << sior << endl;
-          }
 
-          orb->run();
+            cout << "node-registry = " << vm["node-registry"].as<string>() << endl;
+            CORBA::Object_var nodeRegObj = orb->string_to_object(vm["node-registry"].as<string>().c_str());
+            lmp_node_registry::NodeRegistry_var nodeRegistry = lmp_node_registry::NodeRegistry::_narrow(nodeRegObj);
+
+            if( CORBA::is_nil(nodeRegistry) )
+            {
+              cerr << "nodeRegistry: The peer reference is nil!" << endl;
+            }
+            else
+            {
+              cout << "registerNode(nodeObj)" << endl;
+              lmp_node::Node_i* myNode = new lmp_node::Node_i(orb, poa, vm["node-id"].as<unsigned int>(), nodeRegistry);
+
+              PortableServer::ObjectId_var myNodeId = poa->activate_object(myNode);
+
+              lmp_node::Node_var nodeObj = myNode->_this();
+              myNode->_remove_ref();
+              nodeRegistry->registerNode(nodeObj);
+
+              CORBA::String_var sior(orb->object_to_string(nodeObj));
+              cout << sior << endl;
+            }
+
+            orb->run();
+          }
+          cout << "returned from orb->run()." << endl;
+          orb->destroy();
 	    }
         catch(CORBA::SystemException& ex)
         {

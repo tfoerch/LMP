@@ -11,10 +11,12 @@ namespace lmp_node
 Node_i::Node_i(
   CORBA::ORB_ptr           orb,
   PortableServer::POA_ptr  poa,
-  ::CORBA::Long            nodeId)
+  ::CORBA::Long            nodeId,
+  ::lmp_node_registry::NodeRegistry_ptr  aNodeRegistry)
 : theORB(CORBA::ORB::_duplicate(orb)),
   thePOA(PortableServer::POA::_duplicate(poa)),
-  theNodeId(nodeId)
+  theNodeId(nodeId),
+  theNodeRegistry(::lmp_node_registry::NodeRegistry::_duplicate(aNodeRegistry))
 {
   //PortableServer::ObjectId *oid=thePOA->activate_object(this); delete oid;
 }
@@ -39,7 +41,8 @@ lmp_ipcc::IPCC_ptr Node_i::createIPCC(
   {
 	lmp_ipcc::IPCC_i* servant = new lmp_ipcc::IPCC_i(thePOA, this->_this(), localCCId, localAddress, localPortNumber);
     PortableServer::ObjectId *oid=thePOA->activate_object(servant);  delete oid;
-    return theIPCCByCCId.insert(IPCCByCCIdMap::value_type(localCCId, servant->_this())).first->second;
+    lmp_ipcc::IPCC_ptr ipcc = servant->_this();
+    return theIPCCByCCId.insert(IPCCByCCIdMap::value_type(localCCId, lmp_ipcc::IPCC::_duplicate(ipcc))).first->second;
   }
   throw lmp_node::Entity_Already_Exists();
 }
@@ -74,7 +77,8 @@ lmp_neighbor::Neighbor_ptr Node_i::createNeighbor(
   {
 	lmp_neighbor::Neighbor_i* servant = new lmp_neighbor::Neighbor_i(thePOA, this->_this(), remoteNodeId);
 	PortableServer::ObjectId *oid=thePOA->activate_object(servant);  delete oid;
-	return theNeighborByNodeIdMap.insert(NeighborByNodeIdMap::value_type(remoteNodeId, servant->_this())).first->second;
+	lmp_neighbor::Neighbor_ptr neighbor = servant->_this();
+	return theNeighborByNodeIdMap.insert(NeighborByNodeIdMap::value_type(remoteNodeId, lmp_neighbor::Neighbor::_duplicate(neighbor))).first->second;
   }
   throw lmp_node::Entity_Already_Exists();
 }
@@ -103,9 +107,20 @@ void Node_i::deleteNeighbor(
 
 void Node_i::destroy()
 {
+  if (!CORBA::is_nil(theNodeRegistry))
+  {
+	theNodeRegistry->deregisterNode(this->_this());
+  }
   PortableServer::ObjectId *oid=thePOA->servant_to_id(this);
+  std::cout << "before deactivate_object" << std::endl;
   thePOA->deactivate_object(*oid);  delete oid;
-  _remove_ref(); // delete this;
+  std::cout << "after deactivate_object" << std::endl;
+  // _remove_ref(); // delete this;
+  // std::cout << "after _remove_ref" << std::endl;
+  // Shutdown the ORB (but do not wait for completion).  This also
+  // causes the main thread to unblock from CORBA::ORB::run().
+  theORB->shutdown(0);
+
 }
 
 } // end namespace lmp_node

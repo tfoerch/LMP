@@ -11,5 +11,6 @@ module lmp_node_registry
       in lmp_node::Node  aNode);
     boolean isNodeRegistered(
       in long  nodeId);
+    void shutdown();
   };
 };
