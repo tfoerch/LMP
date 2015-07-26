@@ -17,6 +17,7 @@ public:
   ~LaunchServer();
   lmp_node_registry::NodeRegistry_i*  theNodeRegistry;
   boost::optional<CORBA::ORB_var>     theOrb;
+  unsigned long                       theNodeId;
   pid_t                               theChildPid;
 };
 #endif /* MGT_CLIENT_FIXTURE_HPP_ */

@@ -35,7 +35,9 @@ Node_i::~Node_i()
 lmp_ipcc::IPCC_ptr Node_i::createIPCC(
   ::CORBA::Long localCCId,
   ::CORBA::Long localAddress,
-  ::CORBA::Short localPortNumber)
+  ::CORBA::Long remoteAddress,
+  ::CORBA::Short localPortNumber,
+  ::CORBA::Short remotePortNumber)
 {
   if (theIPCCByCCId.find(localCCId) == theIPCCByCCId.end())
   {

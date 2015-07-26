@@ -14,7 +14,9 @@ module lmp_node
     lmp_ipcc::IPCC createIPCC(
       in long  localCCId,
       in long  localAddress,
-      in short localPortNumber)
+      in long  remoteAddress,
+      in short localPortNumber,
+      in short remotePortNumber)
       raises (Entity_Already_Exists);
     lmp_ipcc::IPCC getIPCC(
       in long  localCCId)

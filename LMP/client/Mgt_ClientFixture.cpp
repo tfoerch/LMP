@@ -21,6 +21,7 @@
 LaunchServer::LaunchServer()
   : theNodeRegistry(0),
 	theOrb(),
+	theNodeId(10001),
 	theChildPid(0)
 {
   std::cout << "launch server setup\n";
@@ -55,7 +56,6 @@ LaunchServer::LaunchServer()
 		orb->perform_work();
 	  };
 
-	  const unsigned long nodeId = 10001;
 	  // pid_t parent = getpid();
 	  theChildPid = fork();
 
@@ -79,7 +79,7 @@ LaunchServer::LaunchServer()
 		  };
 		}
 		cout << boost::chrono::steady_clock::now() << ": leaving while" << endl;
-		theNodeRegistry->isNodeRegistered(nodeId);
+		//theNodeRegistry->isNodeRegistered(theNodeId);
 
 	  }
 	  else
@@ -89,7 +89,7 @@ LaunchServer::LaunchServer()
 		const char nodeIdOptStr[] = "--node-id";
 		const char nodeRegistryOptStr[] = "--node-registry";
 		ostringstream nodeIdStream;
-		nodeIdStream << nodeId << ends;
+		nodeIdStream << theNodeId << ends;
 		const char* newargv[] =
           { serverPath,
             serverPath,

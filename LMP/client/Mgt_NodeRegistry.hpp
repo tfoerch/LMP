@@ -21,6 +21,8 @@ public:
     ::lmp_node::Node_ptr  aNode);
   virtual ::CORBA::Boolean isNodeRegistered(
 	::CORBA::Long    nodeId);
+  virtual ::lmp_node::Node_ptr getNode(
+    ::CORBA::Long    nodeId);
   virtual void shutdown();
 private:
   typedef  std::map<CORBA::Long, lmp_node::Node_var>      NodeByNodeIdMap;

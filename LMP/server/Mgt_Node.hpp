@@ -21,7 +21,9 @@ public:
   virtual ::lmp_ipcc::IPCC_ptr createIPCC(
     ::CORBA::Long localCCId,
     ::CORBA::Long localAddress,
-    ::CORBA::Short localPortNumber);
+	::CORBA::Long remoteAddress,
+    ::CORBA::Short localPortNumber,
+	::CORBA::Short remotePortNumber);
   virtual ::lmp_ipcc::IPCC_ptr getIPCC(
     ::CORBA::Long localCCId);
   virtual void deleteIPCC(

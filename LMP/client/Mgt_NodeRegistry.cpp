@@ -42,6 +42,18 @@ void NodeRegistry_i::deregisterNode(
 	( theNodeByNodeIdMap.find(nodeId) != theNodeByNodeIdMap.end() );
 }
 
+::lmp_node::Node_ptr NodeRegistry_i::getNode(
+  ::CORBA::Long    nodeId)
+{
+  NodeByNodeIdMap::const_iterator nodeIter = theNodeByNodeIdMap.find(nodeId);
+  if (nodeIter != theNodeByNodeIdMap.end())
+  {
+    return nodeIter->second;
+  }
+  throw lmp_node::No_Such_Entity();
+}
+
+
 void NodeRegistry_i::shutdown()
 {
   std::cout << "shutdown begin" << std::endl;

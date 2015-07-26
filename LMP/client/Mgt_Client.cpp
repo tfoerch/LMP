@@ -37,6 +37,15 @@ BOOST_AUTO_TEST_SUITE( LMPClient )
 BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
 {
   std::cout << "running test case 1\n";
+  BOOST_CHECK(theNodeRegistry->isNodeRegistered(theNodeId));
+  ::lmp_node::Node_ptr node = theNodeRegistry->getNode(theNodeId);
+  BOOST_CHECK(!CORBA::is_nil(node));
+  if (!CORBA::is_nil(node))
+  {
+	std::cout << "test case 1 node retrieved\n";
+	::lmp_ipcc::IPCC_ptr ipcc = node->createIPCC(7011, 2130706433, 2130706433, 7011, 7012);
+	BOOST_CHECK(!CORBA::is_nil(ipcc));
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
