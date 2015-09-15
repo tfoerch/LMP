@@ -43,10 +43,13 @@ namespace lmp
     	void reset();
 	  private:
         virtual void do_notifyTransition(
-      	const appl::State&   sourceState,
-  		const appl::Event&   event,
-  		const appl::State&   targetState,
-  		const appl::Action&  action);
+      	  const appl::State&   sourceState,
+  		  const appl::Event&   event,
+  		  const appl::State&   targetState,
+  		  const appl::Action&  action);
+		virtual bool is_equal(
+		  const IpccObserverIF& other) const;
+		virtual IpccObserverIF* do_clone() const;
 
         IpccImpl&            theIpcc;
         TransistionSequence  theTransitions;

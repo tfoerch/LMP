@@ -11,7 +11,7 @@
 #include <IPCC_FSM_InvokeIF.hpp>
 #include <IPCC_Msg_ReceiveIF.hpp>
 
-#include <set>
+#include <boost/ptr_container/ptr_deque.hpp>
 
 namespace lmp
 {
@@ -52,7 +52,7 @@ namespace lmp
     	const appl::State&   sourceState,
 		const appl::Event&   event,
 		const appl::State&   targetState,
-		const appl::Action&  action) const;
+		const appl::Action&  action);
       virtual void do_sendHelloMsg();
       // implement IpccMsgReceiveIF
       virtual void do_processReceivedMessage(
@@ -68,13 +68,13 @@ namespace lmp
       bool isConntentionWinning(
     	const msg::Config&  configMsg) const;
 
-      lmp::DWORD                       theLocalNodeId;
-      lmp::DWORD                       theLocalCCId;
-      bool                             theIsActiveSetup;
-      FSM_IPCC                         theFSM;
-  	  lmp::DWORD                       theTxSeqNum;
-  	  lmp::DWORD                       theRcvSeqNum;
-      std::set<appl::IpccObserverIF*>  theObservers;
+      lmp::DWORD                              theLocalNodeId;
+      lmp::DWORD                              theLocalCCId;
+      bool                                    theIsActiveSetup;
+      FSM_IPCC                                theFSM;
+  	  lmp::DWORD                              theTxSeqNum;
+  	  lmp::DWORD                              theRcvSeqNum;
+  	  boost::ptr_deque<appl::IpccObserverIF>  theObservers;
     };
   } // namespace cc
 } // namespace lmp

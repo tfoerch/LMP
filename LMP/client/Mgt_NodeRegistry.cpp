@@ -61,7 +61,7 @@ void NodeRegistry_i::shutdown()
   while (iter != theNodeByNodeIdMap.end())
   {
 	::lmp_node::Node_var  node = iter->second;
-	++iter;
+	theNodeByNodeIdMap.erase(iter++);
 	std::cout << "calling destroy" << std::endl;
 	node->destroy();
 	std::cout << "return from destroy" << std::endl;

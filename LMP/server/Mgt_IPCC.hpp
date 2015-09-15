@@ -1,6 +1,7 @@
 #include <lmp_mgtif_ipcc.hpp>
 #include <lmp_mgtif_ipcc_observer.hpp>
 #include <lmp_mgtif_node.hpp>
+#include <IPCC_Impl.hpp>
 
 #include <iostream>
 using namespace std;
@@ -25,10 +26,11 @@ public:
   virtual void deregisterObserver(::lmp_ipcc_observer::IPCCObserver_ptr observer);
 private:
   PortableServer::POA_ptr thePOA;
-  ::lmp_node::Node_ptr    theNodePtr;
+  ::lmp_node::Node_var    theNodePtr;
   ::CORBA::Long           theLocalCCId;
   ::CORBA::Long           theLocalAddress;
   ::CORBA::Short          theLocalPortNumber;
+  lmp::cc::IpccImpl       theIPCCImpl;
 };
 
 } // end namespace LMP

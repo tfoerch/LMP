@@ -3,6 +3,12 @@
 # to the root binary directory of the project as ${LMP_BINARY_DIR}.
 cmake_minimum_required (VERSION 2.8.11)
 project (lmp)
+option(USE_CLANG "build application with clang" OFF) # OFF is the default
+if(USE_CLANG)
+SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++")
+endif(USE_CLANG)
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_FLAGS "-std=c++11")
 include_directories ("${PROJECT_SOURCE_DIR}/base" "${PROJECT_SOURCE_DIR}/cc" "${PROJECT_BINARY_DIR}/idl")
 
 add_subdirectory (cc)

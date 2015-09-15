@@ -19,6 +19,7 @@
 //
 #include <Mgt_ClientFixture.hpp>
 #include <Mgt_NodeRegistry.hpp>
+#include <Mgt_IPCCObserver.hpp>
 
 #define BOOST_TEST_MODULE LMPClient
 #include <boost/test/included/unit_test.hpp>
@@ -45,6 +46,23 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
 	std::cout << "test case 1 node retrieved\n";
 	::lmp_ipcc::IPCC_ptr ipcc = node->createIPCC(7011, 2130706433, 2130706433, 7011, 7012);
 	BOOST_CHECK(!CORBA::is_nil(ipcc));
+	if (theOrb &&
+	    !CORBA::is_nil(ipcc))
+	{
+	  CORBA::ORB_var orb = *theOrb;
+	  CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
+	  PortableServer::POA_var poa = PortableServer::POA::_narrow(obj);
+
+	  lmp_ipcc_observer::IPCCObserver_i* ipccObserver =
+		new lmp_ipcc_observer::IPCCObserver_i(orb, poa);
+	  poa->activate_object(ipccObserver);
+	  lmp_ipcc_observer::IPCCObserver_ptr ipccObserverPtr = ipccObserver->_this();
+	  cout << "before register observer" << endl;
+	  ipcc->registerObserver(ipccObserverPtr);
+	  cout << "before enable" << endl;
+	  ipcc->enable();
+	  cout << "after enable" << endl;
+	}
   }
 }
 

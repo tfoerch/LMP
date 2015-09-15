@@ -4,7 +4,7 @@ find_package(Boost COMPONENTS chrono system)
 
 include_directories ("${PROJECT_SOURCE_DIR}/client")
 
-add_executable (LMPClient_T Mgt_Client.cpp  Mgt_NodeRegistry.cpp Mgt_ClientFixture.cpp)
+add_executable (LMPClient_T Mgt_Client.cpp  Mgt_NodeRegistry.cpp Mgt_IPCCObserver.cpp Mgt_ClientFixture.cpp)
 
 # Link the executable to the Hello library. Since the Hello library has
 # public include directories we will use those link directories when building

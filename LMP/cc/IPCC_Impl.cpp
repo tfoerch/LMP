@@ -77,12 +77,26 @@ namespace lmp
     void IpccImpl::registerObserver(
       appl::IpccObserverIF&  observer)
     {
-      theObservers.insert(&observer);
+      theObservers.push_back(new_clone(observer));
     }
     void IpccImpl::deregisterObserver(
   	appl::IpccObserverIF&  observer)
     {
-      theObservers.erase(&observer);
+      bool found = false;
+      boost::ptr_deque<appl::IpccObserverIF>::iterator  iter = theObservers.begin();
+      while (!found &&
+    		  iter != theObservers.end())
+      {
+        if (observer == *iter)
+        {
+          theObservers.erase(iter);
+          found = true;
+        }
+        else
+        {
+          ++iter;
+        }
+      }
     }
     bool IpccImpl::do_hasActiveSetupRole() const
     {
@@ -105,14 +119,14 @@ namespace lmp
       const appl::State&   sourceState,
       const appl::Event&   event,
       const appl::State&   targetState,
-	  const appl::Action&  action) const
+	  const appl::Action&  action)
     {
-      for (std::set<appl::IpccObserverIF*>::const_iterator iter = theObservers.begin(),
-    		                                               end_iter = theObservers.end();
+      for (boost::ptr_deque<appl::IpccObserverIF>::iterator iter = theObservers.begin(),
+    		                                                end_iter = theObservers.end();
     		  iter != end_iter;
     		  ++iter)
       {
-    	(*iter)->notifyTransition(sourceState, event, targetState, action);
+    	iter->notifyTransition(sourceState, event, targetState, action);
       }
 //        std::cout << "IPCC[" << theLocalCCId << "]." << event << ": " << sourceState << " -> " << targetState
 //        		  << " executing " << action << std::endl;

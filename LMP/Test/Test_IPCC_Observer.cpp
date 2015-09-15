@@ -47,6 +47,16 @@ namespace lmp
 								 action.getType());
     	theTransitions.push_back(transRecord);
   	  }
+      bool TestIpccObserver::is_equal(
+		  const IpccObserverIF& other) const
+      {
+        return (this == &other);
+      }
+      IpccObserverIF* TestIpccObserver::do_clone() const
+      {
+        return new TestIpccObserver(*this);
+      }
+
   	  TestIpccObserver::TransRecord::TransRecord(
 	    appl::State::Type         sourceState,
 	    appl::Event::EvType       event,

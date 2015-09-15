@@ -1,4 +1,5 @@
 #include <Mgt_IPCC.hpp>
+#include <IPCCObserverProxy.hpp>
 
 namespace lmp_ipcc
 {
@@ -10,10 +11,11 @@ IPCC_i::IPCC_i(
   ::CORBA::Long            localAddress,
   ::CORBA::Short           localPortNumber)
   : thePOA(PortableServer::POA::_duplicate(poa)),
-    theNodePtr(nodePtr),
+    theNodePtr(lmp_node::Node::_duplicate(nodePtr)),
     theLocalCCId(localCCId),
     theLocalAddress(localAddress),
-    theLocalPortNumber(localPortNumber)
+    theLocalPortNumber(localPortNumber),
+	theIPCCImpl(theNodePtr->getNodeId(), theLocalCCId, true)
 {
   cout << "IPCC(localCCId = " << localCCId
 	   << ", localAddress = " << localAddress
@@ -34,6 +36,8 @@ void IPCC_i::destroy()
 
 void IPCC_i::enable()
 {
+  cout << "Node(" << theNodePtr->getNodeId() << ").IPCC(localCCId = " << theLocalCCId << ") enable" << endl;
+  theIPCCImpl.enable();
 }
 
 void IPCC_i::disable()
@@ -43,11 +47,17 @@ void IPCC_i::disable()
 void IPCC_i::registerObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
+  // cout << "registerObserver" << endl;
+  lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
+  theIPCCImpl.registerObserver(observerProxy);
+  // cout << "registerObserver finished" << endl;
 }
 
 void IPCC_i::deregisterObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
+  lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
+  theIPCCImpl.deregisterObserver(observerProxy);
 }
 
 } // end namespace lmp_ipcc

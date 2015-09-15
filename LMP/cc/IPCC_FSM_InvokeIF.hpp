@@ -35,7 +35,7 @@ namespace lmp
         const appl::State&   sourceState,
 		const appl::Event&   event,
 		const appl::State&   targetState,
-		const appl::Action&  action) const {  do_reportTransition(sourceState, event, targetState, action); }
+		const appl::Action&  action) {  do_reportTransition(sourceState, event, targetState, action); }
       inline void sendHelloMsg() { do_sendHelloMsg(); }
       virtual ~IpccFsmInvokeIF(){}
     private:
@@ -48,7 +48,7 @@ namespace lmp
     	const appl::State&   sourceState,
 		const appl::Event&   event,
 		const appl::State&   targetState,
-		const appl::Action&  action) const = 0;
+		const appl::Action&  action) = 0;
       virtual void do_sendHelloMsg() = 0;
     };
   } // namespace cc

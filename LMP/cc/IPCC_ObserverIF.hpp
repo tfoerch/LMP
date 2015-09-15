@@ -140,6 +140,9 @@ namespace lmp
 		  const appl::Event&   event,
 		  const appl::State&   targetState,
 		  const appl::Action&  action) {  do_notifyTransition(sourceState, event, targetState, action); }
+		inline bool operator==(
+		  const IpccObserverIF& other) const { return is_equal(other); }
+		IpccObserverIF* clone() const { return do_clone(); }
 		virtual ~IpccObserverIF(){}
 	  private:
 		virtual void do_notifyTransition(
@@ -147,7 +150,14 @@ namespace lmp
 		  const appl::Event&   event,
 		  const appl::State&   targetState,
 		  const appl::Action&  action) = 0;
+		virtual bool is_equal(
+		  const IpccObserverIF& other) const = 0;
+		virtual IpccObserverIF* do_clone() const = 0;
 	  };
+	  inline IpccObserverIF* new_clone( const IpccObserverIF& observer)
+	  {
+	    return observer.clone();
+	  }
 	  std::ostream& operator<<(
 	    std::ostream&       os,
 		const Event&        event); // implemented in IPCC_Impl.cpp
