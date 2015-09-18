@@ -1,7 +1,7 @@
 #ifndef LIBS_IPCC_IMPL_HPP_
 #define LIBS_IPCC_IMPL_HPP_
 /*
- * IPCC_Impl.h
+ * IPCC_Impl.hpp
  *
  *  Created on: 19.02.2015
  *      Author: tom
