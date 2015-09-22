@@ -4,6 +4,7 @@ module lmp_ipcc_observer
 
   interface IPCCObserver
   {
+    void destroy();
     void stateHasChanged(
       in long        localCCId,
       in IPCC_State  newState);

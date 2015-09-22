@@ -44,7 +44,7 @@ namespace lmp
     	thePeerIPCCObserver->stateHasChanged(theIpcc.getLocalCCId(), ::lmp_ipcc_observer::IPCC_ConfSend);
   	  }
 	  bool IpccObserverProxy::is_equal(
-	    const IpccObserverIF& other) const
+	    const IpccObserverProxyIF& other) const
 	  {
 		try
 		{
@@ -56,7 +56,7 @@ namespace lmp
 		  return false;
 		}
 	  }
-	  lmp::cc::appl::IpccObserverIF* IpccObserverProxy::do_clone() const
+	  lmp::cc::appl::IpccObserverProxyIF* IpccObserverProxy::do_clone() const
 	  {
 		return new IpccObserverProxy(*this);
 	  }

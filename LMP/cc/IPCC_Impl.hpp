@@ -38,9 +38,9 @@ namespace lmp
       void evtDownTimer();
       boost::optional<const lmp::cc::appl::State&> getActiveState() const;
       void registerObserver(
-        appl::IpccObserverIF&  observer);
+        appl::IpccObserverProxyIF&  observer);
       void deregisterObserver(
-    	appl::IpccObserverIF&  observer);
+    	appl::IpccObserverProxyIF&  observer);
     private:
       // implement IpccFsmConnectIF
       virtual bool do_hasActiveSetupRole() const;
@@ -68,13 +68,13 @@ namespace lmp
       bool isConntentionWinning(
     	const msg::Config&  configMsg) const;
 
-      lmp::DWORD                              theLocalNodeId;
-      lmp::DWORD                              theLocalCCId;
-      bool                                    theIsActiveSetup;
-      FSM_IPCC                                theFSM;
-  	  lmp::DWORD                              theTxSeqNum;
-  	  lmp::DWORD                              theRcvSeqNum;
-  	  boost::ptr_deque<appl::IpccObserverIF>  theObservers;
+      lmp::DWORD                                   theLocalNodeId;
+      lmp::DWORD                                   theLocalCCId;
+      bool                                         theIsActiveSetup;
+      FSM_IPCC                                     theFSM;
+  	  lmp::DWORD                                   theTxSeqNum;
+  	  lmp::DWORD                                   theRcvSeqNum;
+  	  boost::ptr_deque<appl::IpccObserverProxyIF>  theObservers;
     };
   } // namespace cc
 } // namespace lmp

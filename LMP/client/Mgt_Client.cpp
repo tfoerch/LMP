@@ -62,6 +62,10 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
 	  cout << "before enable" << endl;
 	  ipcc->enable();
 	  cout << "after enable" << endl;
+	  ipcc->disable();
+
+	  ipcc->deregisterObserver(ipccObserverPtr);
+	  ipccObserverPtr->destroy();
 	}
   }
 }

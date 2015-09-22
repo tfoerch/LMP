@@ -18,11 +18,13 @@ namespace lmp
 	    IpccImpl&  ipcc)
   	    : theIpcc(ipcc)
   	  {
-  		theIpcc.registerObserver(*this);
+  		TestIpccObserverProxy  tmpObserverProxy(*this);
+  		theIpcc.registerObserver(tmpObserverProxy);
   	  }
   	  TestIpccObserver::~TestIpccObserver()
   	  {
-  		theIpcc.deregisterObserver(*this);
+    	TestIpccObserverProxy  tmpObserverProxy(*this);
+  		theIpcc.deregisterObserver(tmpObserverProxy);
   	  }
   	  const TestIpccObserver::TransistionSequence& TestIpccObserver::getTransistions() const
   	  {
@@ -47,14 +49,41 @@ namespace lmp
 								 action.getType());
     	theTransitions.push_back(transRecord);
   	  }
-      bool TestIpccObserver::is_equal(
-		  const IpccObserverIF& other) const
+
+  	  TestIpccObserverProxy::TestIpccObserverProxy(
+  	    IpccObserverIF&  observer)
+  	  : theObserver(observer)
+  	  {
+  	  }
+
+  	  TestIpccObserverProxy::~TestIpccObserverProxy()
+  	  {
+  	  }
+      void TestIpccObserverProxy::do_notifyTransition(
+    	  const appl::State&   sourceState,
+		  const appl::Event&   event,
+		  const appl::State&   targetState,
+		  const appl::Action&  action)
       {
-        return (this == &other);
+    	theObserver.notifyTransition(sourceState, event, targetState, action);
       }
-      IpccObserverIF* TestIpccObserver::do_clone() const
+
+      bool TestIpccObserverProxy::is_equal(
+		const IpccObserverProxyIF& other) const
       {
-        return new TestIpccObserver(*this);
+    	try
+    	{
+    	  const TestIpccObserverProxy&  otherTestProxy = dynamic_cast<const TestIpccObserverProxy&>(other);
+          return (&theObserver == &otherTestProxy.theObserver);
+    	}
+    	catch  (std::bad_cast&)
+    	{
+    	  return false;
+    	}
+      }
+      IpccObserverProxyIF* TestIpccObserverProxy::do_clone() const
+      {
+        return new TestIpccObserverProxy(*this);
       }
 
   	  TestIpccObserver::TransRecord::TransRecord(

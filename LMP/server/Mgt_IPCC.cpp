@@ -42,6 +42,8 @@ void IPCC_i::enable()
 
 void IPCC_i::disable()
 {
+  cout << "Node(" << theNodePtr->getNodeId() << ").IPCC(localCCId = " << theLocalCCId << ") disable" << endl;
+  theIPCCImpl.disable();
 }
 
 void IPCC_i::registerObserver(

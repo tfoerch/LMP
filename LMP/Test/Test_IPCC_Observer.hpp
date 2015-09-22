@@ -47,12 +47,27 @@ namespace lmp
   		  const appl::Event&   event,
   		  const appl::State&   targetState,
   		  const appl::Action&  action);
-		virtual bool is_equal(
-		  const IpccObserverIF& other) const;
-		virtual IpccObserverIF* do_clone() const;
 
         IpccImpl&            theIpcc;
         TransistionSequence  theTransitions;
+	  };
+      class TestIpccObserverProxy : public IpccObserverProxyIF
+	  {
+	  public:
+    	TestIpccObserverProxy(
+    	  IpccObserverIF&      observer);
+    	virtual ~TestIpccObserverProxy();
+	  private:
+        virtual void do_notifyTransition(
+      	  const appl::State&   sourceState,
+  		  const appl::Event&   event,
+  		  const appl::State&   targetState,
+  		  const appl::Action&  action);
+		virtual bool is_equal(
+		  const IpccObserverProxyIF& other) const;
+		virtual IpccObserverProxyIF* do_clone() const;
+
+		IpccObserverIF&  theObserver;
 	  };
       std::ostream& operator<<(
   	    std::ostream&                                 os,

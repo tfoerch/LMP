@@ -18,6 +18,15 @@ IPCCObserver_i::~IPCCObserver_i()
   CORBA::release(theORB);
 }
 
+void IPCCObserver_i::destroy()
+{
+  PortableServer::ObjectId* oid=thePOA->servant_to_id(this);
+  std::cout << "before deactivate_object" << std::endl;
+  thePOA->deactivate_object(*oid);  delete oid;
+  std::cout << "after deactivate_object" << std::endl;
+  // _remove_ref(); // delete this;
+}
+
 void IPCCObserver_i::stateHasChanged(
   ::CORBA::Long                    localCCId,
   ::lmp_ipcc_observer::IPCC_State  newState)

@@ -19,7 +19,7 @@ namespace lmp
     class IpccImpl;
     namespace appl
     {
-      class IpccObserverProxy : public IpccObserverIF
+      class IpccObserverProxy : public IpccObserverProxyIF
 	  {
 	  public:
     	struct TransRecord
@@ -50,8 +50,8 @@ namespace lmp
   		  const appl::State&   targetState,
   		  const appl::Action&  action);
 		virtual bool is_equal(
-		  const IpccObserverIF& other) const;
-		virtual IpccObserverIF* do_clone() const;
+		  const IpccObserverProxyIF& other) const;
+		virtual IpccObserverProxyIF* do_clone() const;
 
         IpccImpl&                            theIpcc;
         lmp_ipcc_observer::IPCCObserver_var  thePeerIPCCObserver;
