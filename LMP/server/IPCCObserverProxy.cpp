@@ -41,7 +41,32 @@ namespace lmp
 								 targetState.getType(),
 								 action.getType());
     	theTransitions.push_back(transRecord);
-    	thePeerIPCCObserver->stateHasChanged(theIpcc.getLocalCCId(), ::lmp_ipcc_observer::IPCC_ConfSend);
+    	if (sourceState != targetState)
+    	{
+    	  ::lmp_ipcc_observer::IPCC_State newState = ::lmp_ipcc_observer::IPCC_Down;
+    	  switch(targetState.getType())
+    	  {
+    	    case appl::State::Down:
+    	      newState = ::lmp_ipcc_observer::IPCC_Down;
+    	      break;
+    	    case appl::State::ConfSnd:
+      	      newState = ::lmp_ipcc_observer::IPCC_ConfSend;
+      	      break;
+    	    case appl::State::ConfRcv:
+      	      newState = ::lmp_ipcc_observer::IPCC_ConfRecv;
+      	      break;
+    	    case appl::State::Active:
+      	      newState = ::lmp_ipcc_observer::IPCC_Active;
+      	      break;
+    	    case appl::State::Up:
+      	      newState = ::lmp_ipcc_observer::IPCC_Up;
+      	      break;
+    	    case appl::State::GoingDown:
+      	      newState = ::lmp_ipcc_observer::IPCC_GoingDown;
+      	      break;
+    	  }
+    	  thePeerIPCCObserver->stateHasChanged(theIpcc.getLocalCCId(), newState);
+    	}
   	  }
 	  bool IpccObserverProxy::is_equal(
 	    const IpccObserverProxyIF& other) const

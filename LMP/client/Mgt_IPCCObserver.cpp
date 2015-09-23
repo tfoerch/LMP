@@ -31,7 +31,29 @@ void IPCCObserver_i::stateHasChanged(
   ::CORBA::Long                    localCCId,
   ::lmp_ipcc_observer::IPCC_State  newState)
 {
-  cout << "ipcc with cc-id = " << localCCId << " state has changed" << endl;
+  cout << "ipcc[" << localCCId << "].stateChanged(";
+  switch(newState)
+  {
+    case ::lmp_ipcc_observer::IPCC_Down:
+      cout << "Down";
+      break;
+    case ::lmp_ipcc_observer::IPCC_ConfSend:
+      cout << "ConfSend";
+      break;
+    case ::lmp_ipcc_observer::IPCC_ConfRecv:
+      cout << "onfRecv";
+      break;
+    case ::lmp_ipcc_observer::IPCC_Active:
+      cout << "Active";
+      break;
+    case ::lmp_ipcc_observer::IPCC_Up:
+      cout << "Up";
+      break;
+    case ::lmp_ipcc_observer::IPCC_GoingDown:
+      cout << "GoingDown";
+      break;
+  }
+  cout << ")" << endl;
 }
 
 void IPCCObserver_i::peerIpccDiscovered(
