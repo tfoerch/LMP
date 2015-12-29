@@ -1,4 +1,5 @@
 #include <Mgt_NodeRegistry.hpp>
+#include <iostream>
 
 //static CORBA::Boolean bindObjectToName(CORBA::ORB_ptr, CORBA::Object_ptr);
 
@@ -23,7 +24,7 @@ NodeRegistry_i::~NodeRegistry_i()
 void NodeRegistry_i::registerNode(
   ::lmp_node::Node_ptr  aNode)
 {
-  cout << "node with node-id = " << aNode->getNodeId() << " registered" << endl;
+  std::cout << "node with node-id = " << aNode->getNodeId() << " registered" << std::endl;
   theNodeByNodeIdMap.insert(NodeByNodeIdMap::value_type(aNode->getNodeId(), ::lmp_node::Node::_duplicate(aNode)));
 }
 
@@ -89,7 +90,7 @@ void NodeRegistry_i::shutdown()
 //
 //    CORBA::String_var x;
 //    x = orb->object_to_string(obj);
-//    cout << x << endl;
+//    std::cout << x << endl;
 //
 //    if( !bindObjectToName(orb, obj) )
 //      return 1;

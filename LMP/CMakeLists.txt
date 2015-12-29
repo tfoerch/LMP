@@ -1,14 +1,21 @@
 # CMakeLists files in this project can
 # refer to the root source directory of the project as ${LMP_SOURCE_DIR} and
 # to the root binary directory of the project as ${LMP_BINARY_DIR}.
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required (VERSION 3.3)
 project (lmp)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
 if(USE_CLANG)
-SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++")
+SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++-3.8")
+SET (CMAKE_C_COMPILER               "/usr/bin/clang-3.8")
 endif(USE_CLANG)
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_FLAGS "-std=c++11")
+find_program(iwyu_path NAMES include-what-you-use iwyu)
+option(USE_IWYU "build application with iwyu analysis" OFF) # OFF is the default
+#find_package(cppcheck)
+#include(CppcheckTargets)
+
 include_directories ("${PROJECT_SOURCE_DIR}/base" "${PROJECT_SOURCE_DIR}/cc" "${PROJECT_BINARY_DIR}/idl")
 
 add_subdirectory (cc)
@@ -16,6 +23,8 @@ add_subdirectory (Test)
 add_subdirectory (idl)
 add_subdirectory (server)
 add_subdirectory (client)
+
+enable_testing()
 
 SET(MAJOR_VERSION "0")
 SET(MINOR_VERSION "2")

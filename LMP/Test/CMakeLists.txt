@@ -2,9 +2,19 @@
 include_directories ("${PROJECT_SOURCE_DIR}/Test")
 
 add_executable (LMP_T Test_IPCC_Observer.cpp  TestMain.cpp)
+#include(CppcheckTargets)
+#add_cppcheck(LMP_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
+
+if(USE_IWYU)
+set_property(TARGET LMP_T PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+endif(USE_IWYU)
 
 # Link the executable to the Hello library. Since the Hello library has
 # public include directories we will use those link directories when building
 target_link_libraries (LMP_T LINK_PUBLIC lmp_cc)
+
+enable_testing()
+
+add_test(NAME unitTest COMMAND LMP_T --log_level=test_suite)
 
 INSTALL(TARGETS LMP_T DESTINATION bin)

@@ -1,8 +1,7 @@
 #include <lmp_mgtif_ipcc_observer.hpp>
 
-#include <iostream>
-#include <map>
-using namespace std;
+#include <omniORB4/CORBA.h>              // for ORB_ptr
+#include <omniORB4/poa.h>                    // for POA_ptr, etc
 
 namespace lmp_ipcc_observer
 {

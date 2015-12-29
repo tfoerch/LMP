@@ -24,6 +24,7 @@
 #define BOOST_TEST_MODULE LMPClient
 #include <boost/test/included/unit_test.hpp>
 
+#include <iostream>
 
 struct MyConfig {
     MyConfig()   { std::cout << "global setup\n"; }
@@ -57,11 +58,11 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
 		new lmp_ipcc_observer::IPCCObserver_i(orb, poa);
 	  poa->activate_object(ipccObserver);
 	  lmp_ipcc_observer::IPCCObserver_ptr ipccObserverPtr = ipccObserver->_this();
-	  cout << "before register observer" << endl;
+	  std::cout << "before register observer" << std::endl;
 	  ipcc->registerObserver(ipccObserverPtr);
-	  cout << "before enable" << endl;
+	  std::cout << "before enable" << std::endl;
 	  ipcc->enable();
-	  cout << "after enable" << endl;
+	  std::cout << "after enable" << std::endl;
 	  ipcc->disable();
 
 	  ipcc->deregisterObserver(ipccObserverPtr);

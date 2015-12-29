@@ -1,4 +1,5 @@
 #include <Mgt_IPCCObserver.hpp>
+#include <iostream>
 
 namespace lmp_ipcc_observer
 {
@@ -31,29 +32,29 @@ void IPCCObserver_i::stateHasChanged(
   ::CORBA::Long                    localCCId,
   ::lmp_ipcc_observer::IPCC_State  newState)
 {
-  cout << "ipcc[" << localCCId << "].stateChanged(";
+  std::cout << "ipcc[" << localCCId << "].stateChanged(";
   switch(newState)
   {
     case ::lmp_ipcc_observer::IPCC_Down:
-      cout << "Down";
+      std::cout << "Down";
       break;
     case ::lmp_ipcc_observer::IPCC_ConfSend:
-      cout << "ConfSend";
+      std::cout << "ConfSend";
       break;
     case ::lmp_ipcc_observer::IPCC_ConfRecv:
-      cout << "onfRecv";
+      std::cout << "onfRecv";
       break;
     case ::lmp_ipcc_observer::IPCC_Active:
-      cout << "Active";
+      std::cout << "Active";
       break;
     case ::lmp_ipcc_observer::IPCC_Up:
-      cout << "Up";
+      std::cout << "Up";
       break;
     case ::lmp_ipcc_observer::IPCC_GoingDown:
-      cout << "GoingDown";
+      std::cout << "GoingDown";
       break;
   }
-  cout << ")" << endl;
+  std::cout << ")" << std::endl;
 }
 
 void IPCCObserver_i::peerIpccDiscovered(
@@ -85,7 +86,7 @@ void IPCCObserver_i::peerIpccDiscovered(
 //
 //    CORBA::String_var x;
 //    x = orb->object_to_string(obj);
-//    cout << x << endl;
+//    std::cout << x << endl;
 //
 //    if( !bindObjectToName(orb, obj) )
 //      return 1;

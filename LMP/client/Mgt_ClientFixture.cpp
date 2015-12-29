@@ -1,22 +1,32 @@
 
 #include <Mgt_ClientFixture.hpp>
-#include <lmp_mgtif_node_registry.hpp>
-#include <lmp_mgtif_node.hpp>
 #include <Mgt_NodeRegistry.hpp>
+#include <omniORB4/CORBA.h>
+#include <omniORB4/poa.h>                         // for POA_var, POA, etc
+#include <omniORB4/templatedecls.h>
+#include <omniORB4/templatedefns.h>
+#include <omniORB4/userexception.h>               // for TRANSIENT
 
 #include <boost/test/unit_test_suite.hpp>
 // #include <boost/test/included/unit_test.hpp>
-#include <boost/chrono/chrono_io.hpp>
+
+#include <boost/chrono/duration.hpp>              // for duration, etc
+#include <boost/chrono/io_v1/chrono_io.hpp>       // for operator<<
+#include <boost/chrono/system_clocks.hpp>         // for steady_clock, etc
+#include <boost/chrono/time_point.hpp>            // for operator+, etc
+// #include <boost/chrono/chrono_io.hpp>
+#include <iostream>
+#include <sstream>
 #include <cstdlib>
 #include <cstdio>
-#include <iostream>
+#include <unistd.h>                               // for execve, fork
 #include <sys/wait.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <ifaddrs.h>
-#include <errno.h>
+// #include <sys/socket.h>
+// #include <netinet/in.h>
+// #include <arpa/inet.h>
+// #include <net/if.h>
+// #include <ifaddrs.h>
+// #include <errno.h>
 
 LaunchServer::LaunchServer()
   : theNodeRegistry(0),
@@ -45,8 +55,8 @@ LaunchServer::LaunchServer()
 	  obj = theNodeRegistry->_this();
 
 	  CORBA::String_var x = orb->object_to_string(obj);
-	  ostringstream registryURIStream;
-	  registryURIStream << x << ends;
+	  std::ostringstream registryURIStream;
+	  registryURIStream << x << std::ends;
 
 	  PortableServer::POAManager_var pman = poa->the_POAManager();
 	  pman->activate();
@@ -67,18 +77,18 @@ LaunchServer::LaunchServer()
 	  {
 		boost::chrono::steady_clock::time_point expireTime =
           boost::chrono::steady_clock::now() + boost::chrono::milliseconds(500);
-		cout << boost::chrono::steady_clock::now() << ": enter while" << endl;
+		std::cout << boost::chrono::steady_clock::now() << ": enter while" << std::endl;
 		while (boost::chrono::steady_clock::now() < expireTime)
 		{
-		  // cout << boost::chrono::steady_clock::now() << ": checking work_pending()" << endl;
+		  // std::cout << boost::chrono::steady_clock::now() << ": checking work_pending()" << std::endl;
 		  if (orb->work_pending())
 		  {
-			cout << boost::chrono::steady_clock::now() << ": enter perform_work()" << endl;
+			std::cout << boost::chrono::steady_clock::now() << ": enter perform_work()" << std::endl;
             orb->perform_work();
-            cout << boost::chrono::steady_clock::now() << ": leaving perform_work()" << endl;
+            std::cout << boost::chrono::steady_clock::now() << ": leaving perform_work()" << std::endl;
 		  };
 		}
-		cout << boost::chrono::steady_clock::now() << ": leaving while" << endl;
+		std::cout << boost::chrono::steady_clock::now() << ": leaving while" << std::endl;
 		//theNodeRegistry->isNodeRegistered(theNodeId);
 
 	  }
@@ -88,8 +98,8 @@ LaunchServer::LaunchServer()
 		const char serverPath[] = "/home/tom/build/LMP/server/LMPServer_T";
 		const char nodeIdOptStr[] = "--node-id";
 		const char nodeRegistryOptStr[] = "--node-registry";
-		ostringstream nodeIdStream;
-		nodeIdStream << theNodeId << ends;
+		std::ostringstream nodeIdStream;
+		nodeIdStream << theNodeId << std::ends;
 		const char* newargv[] =
           { serverPath,
             serverPath,
@@ -99,12 +109,12 @@ LaunchServer::LaunchServer()
 			registryURIStream.str().c_str(),
 			NULL
           };
-//      cout << newargv[0] << " "
+//      std::cout << newargv[0] << " "
 //    	   << newargv[1] << " "
 //    	   << newargv[2] << " "
 //    	   << newargv[3] << " "
 //    	   << newargv[4] << " "
-//    	   << newargv[5] << endl;
+//    	   << newargv[5] << std::endl;
 		char* newenviron[] = { NULL };
 //      newargv[3] = nodeIdStream.str().c_str();
 //      newargv[5] = registryURIStream.str().c_str();
@@ -118,23 +128,23 @@ LaunchServer::LaunchServer()
   }
   catch(CORBA::TRANSIENT&)
   {
-    cerr << "Caught system exception TRANSIENT -- unable to contact the "
-         << "server." << endl;
+    std::cerr << "Caught system exception TRANSIENT -- unable to contact the "
+         << "server." << std::endl;
   }
   catch(CORBA::SystemException& ex)
   {
-    cerr << "Caught a CORBA::" << ex._name() << endl;
+    std::cerr << "Caught a CORBA::" << ex._name() << std::endl;
   }
   catch(CORBA::Exception& ex)
   {
-    cerr << "Caught CORBA::Exception: " << ex._name() << endl;
+    std::cerr << "Caught CORBA::Exception: " << ex._name() << std::endl;
   }
   catch(omniORB::fatalException& fe)
   {
-    cerr << "Caught omniORB::fatalException:" << endl;
-    cerr << "  file: " << fe.file() << endl;
-    cerr << "  line: " << fe.line() << endl;
-    cerr << "  mesg: " << fe.errmsg() << endl;
+    std::cerr << "Caught omniORB::fatalException:" << std::endl;
+    std::cerr << "  file: " << fe.file() << std::endl;
+    std::cerr << "  line: " << fe.line() << std::endl;
+    std::cerr << "  mesg: " << fe.errmsg() << std::endl;
   }
 }
 

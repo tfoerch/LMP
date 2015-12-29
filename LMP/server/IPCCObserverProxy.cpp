@@ -1,6 +1,10 @@
 
 #include <IPCCObserverProxy.hpp>
 #include <IPCC_Impl.hpp>
+#include "lmp_mgtif_ipcc_observer.hpp"  // for IPCCObserver_var, etc
+#include <iostream>                     // for operator<<, ostream, etc
+#include <typeinfo>                     // for bad_cast
+
 
 namespace lmp
 {

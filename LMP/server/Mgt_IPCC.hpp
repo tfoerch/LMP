@@ -3,8 +3,8 @@
 #include <lmp_mgtif_node.hpp>
 #include <IPCC_Impl.hpp>
 
-#include <iostream>
-using namespace std;
+#include <omniORB4/CORBA.h>  // for Long, Short
+#include <omniORB4/poa.h>                    // for POA_ptr
 
 namespace lmp_ipcc
 {

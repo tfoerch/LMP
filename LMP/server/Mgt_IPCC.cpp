@@ -1,6 +1,8 @@
 #include <Mgt_IPCC.hpp>
 #include <IPCCObserverProxy.hpp>
 
+#include <iostream>                     // for operator<<, etc
+
 namespace lmp_ipcc
 {
 
@@ -17,9 +19,9 @@ IPCC_i::IPCC_i(
     theLocalPortNumber(localPortNumber),
 	theIPCCImpl(theNodePtr->getNodeId(), theLocalCCId, true)
 {
-  cout << "IPCC(localCCId = " << localCCId
+  std::cout << "IPCC(localCCId = " << localCCId
 	   << ", localAddress = " << localAddress
-	   << ", localPortNumber = " << localPortNumber << ')' << endl;
+	   << ", localPortNumber = " << localPortNumber << ')' << std::endl;
 }
 
 IPCC_i::~IPCC_i()
@@ -36,23 +38,23 @@ void IPCC_i::destroy()
 
 void IPCC_i::enable()
 {
-  cout << "Node(" << theNodePtr->getNodeId() << ").IPCC(localCCId = " << theLocalCCId << ") enable" << endl;
+  std::cout << "Node(" << theNodePtr->getNodeId() << ").IPCC(localCCId = " << theLocalCCId << ") enable" << std::endl;
   theIPCCImpl.enable();
 }
 
 void IPCC_i::disable()
 {
-  cout << "Node(" << theNodePtr->getNodeId() << ").IPCC(localCCId = " << theLocalCCId << ") disable" << endl;
+  std::cout << "Node(" << theNodePtr->getNodeId() << ").IPCC(localCCId = " << theLocalCCId << ") disable" << std::endl;
   theIPCCImpl.disable();
 }
 
 void IPCC_i::registerObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
-  // cout << "registerObserver" << endl;
+  // std::cout << "registerObserver" << std::endl;
   lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
   theIPCCImpl.registerObserver(observerProxy);
-  // cout << "registerObserver finished" << endl;
+  // std::cout << "registerObserver finished" << std::endl;
 }
 
 void IPCC_i::deregisterObserver(

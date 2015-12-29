@@ -11,6 +11,8 @@
 #include <lmp_mgtif_ipcc_observer.hpp>
 
 #include <deque>
+#include <iosfwd>                       // for ostream
+#include <memory>                       // for allocator
 
 namespace lmp
 {

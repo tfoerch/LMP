@@ -6,6 +6,13 @@ include_directories ("${PROJECT_SOURCE_DIR}/server")
 
 add_executable (LMPServer_T Mgt_Node.cpp Mgt_IPCC.cpp Mgt_Neighbor.cpp  IPCCObserverProxy.cpp ServerMain.cpp)
 
+#include(CppcheckTargets)
+#add_cppcheck(LMPServer_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
+
+if(USE_IWYU)
+set_property(TARGET LMPServer_T PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+endif(USE_IWYU)
+
 # Link the executable to the Hello library. Since the Hello library has
 # public include directories we will use those link directories when building
 target_link_libraries (LMPServer_T LINK_PUBLIC lmp_cc lmp_mgtif omniORB4 omnithread ${Boost_LIBRARIES} )

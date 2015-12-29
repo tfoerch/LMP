@@ -5,30 +5,44 @@
  *      Author: tom
  */
 
-#include <IPCC_FSM.hpp>
+#include "IPCC_FSM.hpp"
+#include "IPCC_ObserverIF.hpp"                            // for Action, etc
+#include "IPCC_FSM_InvokeIF.hpp"
 
 #define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
 #define BOOST_MPL_LIMIT_VECTOR_SIZE 40
 #define BOOST_MPL_LIMIT_MAP_SIZE 40
 
-#include <IPCC_FSM_InvokeIF.hpp>
-// back-end
+#include <boost/core/ref.hpp>
+#include <boost/mpl/aux_/adl_barrier.hpp>                 // for mpl
+#include <boost/mpl/vector.hpp>                           // for vector
+#include <boost/msm/active_state_switching_policies.hpp>  // for msm
+#include <boost/msm/back/args.hpp>                        // for args
 #include <boost/msm/back/state_machine.hpp>
 //front-end
-#include <boost/msm/front/state_machine_def.hpp>
-// functors
 #include <boost/msm/front/functor_row.hpp>
-#include <boost/msm/front/euml/common.hpp>
-// for And_ operator
-#include <boost/msm/front/euml/operator.hpp>
-// for func_state and func_state_machine
-#include <boost/msm/front/euml/state_grammar.hpp>
+#include <boost/msm/front/state_machine_def.hpp>
+#include <boost/msm/front/states.hpp>                     // for state
+//#include <boost/smart_ptr/detail/operator_bool.hpp>
+#include <iostream>                                       // for operator<<, etc
+#include <typeinfo>                                       // for type_info
+
+namespace boost
+{
+  namespace msm
+  {
+  	namespace front
+	{
+      struct none;
+	}
+  }
+}
 
 namespace msm = boost::msm;
 namespace mpl = boost::mpl;
 using namespace msm::front;
 // for And_ operator
-using namespace msm::front::euml;
+//using namespace msm::front::euml;
 
 namespace lmp
 {
@@ -55,7 +69,7 @@ namespace lmp
     // front-end: define the FSM structure
     struct cc_fsm_ : public msm::front::state_machine_def<cc_fsm_, my_visitable_state>
     {
-      cc_fsm_(IpccFsmInvokeIF&  ipcc);
+      explicit cc_fsm_(IpccFsmInvokeIF&  ipcc);
       IpccFsmInvokeIF&  theIPCC;
       // states
       struct Down_tag {};

@@ -8,8 +8,8 @@
  */
 
 #include <IPCC_ObserverIF.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/optional.hpp>
+#include <boost/optional/optional.hpp>     // for optional
+#include <boost/smart_ptr/shared_ptr.hpp>  // for shared_ptr
 
 namespace lmp
 {
@@ -68,7 +68,7 @@ namespace lmp
     class EvContenLost
 	{
 	public:
-      EvContenLost(const msg::Config&  configMsg)
+      explicit EvContenLost(const msg::Config&  configMsg)
 	  : theConfigMsg(configMsg)
 	  {}
       const msg::Config&  theConfigMsg;
@@ -122,7 +122,7 @@ namespace lmp
     class FSM_IPCC
     {
     public:
-      FSM_IPCC(
+      explicit FSM_IPCC(
         IpccFsmInvokeIF&  ipcc);
       // forward-declare nested type. This will inherit msm::back::state_machine<...>
       bool start();

@@ -5,9 +5,16 @@
  *      Author: tom
  */
 
-#include <IPCC_Impl.hpp>
-
+#include "IPCC_Impl.hpp"
+#include "IPCC_FSM.hpp"
+#include "IPCC_Msg_ReceiveIF.hpp"
+#include "IPCC_ObserverIF.hpp"
+#include <boost/core/explicit_operator_bool.hpp>
+#include <boost/ptr_container/detail/reversible_ptr_container.hpp>
+#include <boost/ptr_container/detail/void_ptr_iterator.hpp>
+#include <deque>
 #include <limits>
+#include <ostream>
 
 namespace lmp
 {

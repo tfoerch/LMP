@@ -10,13 +10,21 @@
 #include <IPCC_FSM.hpp>
 #include <IPCC_FSM_InvokeIF.hpp>
 #include <IPCC_Msg_ReceiveIF.hpp>
-
-#include <boost/ptr_container/ptr_deque.hpp>
+#include <boost/optional/optional.hpp>        // for optional
+#include <boost/ptr_container/ptr_deque.hpp>  // for ptr_deque
+#include "ProtocolTypes.hpp"                  // for DWORD
 
 namespace lmp
 {
   namespace cc
   {
+    namespace appl
+	{
+      class Action;
+      class Event;
+      class IpccObserverProxyIF;
+      class State;
+	}
     class IpccImpl : public IpccFsmInvokeIF,
                      public IpccMsgReceiveIF
     {

@@ -1,8 +1,8 @@
 #include <lmp_mgtif_neighbor.hpp>
 #include <lmp_mgtif_node.hpp>
 
-#include <iostream>
-using namespace std;
+#include <omniORB4/CORBA.h>  // for Long
+#include <omniORB4/poa.h>                    // for POA_ptr
 
 namespace lmp_neighbor
 {

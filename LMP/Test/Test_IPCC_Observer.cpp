@@ -7,6 +7,9 @@
 
 #include <Test_IPCC_Observer.hpp>
 #include <IPCC_Impl.hpp>
+#include "IPCC_ObserverIF.hpp"  // for operator<<, State, Action, Event, etc
+#include <iostream>             // for operator<<, ostream, basic_ostream, etc
+#include <typeinfo>             // for bad_cast
 
 namespace lmp
 {

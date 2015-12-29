@@ -1,4 +1,7 @@
 #include <Mgt_Neighbor.hpp>
+#include "lmp_mgtif_node.hpp"  // for Node_ptr, _objref_Node
+
+#include <iostream>
 
 namespace lmp_neighbor
 {
@@ -11,7 +14,7 @@ Neighbor_i::Neighbor_i(
   theNodePtr(nodePtr),
   theRemoteNodeId(remoteNodeId)
 {
-  cout << "Neighbor(remoteNodeId = " << remoteNodeId << ')' << endl;
+  std::cout << "Neighbor(remoteNodeId = " << remoteNodeId << ')' << std::endl;
 }
 
 Neighbor_i::~Neighbor_i()

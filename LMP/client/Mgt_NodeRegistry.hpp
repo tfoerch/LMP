@@ -1,9 +1,9 @@
 #include <lmp_mgtif_node_registry.hpp>
 #include <lmp_mgtif_node.hpp>
 
-#include <iostream>
+#include <omniORB4/CORBA.h>                  // for ORB_ptr
+#include <omniORB4/poa.h>                    // for POA_ptr
 #include <map>
-using namespace std;
 
 namespace lmp_node_registry
 {

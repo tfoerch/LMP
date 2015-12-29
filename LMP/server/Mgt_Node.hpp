@@ -1,9 +1,11 @@
 #include <lmp_mgtif_node.hpp>
 #include <lmp_mgtif_node_registry.hpp>
+#include "lmp_mgtif_ipcc.hpp"                // for IPCC_var, IPCC_ptr
+#include "lmp_mgtif_neighbor.hpp"            // for Neighbor_var, etc
 
-#include <iostream>
+#include <omniORB4/CORBA.h>                  // for ORB_ptr
+#include <omniORB4/poa.h>                    // for POA_ptr
 #include <map>
-using namespace std;
 
 namespace lmp_node
 {

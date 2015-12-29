@@ -10,6 +10,8 @@
 #include <IPCC_ObserverIF.hpp>
 
 #include <deque>
+#include <iosfwd>               // for ostream
+#include <memory>               // for allocator
 
 namespace lmp
 {
@@ -36,7 +38,7 @@ namespace lmp
   	      appl::Action::ActionType  theAction;
 		};
     	typedef  std::deque<TransRecord>  TransistionSequence;
-    	TestIpccObserver(
+    	explicit TestIpccObserver(
     	  IpccImpl&  ipcc);
     	virtual ~TestIpccObserver();
     	const TransistionSequence& getTransistions() const;
@@ -54,7 +56,7 @@ namespace lmp
       class TestIpccObserverProxy : public IpccObserverProxyIF
 	  {
 	  public:
-    	TestIpccObserverProxy(
+    	explicit TestIpccObserverProxy(
     	  IpccObserverIF&      observer);
     	virtual ~TestIpccObserverProxy();
 	  private:
