@@ -211,9 +211,7 @@ function(add_cppcheck _name)
 			FAIL_REGULAR_EXPRESSION
 			"${CPPCHECK_FAIL_REGULAR_EXPRESSION}")
 
-		add_custom_command(TARGET
-			all_cppcheck
-			PRE_BUILD
+		add_custom_target(${_name}_cppcheck
 			COMMAND
 			${CPPCHECK_EXECUTABLE}
 			${CPPCHECK_QUIET_ARG}
@@ -226,6 +224,11 @@ function(add_cppcheck _name)
 			COMMENT
 			"${_name}_cppcheck: Running cppcheck on target ${_name}..."
 			VERBATIM)
+			
+                set_target_properties(${_name}_cppcheck PROPERTIES EXCLUDE_FROM_ALL true)
+                
+                add_dependencies(all_cppcheck ${_name}_cppcheck)
+                
 	endif()
 
 endfunction()

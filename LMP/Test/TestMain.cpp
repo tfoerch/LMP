@@ -8,8 +8,9 @@
 #include <IPCC_Impl.hpp>
 #include <Test_IPCC_Observer.hpp>
 
-#define BOOST_TEST_MODULE Routing
-#include <boost/test/included/unit_test.hpp>
+#define BOOST_TEST_MODULE LMP
+#include <BoostTestTargetConfig.h>
+// #include <boost/test/included/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE( lmp_ipcc_active )
 

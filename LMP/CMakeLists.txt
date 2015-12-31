@@ -13,8 +13,11 @@ set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_FLAGS "-std=c++11")
 find_program(iwyu_path NAMES include-what-you-use iwyu)
 option(USE_IWYU "build application with iwyu analysis" OFF) # OFF is the default
-#find_package(cppcheck)
-#include(CppcheckTargets)
+
+set (BUILD_TESTING ON)
+set (Boost_TEST_FLAGS "--catch_system_error=yes --log_level=test_suite")
+include(BoostTestTargets)
+include(CppcheckTargets)
 
 include_directories ("${PROJECT_SOURCE_DIR}/base" "${PROJECT_SOURCE_DIR}/cc" "${PROJECT_BINARY_DIR}/idl")
 

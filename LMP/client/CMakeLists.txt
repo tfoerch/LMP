@@ -6,8 +6,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/client")
 
 add_executable (LMPClient_T Mgt_Client.cpp  Mgt_NodeRegistry.cpp Mgt_IPCCObserver.cpp Mgt_ClientFixture.cpp)
 
-#include(CppcheckTargets)
-#add_cppcheck(LMPClient_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
+add_cppcheck(LMPClient_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 
 if(USE_IWYU)
 set_property(TARGET LMPClient_T PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
