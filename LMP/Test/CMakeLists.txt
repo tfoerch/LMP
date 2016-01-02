@@ -1,11 +1,12 @@
 # Add executable called "LMP_T" that is built from the source files
 include_directories ("${PROJECT_SOURCE_DIR}/Test")
 
+find_package(Boost COMPONENTS system)
 #add_executable (LMP_T Test_IPCC_Observer.cpp TestMain.cpp)
 enable_testing()
 add_boost_test(LMP_T
                SOURCES Test_IPCC_Observer.cpp TestMain.cpp
-               LIBRARIES lmp_cc)
+               LIBRARIES lmp_cc lmp_base ${Boost_LIBRARIES})
 #add_test(unitTest LMP_T)
 #include(CppcheckTargets)
 #add_cppcheck(LMP_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)

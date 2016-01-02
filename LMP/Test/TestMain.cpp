@@ -6,11 +6,79 @@
  */
 
 #include <IPCC_Impl.hpp>
+#include <IPCC_NetIFSocket.hpp>
 #include <Test_IPCC_Observer.hpp>
+#include <Node.hpp>
+
+#include <boost/asio/io_service.hpp>
 
 #define BOOST_TEST_MODULE LMP
 #include <BoostTestTargetConfig.h>
 // #include <boost/test/included/unit_test.hpp>
+
+BOOST_AUTO_TEST_SUITE( node )
+
+BOOST_AUTO_TEST_CASE( node_methods )
+{
+  lmp::node::Node  node(123, boost::asio::ip::address::from_string("192.168.2.104"));
+  BOOST_CHECK_EQUAL(node.getNodeId(), 123UL);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE( lmp_socket )
+
+BOOST_AUTO_TEST_CASE( getIfAddress )
+{
+  {
+	std::string ifName = "virbr0";
+	lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+	BOOST_CHECK(addr.first);
+	if (addr.first)
+	{
+	  // std::cout << *addr.first << std::endl;
+	  BOOST_CHECK_EQUAL(*addr.first, boost::asio::ip::address::from_string("192.168.122.1"));
+	}
+	BOOST_CHECK(!addr.second);
+  }
+  {
+	std::string ifName = "lo";
+	lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+	BOOST_CHECK(addr.first);
+	if (addr.first)
+	{
+	  // std::cout << *addr.first << std::endl;
+	  BOOST_CHECK_EQUAL(*addr.first, boost::asio::ip::address::from_string("127.0.0.1"));
+	}
+	BOOST_CHECK(addr.second);
+	if (addr.second)
+	{
+	  // std::cout << *addr.second << std::endl;
+	  BOOST_CHECK_EQUAL(*addr.second, boost::asio::ip::address::from_string("::1"));
+	}
+  }
+}
+
+BOOST_AUTO_TEST_CASE( bind_socket_to_netif)
+{
+  unsigned short port = 9701;
+  std::string ifName = "virbr0";
+
+  boost::asio::io_service io_service;
+  lmp::cc::IpccImpl  activeIPCC(123, port, true);
+  lmp::cc::NetworkIFSocket  lmpSocket(io_service, port, ifName, activeIPCC);
+
+  std::stringstream message;
+  message << "test message 1" << std::ends;
+
+  boost::asio::ip::udp::endpoint remote_endpoint(boost::asio::ip::address::from_string("224.0.0.1"),
+		                                         port);
+  lmpSocket.send(message.str().c_str(), message.str().length(), remote_endpoint);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
 
 BOOST_AUTO_TEST_SUITE( lmp_ipcc_active )
 

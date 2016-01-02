@@ -21,6 +21,7 @@ include(CppcheckTargets)
 
 include_directories ("${PROJECT_SOURCE_DIR}/base" "${PROJECT_SOURCE_DIR}/cc" "${PROJECT_BINARY_DIR}/idl")
 
+add_subdirectory (base)
 add_subdirectory (cc)
 add_subdirectory (Test)
 add_subdirectory (idl)
