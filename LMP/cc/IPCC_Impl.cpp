@@ -56,7 +56,7 @@ namespace lmp
       return theLocalCCId;
     }
     void IpccImpl::reconfigure(
-      const msg::HelloConfig&  helloConfig)
+      const obj::HelloConfig&  helloConfig)
     {
       theFSM.process_event(EvReconfig());
     }

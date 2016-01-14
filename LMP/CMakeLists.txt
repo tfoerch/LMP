@@ -5,12 +5,14 @@ cmake_minimum_required (VERSION 3.3)
 project (lmp)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_FLAGS "-std=c++11")
 if(USE_CLANG)
 SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++-3.8")
 SET (CMAKE_C_COMPILER               "/usr/bin/clang-3.8")
+set (CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libc++")
+set (CMAKE_EXE_LINKER_FLAGS "-lc++ -lc++abi -v")
 endif(USE_CLANG)
-set (CMAKE_CXX_STANDARD 11)
-set (CMAKE_CXX_FLAGS "-std=c++11")
 find_program(iwyu_path NAMES include-what-you-use iwyu)
 option(USE_IWYU "build application with iwyu analysis" OFF) # OFF is the default
 
@@ -19,9 +21,15 @@ set (Boost_TEST_FLAGS "--catch_system_error=yes --log_level=test_suite")
 include(BoostTestTargets)
 include(CppcheckTargets)
 
-include_directories ("${PROJECT_SOURCE_DIR}/base" "${PROJECT_SOURCE_DIR}/cc" "${PROJECT_BINARY_DIR}/idl")
+include_directories ("${PROJECT_SOURCE_DIR}/base"
+                     "${PROJECT_SOURCE_DIR}/obj"
+                     "${PROJECT_SOURCE_DIR}/msg"
+                     "${PROJECT_SOURCE_DIR}/cc"
+                     "${PROJECT_BINARY_DIR}/idl")
 
 add_subdirectory (base)
+add_subdirectory (obj)
+add_subdirectory (msg)
 add_subdirectory (cc)
 add_subdirectory (Test)
 add_subdirectory (idl)

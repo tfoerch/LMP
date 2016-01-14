@@ -10,6 +10,10 @@
 #include <IPCC_FSM.hpp>
 #include <IPCC_FSM_InvokeIF.hpp>
 #include <IPCC_Msg_ReceiveIF.hpp>
+#include <Config.hpp>
+#include <ConfigAck.hpp>
+#include <ConfigNack.hpp>
+#include <Hello.hpp>
 #include <boost/optional/optional.hpp>        // for optional
 #include <boost/ptr_container/ptr_deque.hpp>  // for ptr_deque
 #include "ProtocolTypes.hpp"                  // for DWORD
@@ -39,7 +43,7 @@ namespace lmp
       lmp::DWORD  getLocalNodeId() const;
       lmp::DWORD  getLocalCCId() const;
       void reconfigure(
-        const msg::HelloConfig&  helloConfig);
+        const obj::HelloConfig&  helloConfig);
       void evtCCDown();
       void evtConfRet();
       void evtHelloRet();

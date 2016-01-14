@@ -1,5 +1,5 @@
-#ifndef LIBS_IPCC_MSG_RECEIVEIF_HPP_
-#define LIBS_IPCC_MSG_RECEIVEIF_HPP_
+#ifndef LMP_CC_MSG_RECEIVEIF_HPP_
+#define LMP_CC_MSG_RECEIVEIF_HPP_
 /*
  * IPCC_Msg_ReceiveIF.hpp
  *
@@ -10,49 +10,13 @@
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp
 {
+  namespace obj { class HelloConfig; }
   namespace msg
   {
-    class HelloConfig
-	{
-	public:
-      HelloConfig(
-    	lmp::WORD  helloIntv,
-		lmp::WORD  helloDeadIntv)
-	  : theHelloIntv(helloIntv),
-		theHelloDeadIntv(helloDeadIntv)
-	  {}
-  	  lmp::WORD  theHelloIntv;
-      lmp::WORD  theHelloDeadIntv;
-	};
-    class Config
-	{
-	public:
-      Config(
-        lmp::DWORD          localNodeId,
-		lmp::DWORD          localCCId,
-		const HelloConfig&  helloConfig)
-	  : theLocalNodeId(localNodeId),
-		theLocalCCId(localCCId),
-		theHelloConfig(helloConfig)
-	  {}
-	  lmp::DWORD   theLocalNodeId;
-	  lmp::DWORD   theLocalCCId;
-	  HelloConfig  theHelloConfig;
-	};
-    class ConfigAck{};
-    class ConfigNack{};
-    class Hello
-    {
-	public:
-      Hello(
-        lmp::DWORD   txSeqNum,
-		lmp::DWORD   rcvSeqNum)
-	  : theTxSeqNum(txSeqNum),
-		theRcvSeqNum(rcvSeqNum)
-	  {}
-  	  lmp::DWORD   theTxSeqNum;
-  	  lmp::DWORD   theRcvSeqNum;
-    };
+    class Config;
+    class ConfigAck;
+    class ConfigNack;
+    class Hello;
   }
   namespace cc
   {
@@ -81,4 +45,4 @@ namespace lmp
   } // namespace cc
 } // namespace lmp
 
-#endif /* LIBS_IPCC_MSG_RECEIVEIF_HPP_ */
+#endif /* LMP_CC_MSG_RECEIVEIF_HPP_ */

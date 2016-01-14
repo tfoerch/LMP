@@ -31,7 +31,6 @@ namespace lmp
 	  IpccMsgReceiveIF&         ipccMsgHandler)
       : m_listen_endpoint(c_multicast_address, port),
         m_socket(io_service, m_listen_endpoint),
-		m_ifName(ifName),
 		m_sender_endpoint(),
 		m_ipccMsgHandler(ipccMsgHandler)
     {
@@ -70,9 +69,36 @@ namespace lmp
 											  boost::asio::placeholders::error,
 											  boost::asio::placeholders::bytes_transferred));
     }
+
+    NetworkIFSocket::NetworkIFSocket(
+  	  boost::asio::io_service&          io_service,
+	  boost::asio::ip::udp::endpoint&   listen_endpoint,
+	  IpccMsgReceiveIF&                 ipccMsgHandler)
+    : m_listen_endpoint(listen_endpoint),
+      m_socket(io_service, m_listen_endpoint),
+	  m_sender_endpoint(),
+	  m_ipccMsgHandler(ipccMsgHandler)
+    {
+      // bind
+      m_socket.set_option(boost::asio::ip::udp::socket::reuse_address(true));
+
+      // m_socket.bind(m_listen_endpoint);
+
+      // disable loopback (no copies of our packets)
+      m_socket.set_option(boost::asio::ip::multicast::enable_loopback(false));
+
+      m_socket.async_receive_from(boost::asio::buffer(m_buffer, max_buffer_length),
+    		                      m_sender_endpoint,
+								  boost::bind(&NetworkIFSocket::handle_received_msg,
+										      this,
+											  boost::asio::placeholders::error,
+											  boost::asio::placeholders::bytes_transferred));
+    }
+
     NetworkIFSocket::~NetworkIFSocket()
     {
     }
+
     void NetworkIFSocket::send(
       const char                             message[],
 	  lmp::WORD                              length,
@@ -159,11 +185,13 @@ namespace lmp
       const boost::system::error_code&  error,
       size_t                            bytes_recvd)
     {
+      std::cout << "NetworkIFSocket::handle_received_msg(" << bytes_recvd << ")" << std::endl;
     }
     void NetworkIFSocket::handle_send_msg(
   	  const boost::system::error_code&  error,
 	  size_t                            bytes_sent)
     {
+      std::cout << "NetworkIFSocket::handle_send_msg(" << bytes_sent << ")" << std::endl;
     }
   } // namespace cc
 } // namespace lmp

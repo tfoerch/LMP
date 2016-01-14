@@ -5,8 +5,8 @@ find_package(Boost COMPONENTS system)
 #add_executable (LMP_T Test_IPCC_Observer.cpp TestMain.cpp)
 enable_testing()
 add_boost_test(LMP_T
-               SOURCES Test_IPCC_Observer.cpp TestMain.cpp
-               LIBRARIES lmp_cc lmp_base ${Boost_LIBRARIES})
+               SOURCES Test_Wait.cpp Test_IPCC_Observer.cpp Test_IPCC_Msg_Receiver.cpp TestMain.cpp
+               LIBRARIES lmp_cc lmp_msg lmp_obj lmp_base ${Boost_LIBRARIES})
 #add_test(unitTest LMP_T)
 #include(CppcheckTargets)
 #add_cppcheck(LMP_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
