@@ -11,13 +11,16 @@ namespace lmp
 {
   namespace msg
   {
-    enum MsgType
-	{
-      Config = 1,
-	  ConfigAck,
-	  ConfigNack,
-	  Hello
-	};
+    namespace mtype
+    {
+      enum MsgType
+	  {
+    	Config = 1,
+		ConfigAck,
+		ConfigNack,
+		Hello
+	  };
+    } // namespace mtype
   } // namespace msg
 } // namespace lmp
 

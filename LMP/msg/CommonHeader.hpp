@@ -46,12 +46,12 @@ namespace lmp
       typedef boost::optional<decoding_error>    OptDecError;
       typedef std::pair<OptHeader, OptDecError>  DecodingResult;
       typedef boost::optional<encoding_error>    OptEncError;
-      typedef boost::optional<MsgType>           OptMsgType;
+      typedef boost::optional<mtype::MsgType>    OptMsgType;
       inline CommonHeader(
         lmp::BYTE                    version,
 		bool                         controlChannelDown,
 		bool                         lmpRestart,
-        MsgType                      msgType,
+		mtype::MsgType               msgType,
 		lmp::WORD                    lmpLength)
       : m_version(version),
 		m_controlChannelDown(controlChannelDown),
@@ -59,8 +59,10 @@ namespace lmp
 		m_msgType(msgType),
 		m_lmpLength(lmpLength)
       {}
-      inline lmp::WORD getVersion() const { return m_version; }
-      inline const MsgType& getMsgType() const { return m_msgType; }
+      inline lmp::BYTE getVersion() const { return m_version; }
+      inline bool isControlChannelDown() const { return m_controlChannelDown; }
+      inline bool isLmpRestart() const { return m_lmpRestart; }
+      inline const mtype::MsgType& getMsgType() const { return m_msgType; }
       inline lmp::WORD getLmpLength() const { return m_lmpLength; }
       OptEncError encode(
         boost::asio::mutable_buffer&  buffer) const;
@@ -72,13 +74,14 @@ namespace lmp
       lmp::BYTE                    m_version;
       bool                         m_controlChannelDown;
       bool                         m_lmpRestart;
-      MsgType                      m_msgType;
+      mtype::MsgType               m_msgType;
 	  lmp::WORD                    m_lmpLength;
+	public:
 	  static const lmp::WORD       c_headerLength;
 	  static const lmp::BYTE       c_versionMask;
 	  static const lmp::BYTE       c_supportedVersion;
 	  static const lmp::BYTE       c_controlChannelDownMask;
-	  static const lmp::BYTE       c_lmpRestart;
+	  static const lmp::BYTE       c_lmpRestartMask;
 	};
   } // namespace msg
 } // namespace lmp

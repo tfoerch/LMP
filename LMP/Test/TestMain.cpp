@@ -9,12 +9,18 @@
 #include <IPCC_NetIFSocket.hpp>
 #include <Test_IPCC_Observer.hpp>
 #include <Test_IPCC_Msg_Receiver.hpp>
+#include <CommonHeader.hpp>
+#include <Config.hpp>
+#include <ConfigAck.hpp>
+#include <ConfigNack.hpp>
+#include <Hello.hpp>
 #include <Test_Wait.hpp>
 #include <Node.hpp>
 
 #include <boost/asio/io_service.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-//#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
+#include <vector>
 
 #define BOOST_TEST_MODULE LMP
 #include <BoostTestTargetConfig.h>
@@ -32,12 +38,83 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE( msg )
 
+
 BOOST_AUTO_TEST_CASE( msg_header_decode )
 {
-  unsigned char message[] =
-  { 0x10, 0x0, 0x0, 0x1,
-    0x0, 0x20, 0x0, 0x0,
-	0x0, 0x0, 0x0, 0x0};
+  {
+	unsigned char message[] =
+      { 0x10, 0x00, 0x00, 0x01 };
+	boost::asio::const_buffer messageBuffer(message,
+                                            sizeof(message)/sizeof(unsigned char));
+    lmp::msg::CommonHeader::DecodingResult decodingResult =
+      lmp::msg::CommonHeader::decode(messageBuffer);
+    BOOST_CHECK(!decodingResult.first);
+    BOOST_CHECK(decodingResult.second);
+    if (decodingResult.second)
+    {
+	  BOOST_CHECK_EQUAL(*decodingResult.second, lmp::msg::CommonHeader::invalid_length);
+    }
+  }
+  {
+	unsigned char message[] =
+    { 0x20, 0x00, 0x00, 0x01,
+      0x00, 0x20, 0x00, 0x00,
+	  0x00, 0x00, 0x00, 0x00 };
+	boost::asio::const_buffer messageBuffer(message,
+                                            sizeof(message)/sizeof(unsigned char));
+    lmp::msg::CommonHeader::DecodingResult decodingResult =
+      lmp::msg::CommonHeader::decode(messageBuffer);
+    BOOST_CHECK(!decodingResult.first);
+    BOOST_CHECK(decodingResult.second);
+    if (decodingResult.second)
+    {
+	  BOOST_CHECK_EQUAL(*decodingResult.second, lmp::msg::CommonHeader::not_supported_version);
+    }
+  }
+  {
+	unsigned char message[] =
+    { 0x10, 0x00, 0x00, 0x38,
+      0x00, 0x20, 0x00, 0x00,
+	  0x00, 0x00, 0x00, 0x00 };
+	boost::asio::const_buffer messageBuffer(message,
+                                            sizeof(message)/sizeof(unsigned char));
+    lmp::msg::CommonHeader::DecodingResult decodingResult =
+      lmp::msg::CommonHeader::decode(messageBuffer);
+    BOOST_CHECK(!decodingResult.first);
+    BOOST_CHECK(decodingResult.second);
+    if (decodingResult.second)
+    {
+	  BOOST_CHECK_EQUAL(*decodingResult.second, lmp::msg::CommonHeader::not_supported_msgType);
+    }
+  }
+  {
+	unsigned char message[] =
+      { 0x10, 0x00, 0x00, 0x01,
+        0x00, 0x20, 0x00, 0x00,
+	    0x00, 0x00, 0x00, 0x00 };
+	boost::asio::const_buffer messageBuffer(message,
+                                            sizeof(message)/sizeof(unsigned char));
+    lmp::msg::CommonHeader::DecodingResult decodingResult =
+      lmp::msg::CommonHeader::decode(messageBuffer);
+    BOOST_CHECK(decodingResult.first);
+    BOOST_CHECK(!decodingResult.second);
+    if (decodingResult.first)
+    {
+	  const lmp::msg::CommonHeader& header = *decodingResult.first;
+	  BOOST_CHECK_EQUAL(header.getVersion(), static_cast<lmp::BYTE>(1));
+	  BOOST_CHECK_EQUAL(header.isControlChannelDown(), false);
+	  BOOST_CHECK_EQUAL(header.isLmpRestart(), false);
+	  BOOST_CHECK_EQUAL(header.getMsgType(), lmp::msg::mtype::Config);
+	  BOOST_CHECK_EQUAL(header.getLmpLength(), 0x20);
+	  unsigned char emptySpace[lmp::msg::CommonHeader::c_headerLength];
+	  boost::asio::mutable_buffer emptyBuffer(emptySpace,
+	                                          sizeof(message)/sizeof(unsigned char));
+	  lmp::msg::CommonHeader::OptEncError optEncError = header.encode(emptyBuffer);
+	  BOOST_CHECK(!optEncError);
+	  BOOST_CHECK_EQUAL_COLLECTIONS(message, message + lmp::msg::CommonHeader::c_headerLength,
+			                        emptySpace, emptySpace + lmp::msg::CommonHeader::c_headerLength);
+    }
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
