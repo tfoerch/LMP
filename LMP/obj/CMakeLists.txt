@@ -1,5 +1,5 @@
 
-add_library (lmp_obj SHARED HelloConfig.cpp)
+add_library (lmp_obj SHARED ObjectHeader.cpp HelloConfig.cpp)
 
 add_cppcheck(lmp_obj UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 

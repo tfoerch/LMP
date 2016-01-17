@@ -42,7 +42,7 @@ namespace lmp
             *pCharData =
               ( m_controlChannelDown ?
                 ( m_lmpRestart ?
-                  c_controlChannelDownMask & c_lmpRestartMask :
+                  c_controlChannelDownMask | c_lmpRestartMask :
 				  c_controlChannelDownMask ) :
 				( m_lmpRestart ?
 				  c_lmpRestartMask :
@@ -57,13 +57,13 @@ namespace lmp
               if (pWordData)
               {
                 *pWordData  = boost::endian::native_to_big(m_lmpLength);
-              }
-              buffer = buffer + 2;
-              pWordData  = boost::asio::buffer_cast<lmp::WORD*>(buffer);
-              if (pWordData)
-              {
-                *pWordData  = 0x00;
-                return boost::none;
+                buffer = buffer + 2;
+                pWordData  = boost::asio::buffer_cast<lmp::WORD*>(buffer);
+                if (pWordData)
+                {
+                  *pWordData  = 0x00;
+                  return boost::none;
+                }
               }
             }
           }
