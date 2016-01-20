@@ -62,7 +62,7 @@ namespace lmp
       inline lmp::BYTE getVersion() const { return m_version; }
       inline bool isControlChannelDown() const { return m_controlChannelDown; }
       inline bool isLmpRestart() const { return m_lmpRestart; }
-      inline const mtype::MsgType& getMsgType() const { return m_msgType; }
+      inline const mtype::MsgType getMsgType() const { return m_msgType; }
       inline lmp::WORD getLmpLength() const { return m_lmpLength; }
       OptEncError encode(
         boost::asio::mutable_buffer&  buffer) const;

@@ -120,7 +120,7 @@ namespace lmp
     {
       // remoteNodeId, remoeCCId valid; HelloConfig in acceptable range
       return
-        ( ( 3 * configMsg.theHelloConfig.theHelloIntv ) < configMsg.theHelloConfig.theHelloDeadIntv);
+        ( ( 3 * configMsg.getHelloConfig().getHelloIntv() ) < configMsg.getHelloConfig().getHelloDeadIntv());
     }
     void IpccImpl::do_reportTransition(
       const appl::State&   sourceState,
@@ -216,7 +216,7 @@ namespace lmp
     bool IpccImpl::isConntentionWinning(
   	  const msg::Config&  configMsg) const
     {
-      return do_isConntentionWinning(configMsg.theLocalNodeId);
+      return do_isConntentionWinning(configMsg.getLocalNodeId());
     }
     namespace appl
     {
