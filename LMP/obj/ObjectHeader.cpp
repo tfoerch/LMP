@@ -41,6 +41,7 @@ namespace lmp
     	  if (pWordData)
     	  {
     		*pWordData  = boost::endian::native_to_big(m_objLength);
+      	    buffer = buffer + 2;
     		return boost::none;
     	  }
     	}

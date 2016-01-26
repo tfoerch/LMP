@@ -10,7 +10,6 @@
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp
 {
-  namespace obj { class HelloConfig; }
   namespace msg
   {
     class Config;
