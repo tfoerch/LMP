@@ -10,6 +10,7 @@
 #include <LMPMessageIF.hpp>
 #include <ProtocolTypes.hpp>                  // for DWORD
 #include <HelloConfig.hpp>
+#include <LocalCCId.hpp>
 
 namespace lmp
 {
@@ -19,11 +20,11 @@ namespace lmp
 	{
 	public:
       Config(
-		lmp::DWORD                    localCCId,
+        const lmp::obj::LocalCCId&    localCCId,
         lmp::DWORD                    messageId,
         lmp::DWORD                    localNodeId,
 		const lmp::obj::HelloConfig&  helloConfig);
-      inline lmp::WORD getLocalCCId() const { return m_localCCId; }
+      inline const lmp::obj::LocalCCId& getLocalCCId() const { return m_localCCId; }
       inline lmp::WORD getMessageId() const { return m_messageId; }
       inline lmp::WORD getLocalNodeId() const { return m_localNodeId; }
       inline const lmp::obj::HelloConfig& getHelloConfig() const { return m_helloConfig; }
@@ -32,7 +33,7 @@ namespace lmp
       virtual lmp::WORD do_getContentsLength() const;
       virtual CommonHeader::OptEncError do_encodeContents(
     	boost::asio::mutable_buffer&  buffer) const;
-	  lmp::DWORD             m_localCCId;
+	  lmp::obj::LocalCCId    m_localCCId;
 	  lmp::DWORD             m_messageId;
 	  lmp::DWORD             m_localNodeId;
 	  lmp::obj::HelloConfig  m_helloConfig;

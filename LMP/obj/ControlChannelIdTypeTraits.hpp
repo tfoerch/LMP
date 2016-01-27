@@ -1,7 +1,7 @@
 #ifndef LMP_OBJ_CONTROL_CHANNEL_ID_TYPE_TRAITS_HPP_
 #define LMP_OBJ_CONTROL_CHANNEL_ID_TYPE_TRAITS_HPP_
 /*
- * ControlChannelIdTraits.hpp
+ * ControlChannelIdTypeTraits.hpp
  *
  *  Created on: 16.02.2015
  *      Author: tom
