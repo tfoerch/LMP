@@ -391,8 +391,8 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
     }
   }
   lmp::msg::Config  configMsg(lmp::obj::LocalCCId(lmp::obj::ControlChannelIdData(2)),
-		                      34,
-							  115,
+		                      lmp::obj::MessageId(lmp::obj::MessageIdData(34)),
+		                      lmp::obj::LocalNodeId(lmp::obj::NodeIdData(115)),
 							  lmp::obj::HelloConfig(lmp::obj::HelloConfigData(100, 450)));
   activeIPCC.processReceivedMessage(configMsg);
   {
@@ -500,8 +500,8 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
     }
   }
   lmp::msg::Config  configMsg(lmp::obj::LocalCCId(lmp::obj::ControlChannelIdData(2)),
-		                      34,
-							  128,
+		                      lmp::obj::MessageId(lmp::obj::MessageIdData(34)),
+							  lmp::obj::LocalNodeId(lmp::obj::NodeIdData(128)),
 							  lmp::obj::HelloConfig(lmp::obj::HelloConfigData(450, 450)));
   activeIPCC.processReceivedMessage(configMsg);
   // BOOST_TEST_MESSAGE("getActiveState");
@@ -544,7 +544,11 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
 	  BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
 	}
   }
-  lmp::msg::ConfigAck  configAckMsg(115, 2, lmp::obj::HelloConfig(lmp::obj::HelloConfigData(100, 450)));
+  lmp::msg::ConfigAck  configAckMsg(lmp::obj::LocalCCId(lmp::obj::ControlChannelIdData(2)),
+		                            lmp::obj::LocalNodeId(lmp::obj::NodeIdData(115)),
+									lmp::obj::RemoteCCId(lmp::obj::ControlChannelIdData(7)),
+                                    lmp::obj::MessageIdAck(lmp::obj::MessageIdData(34)),
+									lmp::obj::RemoteNodeId(lmp::obj::NodeIdData(117)));
   activeIPCC.processReceivedMessage(configAckMsg);
   {
 	lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
@@ -687,8 +691,8 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
     }
   }
   lmp::msg::Config  configMsg(lmp::obj::LocalCCId(lmp::obj::ControlChannelIdData(2)),
-		                      32,
-							  128,
+		                      lmp::obj::MessageId(lmp::obj::MessageIdData(32)),
+							  lmp::obj::LocalNodeId(lmp::obj::NodeIdData(128)),
 							  lmp::obj::HelloConfig(lmp::obj::HelloConfigData(100, 450)));
   activeIPCC.processReceivedMessage(configMsg);
   // BOOST_TEST_MESSAGE("getActiveState");
@@ -739,8 +743,8 @@ BOOST_AUTO_TEST_CASE( passiveIPCC )
     }
   }
   lmp::msg::Config  configMsg(lmp::obj::LocalCCId(lmp::obj::ControlChannelIdData(2)),
-		                      38,
-							  128,
+		                      lmp::obj::MessageId(lmp::obj::MessageIdData(38)),
+							  lmp::obj::LocalNodeId(lmp::obj::NodeIdData(128)),
 							  lmp::obj::HelloConfig(lmp::obj::HelloConfigData(100, 450)));
   passiveIPCC.processReceivedMessage(configMsg);
   {

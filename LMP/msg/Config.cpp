@@ -13,9 +13,9 @@ namespace lmp
   {
     Config::Config(
       const lmp::obj::LocalCCId&    localCCId,
-      lmp::DWORD                    messageId,
-      lmp::DWORD                    localNodeId,
-	  const lmp::obj::HelloConfig&  helloConfig)
+	  const lmp::obj::MessageId&    messageId,
+	  const lmp::obj::LocalNodeId&  localNodeId,
+ 	  const lmp::obj::HelloConfig&  helloConfig)
     : m_localCCId(localCCId),
 	  m_messageId(messageId),
 	  m_localNodeId(localNodeId),
@@ -27,7 +27,11 @@ namespace lmp
     }
     lmp::WORD Config::do_getContentsLength() const
     {
-      return m_localCCId.getObjLength() + 4 + 4 + m_helloConfig.getObjLength();
+      return
+        ( m_localCCId.getObjLength() +
+          m_messageId.getObjLength() +
+		  m_localNodeId.getObjLength() +
+		  m_helloConfig.getObjLength() );
     }
     CommonHeader::OptEncError Config::do_encodeContents(
   	  boost::asio::mutable_buffer&  buffer) const
@@ -40,11 +44,29 @@ namespace lmp
       }
       else
       {
-        optEncError = m_helloConfig.encode(buffer);
+    	optEncError = m_messageId.encode(buffer);
         if (optEncError &&
-        	*optEncError == obj::ObjectHeader::insufficient_buffer_length)
+      	    *optEncError == obj::ObjectHeader::insufficient_buffer_length)
         {
-          return CommonHeader::OptEncError(CommonHeader::insufficient_buffer_length);
+      	  return CommonHeader::OptEncError(CommonHeader::insufficient_buffer_length);
+        }
+        else
+        {
+    	  optEncError = m_localNodeId.encode(buffer);
+          if (optEncError &&
+      	      *optEncError == obj::ObjectHeader::insufficient_buffer_length)
+          {
+      	    return CommonHeader::OptEncError(CommonHeader::insufficient_buffer_length);
+          }
+          else
+          {
+        	optEncError = m_helloConfig.encode(buffer);
+        	if (optEncError &&
+        	    *optEncError == obj::ObjectHeader::insufficient_buffer_length)
+        	{
+        	  return CommonHeader::OptEncError(CommonHeader::insufficient_buffer_length);
+        	}
+          }
         }
       }
       return boost::none;

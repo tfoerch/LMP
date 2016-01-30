@@ -13,7 +13,7 @@ namespace lmp
 {
   namespace obj
   {
-    const lmp::WORD HelloConfigData::c_contentsLength = 8;
+    const lmp::WORD HelloConfigData::c_contentsLength = 2*sizeof(lmp::WORD);
 
     HelloConfigData::HelloConfigData(
       lmp::WORD  helloIntv,
@@ -26,7 +26,7 @@ namespace lmp
     {
       std::size_t bufSize = boost::asio::buffer_size(buffer);
 	  lmp::WORD* pWordData  = boost::asio::buffer_cast<lmp::WORD*>(buffer);
-      if (bufSize >= 2*sizeof(lmp::WORD) &&
+      if (bufSize >= c_contentsLength &&
     	  pWordData)
       {
     	*pWordData  = boost::endian::native_to_big(m_helloIntv);

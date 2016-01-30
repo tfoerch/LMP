@@ -1,7 +1,7 @@
 #ifndef LMP_OBJ_REMOTE_CC_ID_HPP_
 #define LMP_OBJ_REMOTE_CC_ID_HPP_
 /*
- * LocalCCId.hpp
+ * RemoteCCId.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom

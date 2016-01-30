@@ -216,7 +216,7 @@ namespace lmp
     bool IpccImpl::isConntentionWinning(
   	  const msg::Config&  configMsg) const
     {
-      return do_isConntentionWinning(configMsg.getLocalNodeId());
+      return do_isConntentionWinning(configMsg.getLocalNodeId().getNodeId());
     }
     namespace appl
     {

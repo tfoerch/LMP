@@ -1,5 +1,5 @@
 
-add_library (lmp_obj SHARED ObjectHeader.cpp HelloConfigData.cpp ControlChannelIdData.cpp)
+add_library (lmp_obj SHARED ObjectHeader.cpp HelloConfigData.cpp ControlChannelIdData.cpp MessageIdData.cpp NodeIdData.cpp)
 
 add_cppcheck(lmp_obj UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 

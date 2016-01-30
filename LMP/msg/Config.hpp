@@ -8,9 +8,11 @@
  */
 
 #include <LMPMessageIF.hpp>
-#include <ProtocolTypes.hpp>                  // for DWORD
-#include <HelloConfig.hpp>
 #include <LocalCCId.hpp>
+#include <MessageId.hpp>
+#include <LocalNodeId.hpp>
+#include <HelloConfig.hpp>
+#include <ProtocolTypes.hpp>                  // for DWORD
 
 namespace lmp
 {
@@ -21,12 +23,12 @@ namespace lmp
 	public:
       Config(
         const lmp::obj::LocalCCId&    localCCId,
-        lmp::DWORD                    messageId,
-        lmp::DWORD                    localNodeId,
+		const lmp::obj::MessageId&    messageId,
+		const lmp::obj::LocalNodeId&  localNodeId,
 		const lmp::obj::HelloConfig&  helloConfig);
       inline const lmp::obj::LocalCCId& getLocalCCId() const { return m_localCCId; }
-      inline lmp::WORD getMessageId() const { return m_messageId; }
-      inline lmp::WORD getLocalNodeId() const { return m_localNodeId; }
+      inline const lmp::obj::MessageId& getMessageId() const { return m_messageId; }
+      inline const lmp::obj::LocalNodeId& getLocalNodeId() const { return m_localNodeId; }
       inline const lmp::obj::HelloConfig& getHelloConfig() const { return m_helloConfig; }
     private:
       virtual const mtype::MsgType do_getMsgType() const;
@@ -34,8 +36,8 @@ namespace lmp
       virtual CommonHeader::OptEncError do_encodeContents(
     	boost::asio::mutable_buffer&  buffer) const;
 	  lmp::obj::LocalCCId    m_localCCId;
-	  lmp::DWORD             m_messageId;
-	  lmp::DWORD             m_localNodeId;
+	  lmp::obj::MessageId    m_messageId;
+	  lmp::obj::LocalNodeId  m_localNodeId;
 	  lmp::obj::HelloConfig  m_helloConfig;
 	};
   } // namespace msg

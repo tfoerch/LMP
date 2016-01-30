@@ -1,11 +1,11 @@
 /*
- * ControlChannelIdData.cpp
+ * NodeIdData.cpp
  *
  *  Created on: 20.02.2015
  *      Author: tom
  */
 
-#include "ControlChannelIdData.hpp"
+#include "NodeIdData.hpp"
 #include <boost/asio/buffer.hpp>
 #include <boost/endian/conversion.hpp>
 
@@ -13,13 +13,13 @@ namespace lmp
 {
   namespace obj
   {
-    const lmp::WORD ControlChannelIdData::c_contentsLength = sizeof(lmp::DWORD);
+    const lmp::WORD NodeIdData::c_contentsLength = sizeof(lmp::DWORD);;
 
-    ControlChannelIdData::ControlChannelIdData(
-      lmp::DWORD  controlChannelId)
-    : m_controlChannelId(controlChannelId)
+    NodeIdData::NodeIdData(
+      lmp::DWORD  nodeId)
+    : m_nodeId(nodeId)
     {}
-    ObjectHeader::OptEncError ControlChannelIdData::encode(
+    ObjectHeader::OptEncError NodeIdData::encode(
   	  boost::asio::mutable_buffer&  buffer) const
     {
       std::size_t bufSize = boost::asio::buffer_size(buffer);
@@ -27,7 +27,7 @@ namespace lmp
   	  if (bufSize >= c_contentsLength &&
   		  pDWordData)
   	  {
-  		*pDWordData  = boost::endian::native_to_big(m_controlChannelId);
+  		*pDWordData  = boost::endian::native_to_big(m_nodeId);
   		buffer = buffer + 4;
   		return boost::none;
   	  }
