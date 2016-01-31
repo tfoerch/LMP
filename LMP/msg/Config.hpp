@@ -7,12 +7,12 @@
  *      Author: tom
  */
 
-#include <LMPMessageIF.hpp>
-#include <LocalCCId.hpp>
-#include <MessageId.hpp>
-#include <LocalNodeId.hpp>
-#include <HelloConfig.hpp>
-#include <ProtocolTypes.hpp>                  // for DWORD
+#include "msg/LMPMessageIF.hpp"
+#include "obj/LocalCCId.hpp"
+#include "obj/MessageId.hpp"
+#include "obj/LocalNodeId.hpp"
+#include "obj/HelloConfig.hpp"
+#include "base/ProtocolTypes.hpp"                 // for DWORD
 
 namespace lmp
 {

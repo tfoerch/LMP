@@ -1,7 +1,7 @@
-#ifndef LMP_OBJ_CONTROL_CHANNEL_ID_DATA_HPP_
-#define LMP_OBJ_CONTROL_CHANNEL_ID_DATA_HPP_
+#ifndef LMP_OBJ_HELLO_DATA_HPP_
+#define LMP_OBJ_HELLO_DATA_HPP_
 /*
- * ControlChannelIdData.hpp
+ * HelloData.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom
@@ -14,20 +14,23 @@ namespace lmp
 {
   namespace obj
   {
-    class ControlChannelIdData
+    class HelloData
 	{
 	public:
-      ControlChannelIdData(
-    	lmp::DWORD  controlChannelId);
-      inline lmp::DWORD getControlChannelId() const { return m_controlChannelId; }
+      HelloData(
+    	lmp::DWORD  txSeqNum,
+		lmp::DWORD  rcvSeqNum);
+      inline lmp::DWORD getTxSeqNum() const { return m_txSeqNum; }
+      inline lmp::DWORD getRcvSeqNum() const { return m_rcvSeqNum; }
       lmp::WORD getContentsLength() const { return c_contentsLength; }
       ObjectHeader::OptEncError encode(
     	boost::asio::mutable_buffer&  buffer) const;
 	private:
-  	  lmp::DWORD              m_controlChannelId;
+  	  lmp::DWORD              m_txSeqNum;
+      lmp::DWORD              m_rcvSeqNum;
       static const lmp::WORD  c_contentsLength;
 	};
   } // namespace obj
 } // namespace lmp
 
-#endif /* LMP_OBJ_CONTROL_CHANNEL_ID_DATA_HPP_ */
+#endif /* LMP_OBJ_HELLO_DATA_HPP_ */

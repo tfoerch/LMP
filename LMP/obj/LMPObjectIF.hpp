@@ -7,9 +7,9 @@
  *      Author: tom
  */
 
-#include <ProtocolTypes.hpp>
-#include <ObjectClass.hpp>
-#include <ObjectHeader.hpp>
+#include "base/ProtocolTypes.hpp"
+#include "obj/ObjectClass.hpp"
+#include "obj/ObjectHeader.hpp"
 
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp

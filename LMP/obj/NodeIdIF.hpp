@@ -7,8 +7,7 @@
  *      Author: tom
  */
 
-#include <ProtocolTypes.hpp>                  // for WORD
-#include <NodeIdData.hpp>
+#include "obj/NodeIdData.hpp"
 
 namespace lmp
 {

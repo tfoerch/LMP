@@ -7,8 +7,8 @@
  *      Author: tom
  */
 
-#include <ProtocolTypes.hpp>                  // for WORD
-#include <LMPObjectIF.hpp>
+#include "base/ProtocolTypes.hpp"                  // for WORD
+#include "obj/LMPObjectIF.hpp"
 
 namespace lmp
 {

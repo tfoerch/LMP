@@ -7,12 +7,12 @@
  *      Author: tom
  */
 
-#include <NodeIdClass.hpp>
-#include <ObjectClassTypeTraits.hpp>
-#include <ObjectClassType.hpp>
-#include <NodeIdTypeTraits.hpp>
-#include <NodeIdIF.hpp>
-#include <NodeIdData.hpp>
+#include "obj/NodeIdClass.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
+#include "obj/ObjectClassType.hpp"
+#include "obj/NodeIdTypeTraits.hpp"
+#include "obj/NodeIdIF.hpp"
+#include "obj/NodeIdData.hpp"
 
 namespace lmp
 {

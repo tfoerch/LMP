@@ -1,19 +1,19 @@
 #ifndef LMP_MSG_CONFIGACK_HPP_
 #define LMP_MSG_CONFIGACK_HPP_
 /*
- * Config.hpp
+ * ConfigAck.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom
  */
 
-#include <LMPMessageIF.hpp>
-#include <LocalCCId.hpp>
-#include <LocalNodeId.hpp>
-#include <RemoteCCId.hpp>
-#include <MessageIdAck.hpp>
-#include <RemoteNodeId.hpp>
-#include <ProtocolTypes.hpp>                  // for DWORD
+#include "msg/LMPMessageIF.hpp"
+#include "obj/LocalCCId.hpp"
+#include "obj/LocalNodeId.hpp"
+#include "obj/RemoteCCId.hpp"
+#include "obj/MessageIdAck.hpp"
+#include "obj/RemoteNodeId.hpp"
+#include "base/ProtocolTypes.hpp"                  // for DWORD
 
 namespace lmp
 {

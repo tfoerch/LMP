@@ -7,12 +7,12 @@
  *      Author: tom
  */
 
-#include <MessageIdClass.hpp>
-#include <ObjectClassTypeTraits.hpp>
-#include <ObjectClassType.hpp>
-#include <MessageIdTypeTraits.hpp>
-#include <MessageIdIF.hpp>
-#include <MessageIdData.hpp>
+#include "obj/MessageIdClass.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
+#include "obj/ObjectClassType.hpp"
+#include "obj/MessageIdTypeTraits.hpp"
+#include "obj/MessageIdIF.hpp"
+#include "obj/MessageIdData.hpp"
 
 namespace lmp
 {

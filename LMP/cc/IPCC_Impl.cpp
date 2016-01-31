@@ -6,9 +6,12 @@
  */
 
 #include "IPCC_Impl.hpp"
-#include "IPCC_FSM.hpp"
-#include "IPCC_Msg_ReceiveIF.hpp"
 #include "IPCC_ObserverIF.hpp"
+#include "msg/Config.hpp"
+#include "msg/ConfigAck.hpp"
+#include "msg/ConfigNack.hpp"
+#include "msg/Hello.hpp"
+
 #include <boost/core/explicit_operator_bool.hpp>
 #include <boost/ptr_container/detail/reversible_ptr_container.hpp>
 #include <boost/ptr_container/detail/void_ptr_iterator.hpp>
@@ -191,10 +194,10 @@ namespace lmp
     {
 //      std::cout << "processReceivedMessage helloMsg.theRcvSeqNum = " << helloMsg.theRcvSeqNum
 //    	        << ", theTxSeqNum = " << theTxSeqNum << std::endl;
-      if (helloMsg.theRcvSeqNum == theTxSeqNum)
+      if (helloMsg.getHello().getRcvSeqNum() == theTxSeqNum)
       {
         theFSM.process_event(EvHelloRcvd());
-        theRcvSeqNum = helloMsg.theTxSeqNum;
+        theRcvSeqNum = helloMsg.getHello().getTxSeqNum();
       }
       else
       {

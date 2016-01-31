@@ -1,14 +1,14 @@
 #ifndef LMP_OBJ_HELLO_TYPE_TRAITS_HPP_
 #define LMP_OBJ_HELLO_TYPE_TRAITS_HPP_
 /*
- * ConfigTypeTraits.hpp
+ * HelloTypeTraits.hpp
  *
  *  Created on: 16.02.2015
  *      Author: tom
  */
 
-#include <HelloClass.hpp>
-#include <ObjectClassTypeTraits.hpp>
+#include "obj/HelloClass.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
 
 namespace lmp
 {

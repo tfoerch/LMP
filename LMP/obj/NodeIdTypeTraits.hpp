@@ -1,14 +1,14 @@
 #ifndef LMP_OBJ_NODE_ID_TYPE_TRAITS_HPP_
 #define LMP_OBJ_NODE_ID_TYPE_TRAITS_HPP_
 /*
- * NodeIdTraits.hpp
+ * NodeIdTypeTraits.hpp
  *
  *  Created on: 16.02.2015
  *      Author: tom
  */
 
-#include <NodeIdClass.hpp>
-#include <ObjectClassTypeTraits.hpp>
+#include "obj/NodeIdClass.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
 
 namespace lmp
 {

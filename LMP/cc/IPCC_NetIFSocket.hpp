@@ -7,7 +7,7 @@
  *      Author: tom
  */
 
-#include "ProtocolTypes.hpp"                  // for DWORD
+#include "base/ProtocolTypes.hpp"             // for DWORD
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/optional/optional.hpp>        // for optional

@@ -7,9 +7,9 @@
  *      Author: tom
  */
 
-#include <ObjectClass.hpp>
-#include <ObjectClassIF.hpp>
-#include <ObjectClassTypeTraits.hpp>
+#include "obj/ObjectClass.hpp"
+#include "obj/ObjectClassIF.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
 
 namespace lmp
 {

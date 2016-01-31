@@ -21,17 +21,14 @@ set (Boost_TEST_FLAGS "--catch_system_error=yes --log_level=test_suite")
 include(BoostTestTargets)
 include(CppcheckTargets)
 
-include_directories ("${PROJECT_SOURCE_DIR}/base"
-                     "${PROJECT_SOURCE_DIR}/obj"
-                     "${PROJECT_SOURCE_DIR}/msg"
-                     "${PROJECT_SOURCE_DIR}/cc"
+include_directories ("${PROJECT_SOURCE_DIR}"
                      "${PROJECT_BINARY_DIR}/idl")
 
 add_subdirectory (base)
 add_subdirectory (obj)
 add_subdirectory (msg)
 add_subdirectory (cc)
-add_subdirectory (Test)
+#add_subdirectory (Test)
 add_subdirectory (idl)
 add_subdirectory (server)
 add_subdirectory (client)

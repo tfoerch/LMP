@@ -7,8 +7,7 @@
  *      Author: tom
  */
 
-#include <ProtocolTypes.hpp>                  // for WORD
-#include <MessageIdData.hpp>
+#include "obj/MessageIdData.hpp"
 
 namespace lmp
 {

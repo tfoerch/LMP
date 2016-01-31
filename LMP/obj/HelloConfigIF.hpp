@@ -7,8 +7,7 @@
  *      Author: tom
  */
 
-#include <ProtocolTypes.hpp>
-#include <HelloConfigData.hpp>
+#include "obj/HelloConfigData.hpp"
 
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp

@@ -1,7 +1,7 @@
 #ifndef LMP_OBJ_MESSAGE_ID_CLASS_HPP_
 #define LMP_OBJ_MESSAGE_ID_CLASS_HPP_
 /*
- * ControlChannelIdClass.hpp
+ * MessageIdClass.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom

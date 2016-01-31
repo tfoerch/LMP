@@ -7,9 +7,9 @@
  *      Author: tom
  */
 
-#include <ProtocolTypes.hpp>
-#include <MsgType.hpp>
-#include <CommonHeader.hpp>
+#include "base/ProtocolTypes.hpp"
+#include "msg/MsgType.hpp"
+#include "msg/CommonHeader.hpp"
 
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp

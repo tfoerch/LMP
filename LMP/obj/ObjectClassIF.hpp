@@ -7,8 +7,8 @@
  *      Author: tom
  */
 
-#include <LMPObjectIF.hpp>
-#include <ObjectClassTypeTraits.hpp>
+#include "obj/LMPObjectIF.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
 
 namespace lmp
 {

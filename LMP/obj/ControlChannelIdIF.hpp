@@ -7,8 +7,7 @@
  *      Author: tom
  */
 
-#include <ProtocolTypes.hpp>                  // for WORD
-#include <ControlChannelIdData.hpp>
+#include "obj/ControlChannelIdData.hpp"
 
 namespace lmp
 {

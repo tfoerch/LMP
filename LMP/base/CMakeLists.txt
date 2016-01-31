@@ -8,6 +8,10 @@ if(USE_IWYU)
 set_property(TARGET lmp_base PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
 endif(USE_IWYU)
 
+enable_testing()
+
+add_subdirectory (test)
+
 target_include_directories (lmp_base PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 INSTALL(TARGETS lmp_base DESTINATION lib)

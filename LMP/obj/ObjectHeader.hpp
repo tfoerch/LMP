@@ -7,8 +7,8 @@
  *      Author: tom
  */
 
-#include <ProtocolTypes.hpp>                  // for DWORD
-#include <ObjectClass.hpp>
+#include "base/ProtocolTypes.hpp"                  // for DWORD
+#include "ObjectClass.hpp"
 
 #include <boost/optional/optional.hpp>     // for optional
 

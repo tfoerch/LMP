@@ -1,18 +1,18 @@
 #ifndef LMP_OBJ_HELLOCONFIG_HPP_
 #define LMP_OBJ_HELLOCONFIG_HPP_
 /*
- * ConfigClass.hpp
+ * HelloConfig.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom
  */
 
-#include <ConfigClass.hpp>
-#include <ObjectClassTypeTraits.hpp>
-#include <ObjectClassType.hpp>
-#include <ConfigTypeTraits.hpp>
-#include <HelloConfigIF.hpp>
-#include <HelloConfigData.hpp>
+#include "obj/ConfigClass.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
+#include "obj/ObjectClassType.hpp"
+#include "obj/ConfigTypeTraits.hpp"
+#include "obj/HelloConfigIF.hpp"
+#include "obj/HelloConfigData.hpp"
 
 namespace lmp
 {

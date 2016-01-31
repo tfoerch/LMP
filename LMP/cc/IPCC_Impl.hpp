@@ -7,19 +7,24 @@
  *      Author: tom
  */
 
-#include <IPCC_FSM.hpp>
-#include <IPCC_FSM_InvokeIF.hpp>
-#include <IPCC_Msg_ReceiveIF.hpp>
-#include <Config.hpp>
-#include <ConfigAck.hpp>
-#include <ConfigNack.hpp>
-#include <Hello.hpp>
+#include "cc/IPCC_FSM.hpp"
+#include "cc/IPCC_FSM_InvokeIF.hpp"
+#include "cc/IPCC_Msg_ReceiveIF.hpp"
+#include "obj/HelloConfig.hpp"
+#include "base/ProtocolTypes.hpp"             // for DWORD
+
 #include <boost/optional/optional.hpp>        // for optional
 #include <boost/ptr_container/ptr_deque.hpp>  // for ptr_deque
-#include "ProtocolTypes.hpp"                  // for DWORD
 
 namespace lmp
 {
+  namespace msg
+  {
+    class Config;
+    class ConfigAck;
+    class ConfigNack;
+    class Hello;
+  }
   namespace cc
   {
     namespace appl

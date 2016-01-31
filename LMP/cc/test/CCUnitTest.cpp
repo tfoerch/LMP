@@ -1,21 +1,19 @@
 /*
- * TestMain.cpp
+ * CCUnitTest.cpp
  *
  *  Created on: 27.02.2015
  *      Author: tom
  */
 
-#include <IPCC_Impl.hpp>
-#include <IPCC_NetIFSocket.hpp>
-#include <Test_IPCC_Observer.hpp>
-#include <Test_IPCC_Msg_Receiver.hpp>
-#include <CommonHeader.hpp>
-#include <ObjectHeader.hpp>
-#include <ConfigAck.hpp>
-#include <ConfigNack.hpp>
-#include <Hello.hpp>
-#include <Test_Wait.hpp>
-#include <Node.hpp>
+#include "cc/IPCC_Impl.hpp"
+#include "cc/IPCC_NetIFSocket.hpp"
+#include "msg/Config.hpp"
+#include "msg/ConfigAck.hpp"
+#include "msg/ConfigNack.hpp"
+#include "msg/Hello.hpp"
+#include "Test_IPCC_Observer.hpp"
+#include "Test_IPCC_Msg_Receiver.hpp"
+#include "Test_Wait.hpp"
 
 #include <boost/asio/io_service.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -25,160 +23,6 @@
 #define BOOST_TEST_MODULE LMP
 #include <BoostTestTargetConfig.h>
 // #include <boost/test/included/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE( node )
-
-BOOST_AUTO_TEST_CASE( node_methods )
-{
-  lmp::node::Node  node(123, boost::asio::ip::address::from_string("192.168.2.104"));
-  BOOST_CHECK_EQUAL(node.getNodeId(), 123UL);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE( msg )
-
-BOOST_AUTO_TEST_CASE( msg_header_decode )
-{
-  {
-	unsigned char message[] =
-      { 0x10, 0x00, 0x00, 0x01 };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-    lmp::msg::CommonHeader::DecodingResult decodingResult =
-      lmp::msg::CommonHeader::decode(messageBuffer);
-    BOOST_CHECK(!decodingResult.first);
-    BOOST_CHECK(decodingResult.second);
-    if (decodingResult.second)
-    {
-	  BOOST_CHECK_EQUAL(*decodingResult.second, lmp::msg::CommonHeader::invalid_length);
-    }
-  }
-  {
-	unsigned char message[] =
-    { 0x20, 0x00, 0x00, 0x01,
-      0x00, 0x20, 0x00, 0x00,
-	  0x00, 0x00, 0x00, 0x00 };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-    lmp::msg::CommonHeader::DecodingResult decodingResult =
-      lmp::msg::CommonHeader::decode(messageBuffer);
-    BOOST_CHECK(!decodingResult.first);
-    BOOST_CHECK(decodingResult.second);
-    if (decodingResult.second)
-    {
-	  BOOST_CHECK_EQUAL(*decodingResult.second, lmp::msg::CommonHeader::not_supported_version);
-    }
-  }
-  {
-	unsigned char message[] =
-    { 0x10, 0x00, 0x00, 0x38,
-      0x00, 0x20, 0x00, 0x00,
-	  0x00, 0x00, 0x00, 0x00 };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-    lmp::msg::CommonHeader::DecodingResult decodingResult =
-      lmp::msg::CommonHeader::decode(messageBuffer);
-    BOOST_CHECK(!decodingResult.first);
-    BOOST_CHECK(decodingResult.second);
-    if (decodingResult.second)
-    {
-	  BOOST_CHECK_EQUAL(*decodingResult.second, lmp::msg::CommonHeader::not_supported_msgType);
-    }
-  }
-  {
-	unsigned char message[] =
-      { 0x10, 0x00, 0x00, 0x01,
-        0x00, 0x20, 0x00, 0x00,
-	    0x00, 0x00, 0x00, 0x00 };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-    lmp::msg::CommonHeader::DecodingResult decodingResult =
-      lmp::msg::CommonHeader::decode(messageBuffer);
-    BOOST_CHECK(decodingResult.first);
-    BOOST_CHECK(!decodingResult.second);
-    if (decodingResult.first)
-    {
-	  const lmp::msg::CommonHeader& header = *decodingResult.first;
-	  BOOST_CHECK_EQUAL(header.getVersion(), static_cast<lmp::BYTE>(1));
-	  BOOST_CHECK_EQUAL(header.isControlChannelDown(), false);
-	  BOOST_CHECK_EQUAL(header.isLmpRestart(), false);
-	  BOOST_CHECK_EQUAL(header.getMsgType(), lmp::msg::mtype::Config);
-	  BOOST_CHECK_EQUAL(header.getLmpLength(), 0x20);
-	  unsigned char emptySpace[lmp::msg::CommonHeader::c_headerLength];
-	  boost::asio::mutable_buffer emptyBuffer(emptySpace,
-	                                          sizeof(message)/sizeof(unsigned char));
-	  lmp::msg::CommonHeader::OptEncError optEncError = header.encode(emptyBuffer);
-	  BOOST_CHECK(!optEncError);
-	  BOOST_CHECK_EQUAL_COLLECTIONS(message, message + lmp::msg::CommonHeader::c_headerLength,
-			                        emptySpace, emptySpace + lmp::msg::CommonHeader::c_headerLength);
-    }
-  }
-}
-
-BOOST_AUTO_TEST_SUITE_END()
-
-BOOST_AUTO_TEST_SUITE( obj )
-
-BOOST_AUTO_TEST_CASE( obj_header_decode )
-{
-  {
-	unsigned char message[] =
-      { 0x01, 0x01, 0x00 };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-    lmp::obj::ObjectHeader::DecodingResult decodingResult =
-      lmp::obj::ObjectHeader::decode(messageBuffer);
-    BOOST_CHECK(!decodingResult.first);
-    BOOST_CHECK(decodingResult.second);
-    if (decodingResult.second)
-    {
-	  BOOST_CHECK_EQUAL(*decodingResult.second, lmp::obj::ObjectHeader::invalid_length);
-    }
-  }
-  {
-	unsigned char message[] =
-    { 0x01, 0x27, 0x00, 0x08,
-      0x01, 0x02, 0x00, 0x08 };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-    lmp::obj::ObjectHeader::DecodingResult decodingResult =
-      lmp::obj::ObjectHeader::decode(messageBuffer);
-    BOOST_CHECK(!decodingResult.first);
-    BOOST_CHECK(decodingResult.second);
-    if (decodingResult.second)
-    {
-	  BOOST_CHECK_EQUAL(*decodingResult.second, lmp::obj::ObjectHeader::not_supported_object_class);
-    }
-  }
-  {
-	unsigned char message[] =
-      { 0x01, 0x01, 0x00, 0x08,
-        0x01, 0x02, 0x00, 0x08 };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-    lmp::obj::ObjectHeader::DecodingResult decodingResult =
-      lmp::obj::ObjectHeader::decode(messageBuffer);
-    BOOST_CHECK(decodingResult.first);
-    BOOST_CHECK(!decodingResult.second);
-    if (decodingResult.first)
-    {
-	  const lmp::obj::ObjectHeader& header = *decodingResult.first;
-	  BOOST_CHECK_EQUAL(header.isNegotiable(), false);
-	  BOOST_CHECK_EQUAL(header.getObjectClass(), lmp::obj::otype::ControlChannelID);
-	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x08);
-	  unsigned char emptySpace[lmp::obj::ObjectHeader::c_headerLength];
-	  boost::asio::mutable_buffer emptyBuffer(emptySpace,
-	                                          sizeof(message)/sizeof(unsigned char));
-	  lmp::obj::ObjectHeader::OptEncError optEncError = header.encode(emptyBuffer);
-	  BOOST_CHECK(!optEncError);
-	  BOOST_CHECK_EQUAL_COLLECTIONS(message, message + lmp::obj::ObjectHeader::c_headerLength,
-			                        emptySpace, emptySpace + lmp::obj::ObjectHeader::c_headerLength);
-    }
-  }
-}
-
-BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE( lmp_socket )
 
@@ -349,7 +193,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
 	  BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
 	}
   }
-  lmp::msg::ConfigNack  configNackMsg(115, 2, lmp::obj::HelloConfig(lmp::obj::HelloConfigData(100, 450)));
+  lmp::msg::ConfigNack  configNackMsg(lmp::obj::LocalCCId(lmp::obj::ControlChannelIdData(2)),
+          	                          lmp::obj::LocalNodeId(lmp::obj::NodeIdData(115)),
+									  lmp::obj::RemoteCCId(lmp::obj::ControlChannelIdData(7)),
+									  lmp::obj::MessageIdAck(lmp::obj::MessageIdData(34)),
+									  lmp::obj::RemoteNodeId(lmp::obj::NodeIdData(117)),
+									  lmp::obj::HelloConfig(lmp::obj::HelloConfigData(100, 450)));
   activeIPCC.processReceivedMessage(configNackMsg);
   {
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -570,7 +419,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
 	}
   }
   {
-    lmp::msg::Hello  helloMsg(1, 0);
+    lmp::msg::Hello  helloMsg(lmp::obj::Hello(lmp::obj::HelloData(1, 0)));
     activeIPCC.processReceivedMessage(helloMsg);
     {
 	  lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
@@ -589,7 +438,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
     }
   }
   {
-    lmp::msg::Hello  helloMsg(1, 1);
+    lmp::msg::Hello  helloMsg(lmp::obj::Hello(lmp::obj::HelloData(1, 1)));
     activeIPCC.processReceivedMessage(helloMsg);
     {
 	  lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
@@ -624,7 +473,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
 	}
   }
   {
-    lmp::msg::Hello  helloMsg(2, 2);
+    lmp::msg::Hello  helloMsg(lmp::obj::Hello(lmp::obj::HelloData(2, 2)));
     activeIPCC.processReceivedMessage(helloMsg);
     {
 	  lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
@@ -759,4 +608,5 @@ BOOST_AUTO_TEST_CASE( passiveIPCC )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
 

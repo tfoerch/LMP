@@ -7,8 +7,8 @@
  *      Author: tom
  */
 
-#include <ConfigClass.hpp>
-#include <ObjectClassTypeTraits.hpp>
+#include "obj/ConfigClass.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
 
 namespace lmp
 {

@@ -7,8 +7,8 @@
  *      Author: tom
  */
 
-#include <MessageIdClass.hpp>
-#include <ObjectClassTypeTraits.hpp>
+#include "obj/MessageIdClass.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
 
 namespace lmp
 {

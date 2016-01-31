@@ -7,12 +7,12 @@
  *      Author: tom
  */
 
-#include <ControlChannelIdClass.hpp>
-#include <ObjectClassTypeTraits.hpp>
-#include <ObjectClassType.hpp>
-#include <ControlChannelIdTypeTraits.hpp>
-#include <ControlChannelIdIF.hpp>
-#include <ControlChannelIdData.hpp>
+#include "obj/ControlChannelIdClass.hpp"
+#include "obj/ObjectClassTypeTraits.hpp"
+#include "obj/ObjectClassType.hpp"
+#include "obj/ControlChannelIdTypeTraits.hpp"
+#include "obj/ControlChannelIdIF.hpp"
+#include "obj/ControlChannelIdData.hpp"
 
 namespace lmp
 {
