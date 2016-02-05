@@ -17,12 +17,16 @@ namespace lmp
     class ControlChannelIdData
 	{
 	public:
+      typedef boost::optional<ControlChannelIdData>                    opt_data_type;
+        typedef std::pair<opt_data_type, ObjectHeader::OptDecError>    DataTypeDecodingResult;
       ControlChannelIdData(
     	lmp::DWORD  controlChannelId);
       inline lmp::DWORD getControlChannelId() const { return m_controlChannelId; }
       lmp::WORD getContentsLength() const { return c_contentsLength; }
       ObjectHeader::OptEncError encode(
     	boost::asio::mutable_buffer&  buffer) const;
+      static DataTypeDecodingResult decode(
+    	boost::asio::const_buffer&    buffer);
 	private:
   	  lmp::DWORD              m_controlChannelId;
       static const lmp::WORD  c_contentsLength;

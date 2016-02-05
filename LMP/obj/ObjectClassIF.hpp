@@ -19,8 +19,12 @@ namespace lmp
 	{
 	public:
       typedef ObjectClassBaseTraits<ClassType>  obj_class_traits_type;
+      typedef boost::optional<ClassType>        OptClassType;
       virtual ~ObjectClassIF(){}
       inline ClassType getClassType() const { return do_getClassType(); }
+      static OptClassType classType_cast(
+    	lmp::BYTE                     classTypeByte)
+      { return obj_class_traits_type::classType_cast(classTypeByte); }
     private:
       virtual lmp::BYTE do_getClassTypeByteValue() const { return do_getClassType(); }
       virtual bool do_isNegotiable() const { return true; }

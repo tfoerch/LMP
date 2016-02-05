@@ -20,6 +20,22 @@ namespace lmp
     struct ObjectClassBaseTraits<ccid::ClassType>
     {
       static const otype::ObjectClass  c_object_class = otype::ControlChannelID;
+      static boost::optional<ccid::ClassType> classType_cast(
+        lmp::BYTE                     classTypeByte)
+	  {
+    	boost::optional<ccid::ClassType>  result;
+        const ccid::ClassType cType = static_cast<ccid::ClassType>(classTypeByte);
+        switch(cType)
+        {
+          case ccid::LocalCCId:
+          case ccid::RemoteCCId:
+        	result = cType;
+        	break;
+          default:
+        	break;
+        }
+        return result;
+	  }
     };
     template <>
     struct ObjectClassCTypeTraits<ccid::ClassType, ccid::LocalCCId>

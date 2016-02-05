@@ -71,6 +71,7 @@ namespace lmp
           if (pWordData)
           {
         	lmp::WORD objLength = boost::endian::big_to_native(*pWordData);
+            buffer = buffer + 2;
         	OptObjectClass optObjectClass = objectClass_cast(objectClass);
         	if (optObjectClass)
         	{
@@ -106,7 +107,7 @@ namespace lmp
     ObjectHeader::OptObjectClass ObjectHeader::objectClass_cast(
   	  lmp::BYTE                     objectClassByte)
     {
-    	OptObjectClass result;
+      OptObjectClass result;
       const otype::ObjectClass objectClass = static_cast<otype::ObjectClass>(objectClassByte);
       switch(objectClass)
       {
