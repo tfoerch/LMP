@@ -38,6 +38,7 @@ namespace lmp
     {
       std::size_t bufSize = boost::asio::buffer_size(buffer);
       const lmp::DWORD* pControlChannelId = boost::asio::buffer_cast<const lmp::DWORD*>(buffer);
+	  buffer = buffer + 4;
 	  if (pControlChannelId)
 	  {
         return

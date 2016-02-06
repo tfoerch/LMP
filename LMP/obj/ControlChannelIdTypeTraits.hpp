@@ -42,12 +42,14 @@ namespace lmp
     {
       typedef ControlChannelIdIF    object_ctype_if_type;
       typedef ControlChannelIdData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
     struct ObjectClassCTypeTraits<ccid::ClassType, ccid::RemoteCCId>
     {
       typedef ControlChannelIdIF    object_ctype_if_type;
       typedef ControlChannelIdData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
   } // namespace obj
 } // namespace lmp

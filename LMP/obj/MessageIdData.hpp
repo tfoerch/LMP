@@ -20,7 +20,7 @@ namespace lmp
       MessageIdData(
     	lmp::DWORD  MessageId);
       inline lmp::DWORD getMessageId() const { return m_messageId; }
-      lmp::WORD getContentsLength() const { return c_contentsLength; }
+      static lmp::WORD getContentsLength() { return c_contentsLength; }
       ObjectHeader::OptEncError encode(
     	boost::asio::mutable_buffer&  buffer) const;
 	private:

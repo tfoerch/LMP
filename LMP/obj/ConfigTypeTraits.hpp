@@ -9,12 +9,12 @@
 
 #include "obj/ConfigClass.hpp"
 #include "obj/ObjectClassTypeTraits.hpp"
+#include "obj/HelloConfigData.hpp"
 
 namespace lmp
 {
   namespace obj
   {
-    class HelloConfigData;
     class HelloConfigIF;
     template <>
     struct ObjectClassBaseTraits<config::ClassType>
@@ -26,6 +26,7 @@ namespace lmp
     {
       typedef HelloConfigIF    object_ctype_if_type;
       typedef HelloConfigData  data_type;
+      static bool isNegotiable(const data_type& data) { return data.isNegotiable(); }
     };
   } // namespace obj
 } // namespace lmp

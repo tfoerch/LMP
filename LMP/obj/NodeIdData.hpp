@@ -17,12 +17,16 @@ namespace lmp
     class NodeIdData
 	{
 	public:
+      typedef boost::optional<NodeIdData>                            opt_data_type;
+      typedef std::pair<opt_data_type, ObjectHeader::OptDecError>    DataTypeDecodingResult;
       NodeIdData(
     	lmp::DWORD  nodeId);
       inline lmp::DWORD getNodeId() const { return m_nodeId; }
-      lmp::WORD getContentsLength() const { return c_contentsLength; }
+      static lmp::WORD getContentsLength() { return c_contentsLength; }
       ObjectHeader::OptEncError encode(
     	boost::asio::mutable_buffer&  buffer) const;
+      static DataTypeDecodingResult decode(
+    	boost::asio::const_buffer&    buffer);
 	private:
   	  lmp::DWORD              m_nodeId;
       static const lmp::WORD  c_contentsLength;

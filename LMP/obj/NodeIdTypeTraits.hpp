@@ -20,18 +20,36 @@ namespace lmp
     struct ObjectClassBaseTraits<nodeid::ClassType>
     {
       static const otype::ObjectClass  c_object_class = otype::NodeID;
+      static boost::optional<nodeid::ClassType> classType_cast(
+        lmp::BYTE                     classTypeByte)
+	  {
+    	boost::optional<nodeid::ClassType>  result;
+        const nodeid::ClassType cType = static_cast<nodeid::ClassType>(classTypeByte);
+        switch(cType)
+        {
+          case nodeid::LocalNodeId:
+          case nodeid::RemoteNodeId:
+        	result = cType;
+        	break;
+          default:
+        	break;
+        }
+        return result;
+	  }
     };
     template <>
     struct ObjectClassCTypeTraits<nodeid::ClassType, nodeid::LocalNodeId>
     {
       typedef NodeIdIF    object_ctype_if_type;
       typedef NodeIdData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
     struct ObjectClassCTypeTraits<nodeid::ClassType, nodeid::RemoteNodeId>
     {
       typedef NodeIdIF    object_ctype_if_type;
       typedef NodeIdData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
   } // namespace obj
 } // namespace lmp

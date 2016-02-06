@@ -27,7 +27,6 @@ namespace lmp
       { return obj_class_traits_type::classType_cast(classTypeByte); }
     private:
       virtual lmp::BYTE do_getClassTypeByteValue() const { return do_getClassType(); }
-      virtual bool do_isNegotiable() const { return true; }
       virtual const otype::ObjectClass do_getObjectClass() const
       { return obj_class_traits_type::c_object_class; }
       virtual ClassType do_getClassType() const = 0;

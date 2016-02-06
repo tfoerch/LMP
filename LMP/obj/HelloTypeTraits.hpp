@@ -26,6 +26,7 @@ namespace lmp
     {
       typedef HelloIF    object_ctype_if_type;
       typedef HelloData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
   } // namespace obj
 } // namespace lmp

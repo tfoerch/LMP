@@ -26,12 +26,14 @@ namespace lmp
     {
       typedef MessageIdIF    object_ctype_if_type;
       typedef MessageIdData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
     struct ObjectClassCTypeTraits<msgid::ClassType, msgid::MessageIdAck>
     {
       typedef MessageIdIF    object_ctype_if_type;
       typedef MessageIdData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
   } // namespace obj
 } // namespace lmp

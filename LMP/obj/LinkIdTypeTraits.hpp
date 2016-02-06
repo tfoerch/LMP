@@ -28,36 +28,42 @@ namespace lmp
     {
       typedef LinkIdDWordIF    object_ctype_if_type;
       typedef LinkIdDWordData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
     struct ObjectClassCTypeTraits<linkid::ClassType, linkid::IPv4RemoteLinkId>
     {
       typedef LinkIdDWordIF    object_ctype_if_type;
       typedef LinkIdDWordData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
     struct ObjectClassCTypeTraits<linkid::ClassType, linkid::IPv6LocalLinkId>
     {
       typedef LinkIdIPv6IF    object_ctype_if_type;
       typedef LinkIdIPv6Data  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
     struct ObjectClassCTypeTraits<linkid::ClassType, linkid::IPv6RemoteLinkId>
     {
       typedef LinkIdIPv6IF    object_ctype_if_type;
       typedef LinkIdIPv6Data  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
     struct ObjectClassCTypeTraits<linkid::ClassType, linkid::UnnumberedLocalLinkId>
     {
       typedef LinkIdDWordIF    object_ctype_if_type;
       typedef LinkIdDWordData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
     struct ObjectClassCTypeTraits<linkid::ClassType, linkid::UnnumberedRemoteLinkId>
     {
       typedef LinkIdDWordIF    object_ctype_if_type;
       typedef LinkIdDWordData  data_type;
+      static bool isNegotiable(const data_type&) { return false; }
     };
   } // namespace obj
 } // namespace lmp

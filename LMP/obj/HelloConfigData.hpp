@@ -22,6 +22,7 @@ namespace lmp
 		lmp::WORD  helloDeadIntv);
       inline lmp::WORD getHelloIntv() const { return m_helloIntv; }
       inline lmp::WORD getHelloDeadIntv() const { return m_helloDeadIntv; }
+      bool isNegotiable() const { return true; }
       lmp::WORD getContentsLength() const { return c_contentsLength; }
       ObjectHeader::OptEncError encode(
     	boost::asio::mutable_buffer&  buffer) const;
