@@ -17,14 +17,18 @@ namespace lmp
     class HelloData
 	{
 	public:
+      typedef boost::optional<HelloData>                             opt_data_type;
+      typedef std::pair<opt_data_type, ObjectHeader::OptDecError>    DataTypeDecodingResult;
       HelloData(
     	lmp::DWORD  txSeqNum,
 		lmp::DWORD  rcvSeqNum);
       inline lmp::DWORD getTxSeqNum() const { return m_txSeqNum; }
       inline lmp::DWORD getRcvSeqNum() const { return m_rcvSeqNum; }
-      lmp::WORD getContentsLength() const { return c_contentsLength; }
+      static lmp::WORD getContentsLength() { return c_contentsLength; }
       ObjectHeader::OptEncError encode(
     	boost::asio::mutable_buffer&  buffer) const;
+      static DataTypeDecodingResult decode(
+    	boost::asio::const_buffer&    buffer);
 	private:
   	  lmp::DWORD              m_txSeqNum;
       lmp::DWORD              m_rcvSeqNum;

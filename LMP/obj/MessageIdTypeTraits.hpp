@@ -20,6 +20,22 @@ namespace lmp
     struct ObjectClassBaseTraits<msgid::ClassType>
     {
       static const otype::ObjectClass  c_object_class = otype::MessageID;
+      static boost::optional<msgid::ClassType> classType_cast(
+        lmp::BYTE                     classTypeByte)
+	  {
+    	boost::optional<msgid::ClassType>  result;
+        const msgid::ClassType cType = static_cast<msgid::ClassType>(classTypeByte);
+        switch(cType)
+        {
+          case msgid::MessageId:
+          case msgid::MessageIdAck:
+        	result = cType;
+        	break;
+          default:
+        	break;
+        }
+        return result;
+	  }
     };
     template <>
     struct ObjectClassCTypeTraits<msgid::ClassType, msgid::MessageId>

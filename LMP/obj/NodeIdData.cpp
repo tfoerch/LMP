@@ -13,7 +13,7 @@ namespace lmp
 {
   namespace obj
   {
-    const lmp::WORD NodeIdData::c_contentsLength = sizeof(lmp::DWORD);;
+    const lmp::WORD NodeIdData::c_contentsLength = sizeof(lmp::DWORD);
 
     NodeIdData::NodeIdData(
       lmp::DWORD  nodeId)

@@ -20,6 +20,21 @@ namespace lmp
     struct ObjectClassBaseTraits<hello::ClassType>
     {
       static const otype::ObjectClass  c_object_class = otype::Hello;
+      static boost::optional<hello::ClassType> classType_cast(
+        lmp::BYTE                     classTypeByte)
+	  {
+    	boost::optional<hello::ClassType>  result;
+        const hello::ClassType cType = static_cast<hello::ClassType>(classTypeByte);
+        switch(cType)
+        {
+          case hello::Hello:
+        	result = cType;
+        	break;
+          default:
+        	break;
+        }
+        return result;
+	  }
     };
     template <>
     struct ObjectClassCTypeTraits<hello::ClassType, hello::Hello>

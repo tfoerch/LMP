@@ -41,5 +41,27 @@ namespace lmp
       }
       return ObjectHeader::OptEncError(ObjectHeader::insufficient_buffer_length);
     }
+    HelloData::DataTypeDecodingResult HelloData::decode(
+        	boost::asio::const_buffer&    buffer)
+    {
+      std::size_t bufSize = boost::asio::buffer_size(buffer);
+      const lmp::DWORD* pTxSeqNum = boost::asio::buffer_cast<const lmp::DWORD*>(buffer);
+      buffer = buffer + 4;
+	  if (pTxSeqNum)
+	  {
+	    const lmp::DWORD* pRcvSeqNum = boost::asio::buffer_cast<const lmp::DWORD*>(buffer);
+	    buffer = buffer + 4;
+	    if (pRcvSeqNum)
+	    {
+          return
+            DataTypeDecodingResult(opt_data_type(HelloData(boost::endian::big_to_native(*pTxSeqNum),
+            		                                       boost::endian::big_to_native(*pRcvSeqNum))),
+    	    		               boost::none);
+	    }
+	  }
+	  return
+        DataTypeDecodingResult(boost::none,
+        		               ObjectHeader::OptDecError(ObjectHeader::unspecified_decoding_error));
+    }
   } // namespace obj
 } // namespace lmp

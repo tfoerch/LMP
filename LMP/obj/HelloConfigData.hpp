@@ -17,15 +17,19 @@ namespace lmp
     class HelloConfigData
 	{
 	public:
+      typedef boost::optional<HelloConfigData>                       opt_data_type;
+      typedef std::pair<opt_data_type, ObjectHeader::OptDecError>    DataTypeDecodingResult;
       HelloConfigData(
     	lmp::WORD  helloIntv,
 		lmp::WORD  helloDeadIntv);
       inline lmp::WORD getHelloIntv() const { return m_helloIntv; }
       inline lmp::WORD getHelloDeadIntv() const { return m_helloDeadIntv; }
       bool isNegotiable() const { return true; }
-      lmp::WORD getContentsLength() const { return c_contentsLength; }
+      static lmp::WORD getContentsLength() { return c_contentsLength; }
       ObjectHeader::OptEncError encode(
     	boost::asio::mutable_buffer&  buffer) const;
+      static DataTypeDecodingResult decode(
+    	boost::asio::const_buffer&    buffer);
 	private:
   	  lmp::WORD  m_helloIntv;
       lmp::WORD  m_helloDeadIntv;
