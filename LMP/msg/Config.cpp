@@ -6,6 +6,7 @@
  */
 
 #include "Config.hpp"
+#include <boost/asio/buffer.hpp>
 
 namespace lmp
 {
@@ -70,6 +71,27 @@ namespace lmp
         }
       }
       return boost::none;
+    }
+    Config::DecodingResult Config::decode(
+      const CommonHeader&         msgHeader,
+  	  boost::asio::const_buffer&  buffer)
+    {
+      DecodingResult decodingResult;
+      std::size_t bufSize = boost::asio::buffer_size(buffer);
+      std::size_t bytesRead = CommonHeader::c_headerLength;
+      while (bufSize > lmp::obj::ObjectHeader::c_headerLength &&
+    		 bytesRead + lmp::obj::ObjectHeader::c_headerLength < msgHeader.getLmpLength() &&
+			 !decodingResult.first &&
+			 !decodingResult.second)
+      {
+    	lmp::obj::ObjectHeader::DecodingResult headerDecodingResult =
+          lmp::obj::ObjectHeader::decode(buffer);
+    	if (headerDecodingResult.first)
+    	{
+    	  const lmp::obj::ObjectHeader& header = *headerDecodingResult.first;
+    	}
+      }
+      return decodingResult;
     }
   } // namespace msg
 } // namespace lmp

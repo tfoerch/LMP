@@ -18,9 +18,18 @@ namespace lmp
 {
   namespace msg
   {
+    class CommonHeader;
     class Config : public LMPMessageIF
 	{
 	public:
+      typedef boost::optional<Config>      OptMsg;
+      enum decoding_error
+	  {
+		invalid_length,
+		unspecified_decoding_error
+	  };
+      typedef boost::optional<decoding_error>    OptDecError;
+      typedef std::pair<OptMsg, OptDecError>  DecodingResult;
       Config(
         const lmp::obj::LocalCCId&    localCCId,
 		const lmp::obj::MessageId&    messageId,
@@ -30,6 +39,9 @@ namespace lmp
       inline const lmp::obj::MessageId& getMessageId() const { return m_messageId; }
       inline const lmp::obj::LocalNodeId& getLocalNodeId() const { return m_localNodeId; }
       inline const lmp::obj::HelloConfig& getHelloConfig() const { return m_helloConfig; }
+      static DecodingResult decode(
+        const CommonHeader&         msgHeader,
+    	boost::asio::const_buffer&  buffer);
     private:
       virtual const mtype::MsgType do_getMsgType() const;
       virtual lmp::WORD do_getContentsLength() const;
