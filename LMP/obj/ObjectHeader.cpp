@@ -8,7 +8,7 @@
 #include "ObjectHeader.hpp"
 #include <boost/asio/buffer.hpp>
 #include <boost/endian/conversion.hpp>
-//#include <iostream>
+#include <iostream>
 
 namespace lmp
 {
@@ -75,7 +75,7 @@ namespace lmp
         	OptObjectClass optObjectClass = objectClass_cast(objectClass);
         	if (optObjectClass)
         	{
-        	  // std::cout << "msgType = " << *optMsgType << std::endl;
+        	  std::cout << "objectClass = " << *optObjectClass << std::endl;
         	  return DecodingResult(OptHeader(ObjectHeader(negotiable,
         			                                       classType,
 														   *optObjectClass,

@@ -15,6 +15,7 @@
 #include <boost/asio/buffers_iterator.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_binary.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
 
 #define BOOST_TEST_MODULE LMP
 #include <BoostTestTargetConfig.h>
@@ -39,19 +40,89 @@ size_t parseDocument(ConstBuffers const& buffers, int &data)
   using boost::spirit::qi::parse;
   using boost::phoenix::ref;
   return
-	( parse(first, last,
-
-	  //  Begin grammar
-	  (
-	       byte_[ref(versByte) = _1]
-	    >> byte_[ref(msgTypeByte) = _1]
-        >> big_word[ref(msgLength) = _1]
-	  ),
-	  //  End grammar
-			 data) ?
+	( parse(first,
+			last,
+			//  Begin grammar
+			(
+			     byte_[ref(versByte) = _1]
+	          >> byte_[ref(msgTypeByte) = _1]
+              >> big_word[ref(msgLength) = _1]
+			),
+			//  End grammar
+			data) ?
       (first - begin) :
 	  0 ); // only optionally consume
 }
+
+namespace client
+{
+    namespace qi = boost::spirit::qi;
+    namespace ascii = boost::spirit::ascii;
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //  Our nabialek_trick grammar
+    ///////////////////////////////////////////////////////////////////////////////
+    template <typename Iterator>
+    struct nabialek_trick : qi::grammar<
+        Iterator, ascii::space_type, qi::locals<qi::rule<Iterator, ascii::space_type>*> >
+    {
+        nabialek_trick() : nabialek_trick::base_type(start)
+        {
+            using ascii::alnum;
+            using qi::lexeme;
+            using qi::lazy;
+            using qi::_a;
+            using qi::_1;
+
+            id = lexeme[*(ascii::alnum | '_')];
+            one = id;
+            two = id >> ',' >> id;
+
+            keyword.add
+                ("one", &one)
+                ("two", &two)
+                ;
+
+            start = *(keyword[_a = _1] >> lazy(*_a));
+        }
+
+        qi::rule<Iterator, ascii::space_type> id, one, two;
+        qi::rule<Iterator, ascii::space_type, qi::locals<qi::rule<Iterator, ascii::space_type>*> > start;
+        qi::symbols<char, qi::rule<Iterator, ascii::space_type>*> keyword;
+    };
+}
+
+namespace lmp
+{
+  namespace parse
+  {
+    namespace qi = boost::spirit::qi;
+    namespace ascii = boost::spirit::ascii;
+    template <typename Iterator>
+    struct message_grammar : qi::grammar<Iterator>
+    {
+      message_grammar() : message_grammar::base_type(start)
+      {
+    	using qi::big_word;
+    	using qi::big_dword;
+    	using qi::byte_;
+        using ascii::alnum;
+        using qi::lexeme;
+        using qi::lazy;
+        using qi::_a;
+        using qi::_1;
+        // 0x10, 0x00, 0x00, 0x01, // <Common Header>
+        // 0x00, 0x28, 0x00, 0x00,
+
+	    config_msg =  '\x10' >> byte_ >> byte_ >> '\x01' >> big_word >> byte_ >> byte_;
+
+        start = config_msg;
+      }
+      qi::rule<Iterator> config_msg;
+      qi::rule<Iterator> start;
+    };
+  } // namespace parse
+} // namespace lmp
 
 
 BOOST_AUTO_TEST_SUITE( msg )
@@ -190,26 +261,45 @@ BOOST_AUTO_TEST_CASE( config )
   }
 }
 
-BOOST_AUTO_TEST_CASE( config_spirit )
+BOOST_AUTO_TEST_CASE( config_header_spirit )
 {
   {
+    using boost::spirit::qi::parse;
+
+    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
 	unsigned char message[] =
       { 0x10, 0x00, 0x00, 0x01, // <Common Header>
-        0x00, 0x28, 0x00, 0x00,
-	    0x01, 0x01, 0x00, 0x08, // <LOCAL_CCID>
-        0x01, 0x02, 0x00, 0x08,
-		0x01, 0x05, 0x00, 0x08, // <MESSAGE_ID>
-        0x01, 0x02, 0x05, 0x08,
-		0x01, 0x02, 0x00, 0x08, // <LOCAL_NODE_ID>
-		0x01, 0x02, 0x05, 0x08,
-		0x81, 0x06, 0x00, 0x08, // <CONFIG> = HelloConfig
-		0x00, 0x9A, 0x01, 0xCF };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-	boost::asio::streambuf strbuf;
-	boost::asio::streambuf::mutable_buffers_type bufs = strbuf.prepare(1024);
-	size_t numBytes = boost::asio::buffer_copy(bufs, messageBuffer);
-	strbuf.commit(numBytes);
+        0x00, 0x28, 0x00, 0x00 };
+	boost::asio::const_buffers_1 messageBuffer(message,
+                                               sizeof(message)/sizeof(unsigned char));
+	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+	BufIterType last = boost::asio::buffers_end(messageBuffer);
+	lmp::parse::message_grammar<BufIterType>  msgGrammar;
+	BOOST_CHECK(parse(begin,
+		              last,
+					  msgGrammar));
+
+  }
+}
+
+BOOST_AUTO_TEST_CASE( unknown_msg_type_header_spirit )
+{
+  {
+    using boost::spirit::qi::parse;
+
+    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+	unsigned char message[] =
+      { 0x10, 0x00, 0x00, 0x45, // <Common Header>
+        0x00, 0x28, 0x00, 0x00 };
+	boost::asio::const_buffers_1 messageBuffer(message,
+                                               sizeof(message)/sizeof(unsigned char));
+	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+	BufIterType last = boost::asio::buffers_end(messageBuffer);
+	lmp::parse::message_grammar<BufIterType>  msgGrammar;
+	BOOST_CHECK(!parse(begin,
+			           last,
+					   msgGrammar));
+
   }
 }
 

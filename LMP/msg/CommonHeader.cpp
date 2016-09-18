@@ -103,7 +103,7 @@ namespace lmp
               {
             	lmp::WORD lmpLength = boost::endian::big_to_native(*pWordData);
                 // std::cout << "lmpLength = " << lmpLength << std::endl;
-                buffer = buffer + 2;
+                buffer = buffer + 4; // length and reserved field
             	OptMsgType optMsgType = msgType_cast(msgType);
             	if (optMsgType)
             	{

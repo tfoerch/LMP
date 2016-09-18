@@ -7,6 +7,7 @@
 
 #include "Config.hpp"
 #include <boost/asio/buffer.hpp>
+#include <iostream>
 
 namespace lmp
 {
@@ -76,20 +77,147 @@ namespace lmp
       const CommonHeader&         msgHeader,
   	  boost::asio::const_buffer&  buffer)
     {
+      // std::cout << "Config::decode" << std::endl;
       DecodingResult decodingResult;
       std::size_t bufSize = boost::asio::buffer_size(buffer);
       std::size_t bytesRead = CommonHeader::c_headerLength;
-      while (bufSize > lmp::obj::ObjectHeader::c_headerLength &&
-    		 bytesRead + lmp::obj::ObjectHeader::c_headerLength < msgHeader.getLmpLength() &&
-			 !decodingResult.first &&
-			 !decodingResult.second)
+	  // <LOCAL_CCID>
+	  lmp::obj::LocalCCId::DecodingResult localCCIdDecodingResult;
+      if (bufSize > lmp::obj::ObjectHeader::c_headerLength &&
+     	  bytesRead + lmp::obj::ObjectHeader::c_headerLength < msgHeader.getLmpLength())
       {
-    	lmp::obj::ObjectHeader::DecodingResult headerDecodingResult =
-          lmp::obj::ObjectHeader::decode(buffer);
-    	if (headerDecodingResult.first)
-    	{
-    	  const lmp::obj::ObjectHeader& header = *headerDecodingResult.first;
-    	}
+      	lmp::obj::ObjectHeader::DecodingResult headerDecodingResult =
+            lmp::obj::ObjectHeader::decode(buffer);
+      	if (headerDecodingResult.first)
+      	{
+      	  const lmp::obj::ObjectHeader& header = *headerDecodingResult.first;
+      	  if (header.getObjectClass() == lmp::obj::otype::ControlChannelID)
+      	  {
+      		lmp::obj::ObjectClassIF<lmp::obj::ccid::ClassType>::OptClassType optCType =
+      		  lmp::obj::ObjectClassIF<lmp::obj::ccid::ClassType>::classType_cast(header.getClassType());
+       	    if (optCType &&
+       	    	*optCType == lmp::obj::ccid::LocalCCId)
+       	    {
+       	      localCCIdDecodingResult =
+       	        lmp::obj::LocalCCId::decode(header, buffer);
+       	      if (localCCIdDecodingResult.first)
+       	      {
+       			const lmp::obj::LocalCCId& localCCId = *localCCIdDecodingResult.first;
+       	    	std::cout << "localCCId = " << localCCId.getControlChannelId() << std::endl;
+       	      }
+       	      else if (localCCIdDecodingResult.second)
+       	      {
+       	    	if (*localCCIdDecodingResult.second == lmp::obj::ObjectHeader::invalid_length)
+       	    	{
+       	    	  decodingResult.second = OptDecError(invalid_length);
+       	    	}
+       	    	else
+       	    	{
+       	    	  decodingResult.second = OptDecError(unspecified_decoding_error);
+       	    	}
+       	      }
+       	    }
+      	  }
+      	}
+      }
+      // <MESSAGE_ID>
+      if (!decodingResult.second)
+      {
+	    lmp::obj::MessageId::DecodingResult messageIdDecodingResult;
+	    if (bufSize > lmp::obj::ObjectHeader::c_headerLength &&
+		    bytesRead + lmp::obj::ObjectHeader::c_headerLength < msgHeader.getLmpLength())
+	    {
+	      lmp::obj::ObjectHeader::DecodingResult headerDecodingResult =
+	        lmp::obj::ObjectHeader::decode(buffer);
+	      if (headerDecodingResult.first)
+	      {
+	    	const lmp::obj::ObjectHeader& header = *headerDecodingResult.first;
+	    	if (header.getObjectClass() == lmp::obj::otype::MessageID)
+	    	{
+	          lmp::obj::ObjectClassIF<lmp::obj::msgid::ClassType>::OptClassType optCType =
+			    lmp::obj::ObjectClassIF<lmp::obj::msgid::ClassType>::classType_cast(header.getClassType());
+	          if (optCType &&
+	        	  *optCType == lmp::obj::msgid::MessageId)
+	          {
+	        	messageIdDecodingResult =
+				  lmp::obj::MessageId::decode(header, buffer);
+	        	if (messageIdDecodingResult.first)
+	        	{
+	        	  const lmp::obj::MessageId& messageId = *messageIdDecodingResult.first;
+	        	  std::cout << "messageId = " << messageId.getMessageId() << std::endl;
+	        	}
+	          }
+	    	}
+	      }
+	    }
+	    // <LOCAL_NODE_ID>
+	    if (!decodingResult.second)
+	    {
+	      lmp::obj::LocalNodeId::DecodingResult localNodeIdDecodingResult;
+	      if (bufSize > lmp::obj::ObjectHeader::c_headerLength &&
+		      bytesRead + lmp::obj::ObjectHeader::c_headerLength < msgHeader.getLmpLength())
+	      {
+	        lmp::obj::ObjectHeader::DecodingResult headerDecodingResult =
+			  lmp::obj::ObjectHeader::decode(buffer);
+	        if (headerDecodingResult.first)
+	        {
+	          const lmp::obj::ObjectHeader& header = *headerDecodingResult.first;
+	          if (header.getObjectClass() == lmp::obj::otype::NodeID)
+	          {
+	    	    lmp::obj::ObjectClassIF<lmp::obj::nodeid::ClassType>::OptClassType optCType =
+			      lmp::obj::ObjectClassIF<lmp::obj::nodeid::ClassType>::classType_cast(header.getClassType());
+	    	    if (optCType &&
+	    		    *optCType == lmp::obj::nodeid::LocalNodeId)
+	    	    {
+	    		  localNodeIdDecodingResult =
+				    lmp::obj::LocalNodeId::decode(header, buffer);
+	    		  if (localNodeIdDecodingResult.first)
+	    		  {
+				    const lmp::obj::LocalNodeId& localNodeId = *localNodeIdDecodingResult.first;
+				    std::cout << "localNodeId = " << localNodeId.getNodeId() << std::endl;
+	    		  }
+	    	    }
+	          }
+	        }
+	      }
+	      // <CONFIG> = HelloConfig
+	      if (!decodingResult.second)
+	      {
+	    	lmp::obj::HelloConfig::DecodingResult helloConfigDecodingResult;
+	    	if (bufSize > lmp::obj::ObjectHeader::c_headerLength &&
+		        bytesRead + lmp::obj::ObjectHeader::c_headerLength < msgHeader.getLmpLength())
+	    	{
+     		  lmp::obj::ObjectHeader::DecodingResult headerDecodingResult =
+     		    lmp::obj::ObjectHeader::decode(buffer);
+     		  if (headerDecodingResult.first)
+     		  {
+		        const lmp::obj::ObjectHeader& header = *headerDecodingResult.first;
+		        if (header.getObjectClass() == lmp::obj::otype::Config)
+		        {
+		          lmp::obj::ObjectClassIF<lmp::obj::config::ClassType>::OptClassType optCType =
+			        lmp::obj::ObjectClassIF<lmp::obj::config::ClassType>::classType_cast(header.getClassType());
+		          if (optCType &&
+				      *optCType == lmp::obj::config::HelloConfig)
+		          {
+			        helloConfigDecodingResult =
+				      lmp::obj::HelloConfig::decode(header, buffer);
+			        if (helloConfigDecodingResult.first)
+			        {
+				      const lmp::obj::HelloConfig& helloConfig = *helloConfigDecodingResult.first;
+				      std::cout << "helloIntv = " << helloConfig.getHelloIntv()
+					            << ", helloDeadIntv = " << helloConfig.getHelloDeadIntv() << std::endl;
+				      decodingResult.first =
+				        OptMsg(Config(*localCCIdDecodingResult.first,
+				    	 	          *messageIdDecodingResult.first,
+									  *localNodeIdDecodingResult.first,
+									  *helloConfigDecodingResult.first));
+			        }
+		          }
+			    }
+		      }
+     		}
+     	  }
+	    }
       }
       return decodingResult;
     }
