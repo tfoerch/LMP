@@ -20,6 +20,8 @@
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/phoenix/object/static_cast.hpp>
+#include <iomanip>
 
 #define BOOST_TEST_MODULE LMP
 #include <BoostTestTargetConfig.h>
@@ -67,65 +69,62 @@ namespace lmp
     namespace phoenix = boost::phoenix;
     namespace qi = boost::spirit::qi;
     enum class MsgType : lmp::BYTE { Config = 1, ConfigAck = 2, ConfigNack = 3 };
-    struct Objects
-    {
-    };
-    struct LocalCCIdValues
+    struct LocalCCIdData
     {
 	  bool        m_negotiatable;
 	  lmp::DWORD  m_CCId;
     };
-    std::ostream& operator<<(std::ostream& os, const LocalCCIdValues& localCCId)
+    std::ostream& operator<<(std::ostream& os, const LocalCCIdData& localCCId)
     {
       os << localCCId.m_CCId;
       return os;
     }
-    struct RemoteCCIdValues
+    struct RemoteCCIdData
     {
 	  bool        m_negotiatable;
 	  lmp::DWORD  m_CCId;
     };
-    std::ostream& operator<<(std::ostream& os, const RemoteCCIdValues& remoteCCId)
+    std::ostream& operator<<(std::ostream& os, const RemoteCCIdData& remoteCCId)
     {
       os << remoteCCId.m_CCId;
       return os;
     }
-   struct MessageIdValues
+   struct MessageIdData
     {
       bool        m_negotiatable;
       lmp::DWORD  m_messageId;
     };
-    std::ostream& operator<<(std::ostream& os, const MessageIdValues& messageId)
+    std::ostream& operator<<(std::ostream& os, const MessageIdData& messageId)
     {
       os << messageId.m_messageId;
       return os;
     }
-    struct MessageIdAckValues
+    struct MessageIdAckData
     {
       bool        m_negotiatable;
       lmp::DWORD  m_messageId;
     };
-    std::ostream& operator<<(std::ostream& os, const MessageIdAckValues& messageAckId)
+    std::ostream& operator<<(std::ostream& os, const MessageIdAckData& messageAckId)
     {
       os << messageAckId.m_messageId;
       return os;
     }
-    struct LocalNodeIdValues
+    struct LocalNodeIdData
     {
 	   bool        m_negotiatable;
 	   lmp::DWORD  m_nodeId;
     };
-    std::ostream& operator<<(std::ostream& os, const LocalNodeIdValues& nodeId)
+    std::ostream& operator<<(std::ostream& os, const LocalNodeIdData& nodeId)
     {
       os << nodeId.m_nodeId;
       return os;
     }
-    struct RemoteNodeIdValues
+    struct RemoteNodeIdData
     {
 	   bool        m_negotiatable;
 	   lmp::DWORD  m_nodeId;
     };
-    std::ostream& operator<<(std::ostream& os, const RemoteNodeIdValues& nodeId)
+    std::ostream& operator<<(std::ostream& os, const RemoteNodeIdData& nodeId)
     {
       os << nodeId.m_nodeId;
       return os;
@@ -141,16 +140,119 @@ namespace lmp
       os << helloConfig.m_helloIntv << ", " << helloConfig.m_helloDeadIntv;
       return os;
     }
-    struct ConfigMsgValues
+    struct UnknownObject
+    {
+  	  bool                    m_negotiatable;
+  	  lmp::BYTE               m_class_type;
+  	  lmp::BYTE               m_object_class;
+  	  lmp::WORD               m_length;
+  	  std::vector<lmp::BYTE>  m_data;
+    };
+    std::ostream& operator<<(std::ostream& os, const UnknownObject& unknownObject)
+    {
+      os << static_cast<lmp::WORD>(unknownObject.m_class_type)
+         << ", " << static_cast<lmp::WORD>(unknownObject.m_object_class)
+		 << ", " << unknownObject.m_length
+		 << ", '" << std::hex;
+      for (std::vector<lmp::BYTE>::const_iterator iter = unknownObject.m_data.begin();
+    	   iter != unknownObject.m_data.end();
+    	   ++iter)
+      {
+    	if (iter != unknownObject.m_data.begin())
+    	{
+    	  os << " ";
+    	}
+    	os << std::setw(2) << std::setfill('0') << static_cast<lmp::WORD>(*iter);
+      }
+      os << "'" << std::dec;
+      return os;
+    }
+    typedef
+      boost::variant<LocalCCIdData,
+	                 RemoteCCIdData,
+					 MessageIdData,
+					 MessageIdAckData,
+					 LocalNodeIdData,
+					 RemoteNodeIdData,
+					 HelloConfig,
+					 UnknownObject>          ObjectVariants;
+    struct obj_variants_printer : boost::static_visitor<std::ostream&>
+    {
+      obj_variants_printer(std::ostream& os)
+      : m_os(os)
+	  {}
+      std::ostream& operator()(const LocalCCIdData& localCCId) const
+      {
+    	m_os << localCCId;
+    	return m_os;
+      }
+      std::ostream& operator()(const RemoteCCIdData& remoteCCId) const
+      {
+    	m_os << remoteCCId;
+    	return m_os;
+      }
+      std::ostream& operator()(const MessageIdData& messageId) const
+      {
+    	m_os << messageId;
+    	return m_os;
+      }
+      std::ostream& operator()(const MessageIdAckData& messageId) const
+      {
+    	m_os << messageId;
+    	return m_os;
+      }
+      std::ostream& operator()(const LocalNodeIdData& localNodeId) const
+      {
+    	m_os << localNodeId;
+    	return m_os;
+      }
+      std::ostream& operator()(const RemoteNodeIdData& remoteNodeId) const
+      {
+    	m_os << remoteNodeId;
+    	return m_os;
+      }
+      std::ostream& operator()(const HelloConfig& helloConfig) const
+      {
+    	m_os << helloConfig;
+    	return m_os;
+      }
+      std::ostream& operator()(const UnknownObject& unknownObject) const
+      {
+    	m_os << unknownObject;
+    	return m_os;
+      }
+      std::ostream&   m_os;
+    };
+    struct ObjectSequence
+    {
+      std::vector<ObjectVariants>   m_objects;
+    };
+    std::ostream& operator<<(
+      std::ostream&          os,
+	  const ObjectSequence&  objectSequence)
+    {
+      for (std::vector<ObjectVariants>::const_iterator iter = objectSequence.m_objects.begin();
+    	   iter != objectSequence.m_objects.end();
+    	   ++iter)
+      {
+    	if (iter != objectSequence.m_objects.begin())
+    	{
+    	  os << ", ";
+    	}
+        boost::apply_visitor(obj_variants_printer(os), *iter);
+      }
+      return os;
+    }
+    struct ConfigMsgData
 	{
-      LocalCCIdValues    m_localCCId;
-      MessageIdValues    m_messageId;
-      LocalNodeIdValues  m_localNodeId;
-      HelloConfig        m_helloConfig;
+      LocalCCIdData    m_localCCId;
+      MessageIdData    m_messageId;
+      LocalNodeIdData  m_localNodeId;
+      HelloConfig      m_helloConfig;
 	};
     std::ostream& operator<<(
       std::ostream&          os,
-	  const ConfigMsgValues& config)
+	  const ConfigMsgData& config)
     {
       std::cout << "ConfigMsg(" << config.m_localCCId
     			<< ", " << config.m_messageId
@@ -159,17 +261,17 @@ namespace lmp
 				<< ")";
       return os;
     }
-    struct ConfigAckMsgValues
+    struct ConfigAckMsgData
 	{
-      LocalCCIdValues     m_localCCId;
-      LocalNodeIdValues   m_localNodeId;
-      RemoteCCIdValues    m_remoteCCId;
-      MessageIdAckValues  m_messageId;
-      RemoteNodeIdValues  m_remoteNodeId;
+      LocalCCIdData     m_localCCId;
+      LocalNodeIdData   m_localNodeId;
+      RemoteCCIdData    m_remoteCCId;
+      MessageIdAckData  m_messageId;
+      RemoteNodeIdData  m_remoteNodeId;
 	};
     std::ostream& operator<<(
       std::ostream&             os,
-	  const ConfigAckMsgValues& configAck)
+	  const ConfigAckMsgData& configAck)
     {
       std::cout << "ConfigAckMsg(" << configAck.m_localCCId
 				<< ", " << configAck.m_localNodeId
@@ -179,18 +281,18 @@ namespace lmp
 				<< ")";
       return os;
     }
-    struct ConfigNackMsgValues
+    struct ConfigNackMsgData
 	{
-      LocalCCIdValues     m_localCCId;
-      LocalNodeIdValues   m_localNodeId;
-      RemoteCCIdValues    m_remoteCCId;
-      MessageIdAckValues  m_messageId;
-      RemoteNodeIdValues  m_remoteNodeId;
-      HelloConfig         m_helloConfig;
+      LocalCCIdData     m_localCCId;
+      LocalNodeIdData   m_localNodeId;
+      RemoteCCIdData    m_remoteCCId;
+      MessageIdAckData  m_messageId;
+      RemoteNodeIdData  m_remoteNodeId;
+      HelloConfig       m_helloConfig;
 	};
     std::ostream& operator<<(
       std::ostream&          os,
-	  const ConfigNackMsgValues& configNack)
+	  const ConfigNackMsgData& configNack)
     {
       std::cout << "ConfigNackMsg(" << configNack.m_localCCId
 				<< ", " << configNack.m_localNodeId
@@ -201,51 +303,101 @@ namespace lmp
 				<< ")";
       return os;
     }
+    struct UnknownMessage
+    {
+      lmp::BYTE               m_type;
+  	  lmp::WORD               m_length;
+  	  ObjectSequence          m_objects;
+    };
+    std::ostream& operator<<(
+      std::ostream&          os,
+	  const UnknownMessage&  unknownMessage)
+    {
+      std::cout << "UnknownMessage(" << static_cast<lmp::WORD>(unknownMessage.m_type)
+				<< ", " << unknownMessage.m_length
+				<< ", " << unknownMessage.m_objects
+				<< ")";
+      return os;
+    }
     typedef
-      boost::variant<ConfigMsgValues,
-					 ConfigAckMsgValues,
-					 ConfigNackMsgValues>
-    MsgVariants;
-    struct MsgValues
+      boost::variant<ConfigMsgData,
+					 ConfigAckMsgData,
+					 ConfigNackMsgData,
+					 UnknownMessage>     MsgVariants;
+    struct msg_variants_printer : boost::static_visitor<std::ostream&>
+    {
+      msg_variants_printer(std::ostream& os)
+      : m_os(os)
+	  {}
+      std::ostream& operator()(const ConfigMsgData& config) const
+      {
+    	m_os << config << std::endl;
+    	return m_os;
+      }
+      std::ostream& operator()(const ConfigAckMsgData& configAck) const
+      {
+    	m_os << configAck << std::endl;
+    	return m_os;
+      }
+      std::ostream& operator()(const ConfigNackMsgData& configNack) const
+      {
+    	m_os << configNack << std::endl;
+    	return m_os;
+      }
+      std::ostream& operator()(const UnknownMessage& unknownMessage) const
+      {
+    	m_os << unknownMessage << std::endl;
+    	return m_os;
+      }
+      std::ostream&   m_os;
+    };
+    struct MsgData
     {
       lmp::BYTE             m_flags;
       MsgVariants           m_message;
     };
+    std::ostream& operator<<(
+      std::ostream&      os,
+	  const MsgData&     msgData)
+    {
+      boost::apply_visitor(msg_variants_printer(os), msgData.m_message);
+      return os;
+    }
   }
 }
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::LocalCCIdValues,
+  lmp::parse::LocalCCIdData,
   (bool,       m_negotiatable)
   (lmp::DWORD, m_CCId)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::RemoteCCIdValues,
+  lmp::parse::RemoteCCIdData,
   (bool,       m_negotiatable)
   (lmp::DWORD, m_CCId)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::MessageIdValues,
+  lmp::parse::MessageIdData,
   (bool,       m_negotiatable)
   (lmp::DWORD, m_messageId)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::MessageIdAckValues,
+  lmp::parse::MessageIdAckData,
   (bool,       m_negotiatable)
   (lmp::DWORD, m_messageId)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::LocalNodeIdValues,
+  lmp::parse::LocalNodeIdData,
   (bool,       m_negotiatable)
   (lmp::DWORD, m_nodeId)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::RemoteNodeIdValues,
+  lmp::parse::RemoteNodeIdData,
   (bool,       m_negotiatable)
   (lmp::DWORD, m_nodeId)
 )
@@ -258,34 +410,55 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::ConfigMsgValues,
-  (lmp::parse::LocalCCIdValues,       m_localCCId)
-  (lmp::parse::MessageIdValues,       m_messageId)
-  (lmp::parse::LocalNodeIdValues,     m_localNodeId)
-  (lmp::parse::HelloConfig,           m_helloConfig)
+  lmp::parse::UnknownObject,
+  (bool,                    m_negotiatable)
+  (lmp::BYTE,               m_class_type)
+  (lmp::BYTE,               m_object_class)
+  (lmp::WORD,               m_length)
+  (std::vector<lmp::BYTE>,  m_data)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::ConfigAckMsgValues,
-  (lmp::parse::LocalCCIdValues,       m_localCCId)
-  (lmp::parse::LocalNodeIdValues,     m_localNodeId)
-  (lmp::parse::RemoteCCIdValues,      m_remoteCCId)
-  (lmp::parse::MessageIdAckValues,    m_messageId)
-  (lmp::parse::RemoteNodeIdValues,    m_remoteNodeId)
+  lmp::parse::ObjectSequence,
+  (std::vector<lmp::parse::ObjectVariants>,  m_objects)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::ConfigNackMsgValues,
-  (lmp::parse::LocalCCIdValues,       m_localCCId)
-  (lmp::parse::LocalNodeIdValues,     m_localNodeId)
-  (lmp::parse::RemoteCCIdValues,      m_remoteCCId)
-  (lmp::parse::MessageIdAckValues,    m_messageId)
-  (lmp::parse::RemoteNodeIdValues,    m_remoteNodeId)
-  (lmp::parse::HelloConfig,           m_helloConfig)
+  lmp::parse::ConfigMsgData,
+  (lmp::parse::LocalCCIdData,       m_localCCId)
+  (lmp::parse::MessageIdData,       m_messageId)
+  (lmp::parse::LocalNodeIdData,     m_localNodeId)
+  (lmp::parse::HelloConfig,         m_helloConfig)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::parse::MsgValues,
+  lmp::parse::ConfigAckMsgData,
+  (lmp::parse::LocalCCIdData,       m_localCCId)
+  (lmp::parse::LocalNodeIdData,     m_localNodeId)
+  (lmp::parse::RemoteCCIdData,      m_remoteCCId)
+  (lmp::parse::MessageIdAckData,    m_messageId)
+  (lmp::parse::RemoteNodeIdData,    m_remoteNodeId)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+  lmp::parse::ConfigNackMsgData,
+  (lmp::parse::LocalCCIdData,       m_localCCId)
+  (lmp::parse::LocalNodeIdData,     m_localNodeId)
+  (lmp::parse::RemoteCCIdData,      m_remoteCCId)
+  (lmp::parse::MessageIdAckData,    m_messageId)
+  (lmp::parse::RemoteNodeIdData,    m_remoteNodeId)
+  (lmp::parse::HelloConfig,         m_helloConfig)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+  lmp::parse::UnknownMessage,
+  (lmp::BYTE,                         m_type)
+  (lmp::WORD,                         m_length)
+  (lmp::parse::ObjectSequence,        m_objects)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+  lmp::parse::MsgData,
   (lmp::BYTE,                         m_flags)
   (lmp::parse::MsgVariants,           m_message)
 )
@@ -294,28 +467,6 @@ namespace lmp
 {
   namespace parse
   {
-    struct msg_variants_printer : boost::static_visitor<>
-    {
-      void operator()(const ConfigMsgValues& config) const
-      {
-    	std::cout << config << std::endl;
-      }
-      void operator()(const ConfigAckMsgValues& configAck) const
-      {
-    	std::cout << configAck << std::endl;
-      }
-      void operator()(const ConfigNackMsgValues& configNack) const
-      {
-    	std::cout << configNack << std::endl;
-      }
-    };
-    struct msg_values_printer
-    {
-      void operator()(const MsgValues& msgValues) const
-      {
-    	boost::apply_visitor(msg_variants_printer(), msgValues.m_message);
-      }
-    };
     struct print_action
     {
         void operator()(lmp::DWORD const& i, qi::unused_type, qi::unused_type) const
@@ -323,18 +474,28 @@ namespace lmp
             std::cout << i << std::endl;
         }
     };
-    template <typename Iterator>
-    struct message_grammar : qi::grammar<Iterator, MsgValues()>
+    struct Sniffer
     {
-      message_grammar() : message_grammar::base_type(message)
+        typedef void result_type;
+
+        template <typename T>
+        void operator()(T const&) const { std::cout << typeid(T).name() << "\n"; }
+    };
+    template <typename Iterator>
+    struct message_grammar : qi::grammar<Iterator, MsgData()>
+    {
+      message_grammar() : message_grammar::base_type(message, "message")
       {
     	using qi::big_word;
     	using qi::big_dword;
     	using qi::byte_;
+    	using qi::repeat;
+        using qi::eps;
         using qi::lazy;
         using qi::_a;
         using qi::_1;
     	using phoenix::at_c;
+        using phoenix::push_back;
     	using namespace qi::labels;
        // 0x10, 0x00, 0x00, 0x01, // <Common Header>
         // 0x00, 0x28, 0x00, 0x00,
@@ -399,16 +560,34 @@ namespace lmp
 				>> big_word [ at_c<1>(_val) = _1 ]
 				>> big_word [ at_c<2>(_val) = _1 ];
 
+		byte_sequence =
+				( eps(_r1 > 1)
+				  >> byte_sequence(_r1 - 1) [ _val = _1 ]
+				  >> byte_ [ push_back(_val, _1) ] ) |
+				byte_ [ push_back(_val, _1) ];
+
+		unknown_object =
+				byte_  [ at_c<1>(_val) = _1 ] // c-type
+				>> byte_ [ at_c<2>(_val) = _1 ] // object class
+				>> big_word [ at_c<3>(_val) = _1 ] // length
+				>> byte_sequence( at_c<3>(_val) - 4 ) [ at_c<4>(_val) = _1 ];
+				// >> repeat(4)[byte_] [ at_c<4>(_val) = _1 ]; //[ push_back(at_c<4>(_val), phoenix::static_cast_<lmp::BYTE>(_1)) ]; // [ Sniffer() ];
+
+    	objects %=
+    			local_ccid |
+				remote_ccid |
+				message_id |
+				message_id_ack |
+				local_node_id |
+				remote_node_id |
+				hello_config |
+				unknown_object;
+
    	    config_body %=
    	    		local_ccid
 				>> message_id
 				>> local_node_id
 				>> hello_config;
-//   	    config_body =
-//   	    		local_ccid [ at_c<0>(_val) = _1 ]
-//				>> message_id [ at_c<1>(_val) = _1 ]
-//				>> local_node_id [ at_c<2>(_val) = _1 ]
-//				>> hello_config [ at_c<3>(_val) = _1 ];
 
     	config_ack_body %=
    	    		local_ccid
@@ -425,6 +604,10 @@ namespace lmp
 				>> remote_node_id
 				>> hello_config;
 
+
+    	object_sequence =
+    		    +objects [push_back(at_c<0>(_val), _1)];
+
     	config_msg =
     			byte_(0x01)
 				>> msg_length [_a = _1]
@@ -439,32 +622,172 @@ namespace lmp
 				>> msg_length [_a = _1]
 			    >> config_nack_body(_a) [ _val = _1 ];
 
+    	unknown_msg %=
+    			byte_ // type
+				>> msg_length //length
+				>> object_sequence(at_c<1>(_val));
+
 	    msg_type_and_bodies %=
 	    	    config_msg |
 	    	    config_ack_msg |
-				config_nack_msg;
+				config_nack_msg |
+				unknown_msg;
 
         message %=
         		vers_flags
 				>> msg_type_and_bodies;
+
+        message.name("message");
+        msg_type_and_bodies.name("message_type_and_bodies");
+        config_msg.name("config_message");
+        config_ack_msg.name("config_ack_message");
+        config_nack_msg.name("config_nack_message");
+        config_body.name("config_message_body");
+        config_ack_body.name("config_ack_message_body");
+        config_nack_body.name("config_nack_message_body");
+        local_ccid.name("local_ccid_object");
+        remote_ccid.name("remote_ccid_object");
+        message_id.name("message_id_object");
+        message_id_ack.name("message_id_ack_object");
+        local_node_id.name("local_node_id_object");
+        remote_node_id.name("remote_node_id_object");
+        hello_config.name("hello_config_object");
+        vers_flags.name("procol_version_and_message_flags");
+        msg_length.name("message_length");
       }
       qi::rule<Iterator, lmp::BYTE()> vers_flags;
       qi::rule<Iterator, lmp::WORD()> msg_length;
-      qi::rule<Iterator, LocalCCIdValues()>     local_ccid;
-      qi::rule<Iterator, RemoteCCIdValues()>    remote_ccid;
-      qi::rule<Iterator, MessageIdValues()>     message_id;
-      qi::rule<Iterator, MessageIdAckValues()>  message_id_ack;
-      qi::rule<Iterator, LocalNodeIdValues()>   local_node_id;
-      qi::rule<Iterator, RemoteNodeIdValues()>  remote_node_id;
-      qi::rule<Iterator, HelloConfig()>         hello_config;
-      qi::rule<Iterator, ConfigMsgValues(lmp::WORD)>      config_body;
-      qi::rule<Iterator, ConfigAckMsgValues(lmp::WORD)>   config_ack_body;
-      qi::rule<Iterator, ConfigNackMsgValues(lmp::WORD)>  config_nack_body;
-      qi::rule<Iterator, ConfigMsgValues(),     qi::locals<lmp::WORD>>  config_msg;
-      qi::rule<Iterator, ConfigAckMsgValues(),  qi::locals<lmp::WORD>>  config_ack_msg;
-      qi::rule<Iterator, ConfigNackMsgValues(), qi::locals<lmp::WORD>>  config_nack_msg;
+      qi::rule<Iterator, LocalCCIdData()>     local_ccid;
+      qi::rule<Iterator, RemoteCCIdData()>    remote_ccid;
+      qi::rule<Iterator, MessageIdData()>     message_id;
+      qi::rule<Iterator, MessageIdAckData()>  message_id_ack;
+      qi::rule<Iterator, LocalNodeIdData()>   local_node_id;
+      qi::rule<Iterator, RemoteNodeIdData()>  remote_node_id;
+      qi::rule<Iterator, HelloConfig()>       hello_config;
+      qi::rule<Iterator, std::vector<lmp::BYTE>(lmp::WORD)>  byte_sequence;
+      qi::rule<Iterator, UnknownObject()>     unknown_object;
+      qi::rule<Iterator, ObjectVariants()>    objects;
+      qi::rule<Iterator, ConfigMsgData(lmp::WORD)>      config_body;
+      qi::rule<Iterator, ConfigAckMsgData(lmp::WORD)>   config_ack_body;
+      qi::rule<Iterator, ConfigNackMsgData(lmp::WORD)>  config_nack_body;
+      qi::rule<Iterator, ObjectSequence(lmp::WORD)>              object_sequence;
+      qi::rule<Iterator, ConfigMsgData(),     qi::locals<lmp::WORD>>  config_msg;
+      qi::rule<Iterator, ConfigAckMsgData(),  qi::locals<lmp::WORD>>  config_ack_msg;
+      qi::rule<Iterator, ConfigNackMsgData(), qi::locals<lmp::WORD>>  config_nack_msg;
+      qi::rule<Iterator, UnknownMessage()>                            unknown_msg;
       qi::rule<Iterator, MsgVariants()>   msg_type_and_bodies;
-      qi::rule<Iterator, MsgValues()>     message;
+      qi::rule<Iterator, MsgData()>       message;
+    };
+    template <typename Iterator>
+    struct object_grammar : qi::grammar<Iterator, UnknownObject()>
+    {
+      object_grammar() : object_grammar::base_type(unknown_object, "unknown_object")
+      {
+    	using qi::big_word;
+    	using qi::big_dword;
+    	using qi::byte_;
+    	using qi::repeat;
+        using qi::eps;
+        using qi::lazy;
+        using qi::_a;
+        using qi::_1;
+    	using phoenix::at_c;
+        using phoenix::push_back;
+    	using namespace qi::labels;
+
+
+		local_ccid =
+				( byte_(0x01) [ at_c<0>(_val) = false ] |
+				  byte_(0x81) [ at_c<0>(_val) = true  ] ) // c-type
+				>> byte_(0x01) // class
+				>> big_word // length
+		        >> big_dword [ at_c<1>(_val) = _1 ];
+
+		remote_ccid =
+				( byte_(0x02) [ at_c<0>(_val) = false ] |
+				  byte_(0x82) [ at_c<0>(_val) = true  ] ) // c-type
+				>> byte_(0x01) // class
+				>> big_word // length
+		        >> big_dword [ at_c<1>(_val) = _1 ];
+
+	    message_id =
+				( byte_(0x01) [ at_c<0>(_val) = false ] |
+				  byte_(0x81) [ at_c<0>(_val) = true  ] ) // c-type
+				>> byte_(0x05) // class
+				>> big_word // length
+				>> big_dword [ at_c<1>(_val) = _1 ];
+
+	    message_id_ack =
+				( byte_(0x02) [ at_c<0>(_val) = false ] |
+				  byte_(0x82) [ at_c<0>(_val) = true  ] ) // c-type
+				>> byte_(0x05) // class
+				>> big_word // length
+				>> big_dword [ at_c<1>(_val) = _1 ];
+
+		local_node_id =
+				( byte_(0x01) [ at_c<0>(_val) = false ] |
+				  byte_(0x81) [ at_c<0>(_val) = true  ] ) // c-type
+				>> byte_(0x02) // class
+				>> big_word // length
+				>> big_dword [ at_c<1>(_val) = _1 ];
+
+		remote_node_id =
+				( byte_(0x02) [ at_c<0>(_val) = false ] |
+				  byte_(0x82) [ at_c<0>(_val) = true  ] ) // c-type
+				>> byte_(0x02) // class
+				>> big_word // length
+				>> big_dword [ at_c<1>(_val) = _1 ];
+
+		hello_config =
+				( byte_(0x01) [ at_c<0>(_val) = false ] |
+				  byte_(0x81) [ at_c<0>(_val) = true  ] ) // c-type
+				>> byte_(0x06) // class
+				>> big_word // length
+				>> big_word [ at_c<1>(_val) = _1 ]
+				>> big_word [ at_c<2>(_val) = _1 ];
+
+		byte_sequence =
+				( eps(_r1 > 1) [ std::cout << _r1 << std::endl ]
+				  >> byte_sequence(_r1 - 1) [ _val = _1 ]
+				  >> byte_ [ push_back(_val, _1) ] ) |
+				byte_ [ push_back(_val, _1) ];
+
+		unknown_object =
+				byte_  [ at_c<1>(_val) = _1 ] // c-type
+				>> byte_ [ at_c<2>(_val) = _1 ] // object class
+				>> big_word [ at_c<3>(_val) = _1 ] // length
+				>> byte_sequence( (at_c<3>(_val) - 4) ) [ at_c<4>(_val) = _1 ];
+				// >> repeat(4)[byte_] [ at_c<4>(_val) = _1 ]; //[ push_back(at_c<4>(_val), phoenix::static_cast_<lmp::BYTE>(_1)) ]; // [ Sniffer() ];
+
+    	objects %=
+    			local_ccid |
+				remote_ccid |
+				message_id |
+				message_id_ack |
+				local_node_id |
+				remote_node_id |
+				hello_config |
+				( unknown_object [ std::cout << _1 << std::endl ] );
+
+
+        local_ccid.name("local_ccid_object");
+        remote_ccid.name("remote_ccid_object");
+        message_id.name("message_id_object");
+        message_id_ack.name("message_id_ack_object");
+        local_node_id.name("local_node_id_object");
+        remote_node_id.name("remote_node_id_object");
+        hello_config.name("hello_config_object");
+      }
+      qi::rule<Iterator, LocalCCIdData()>     local_ccid;
+      qi::rule<Iterator, RemoteCCIdData()>    remote_ccid;
+      qi::rule<Iterator, MessageIdData()>     message_id;
+      qi::rule<Iterator, MessageIdAckData()>  message_id_ack;
+      qi::rule<Iterator, LocalNodeIdData()>   local_node_id;
+      qi::rule<Iterator, RemoteNodeIdData()>  remote_node_id;
+      qi::rule<Iterator, HelloConfig()>       hello_config;
+      qi::rule<Iterator, std::vector<lmp::BYTE>(lmp::WORD)>  byte_sequence;
+      qi::rule<Iterator, UnknownObject()>     unknown_object;
+      qi::rule<Iterator, ObjectVariants()>    objects;
     };
   } // namespace parse
 } // namespace lmp
@@ -606,7 +929,7 @@ BOOST_AUTO_TEST_CASE( config )
   }
 }
 
-BOOST_AUTO_TEST_CASE( config_header_spirit )
+BOOST_AUTO_TEST_CASE( config_message_spirit )
 {
   {
     using boost::spirit::qi::parse;
@@ -628,15 +951,72 @@ BOOST_AUTO_TEST_CASE( config_header_spirit )
 	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
 	BufIterType last = boost::asio::buffers_end(messageBuffer);
 	lmp::parse::message_grammar<BufIterType>  msgGrammar;
-	lmp::parse::MsgValues msgValues;
+	lmp::parse::MsgData msgData;
 	BOOST_CHECK(parse(begin,
 		              last,
 					  msgGrammar,
-					  msgValues));
-	lmp::parse::msg_values_printer  printer;
-	printer(msgValues);
-	// BOOST_CHECK_EQUAL(msgValues.m_type, lmp::parse::MsgType::Config);
-	// std::cout << static_cast<lmp::WORD>(msgValues.m_type) << std::endl;
+					  msgData));
+	std::cout << msgData << std::endl;
+	// BOOST_CHECK_EQUAL(msgData.m_type, lmp::parse::MsgType::Config);
+	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
+  }
+}
+
+BOOST_AUTO_TEST_CASE( unknown_message_spirit )
+{
+  {
+    using boost::spirit::qi::parse;
+
+    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+	unsigned char message[] =
+    { 0x10, 0x00, 0x00, 0x04, // <Common Header>
+      0x00, 0x28, 0x00, 0x00,
+	  0x01, 0x01, 0x00, 0x08, // <LOCAL_CCID>
+      0x01, 0x02, 0x00, 0x08,
+	  0x01, 0x05, 0x00, 0x08, // <MESSAGE_ID>
+      0x01, 0x02, 0x05, 0x08,
+	  0x01, 0x02, 0x00, 0x08, // <LOCAL_NODE_ID>
+	  0x01, 0x02, 0x05, 0x08,
+	  0x81, 0x08, 0x00, 0x08, // <CONFIG> = HelloConfig
+	  0x01, 0x9A, 0x03, 0xCF };
+	boost::asio::const_buffers_1 messageBuffer(message,
+                                               sizeof(message)/sizeof(unsigned char));
+	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+	BufIterType last = boost::asio::buffers_end(messageBuffer);
+	lmp::parse::message_grammar<BufIterType>  msgGrammar;
+	lmp::parse::MsgData msgData;
+	BOOST_CHECK(parse(begin,
+		              last,
+					  msgGrammar,
+					  msgData));
+	std::cout << msgData << std::endl;
+	// BOOST_CHECK_EQUAL(msgData.m_type, lmp::parse::MsgType::Config);
+	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
+  }
+}
+
+BOOST_AUTO_TEST_CASE( unknown_object_spirit )
+{
+  {
+    using boost::spirit::qi::parse;
+
+    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+	unsigned char message[] =
+    { 0x81, 0x08, 0x00, 0x08, // <CONFIG> = HelloConfig
+	  0x00, 0x9A, 0x01, 0xCF };
+	boost::asio::const_buffers_1 messageBuffer(message,
+                                               sizeof(message)/sizeof(unsigned char));
+	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+	BufIterType last = boost::asio::buffers_end(messageBuffer);
+	lmp::parse::object_grammar<BufIterType>  objGrammar;
+	lmp::parse::UnknownObject objData;
+	BOOST_CHECK(parse(begin,
+		              last,
+					  objGrammar,
+					  objData));
+	std::cout << objData << std::endl;
+	// BOOST_CHECK_EQUAL(msgData.m_type, lmp::parse::MsgType::Config);
+	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
   }
 }
 
@@ -654,11 +1034,11 @@ BOOST_AUTO_TEST_CASE( unknown_msg_type_header_spirit )
 	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
 	BufIterType last = boost::asio::buffers_end(messageBuffer);
 	lmp::parse::message_grammar<BufIterType>  msgGrammar;
-	lmp::parse::MsgValues msgValues;
+	lmp::parse::MsgData msgData;
 	BOOST_CHECK(!parse(begin,
 			           last,
 					   msgGrammar,
-					   msgValues));
+					   msgData));
 
   }
 }
