@@ -105,47 +105,87 @@ namespace lmp
 				>> big_word // length
 		        >> big_dword [ at_c<1>(_val) = _1 ];
 
-        control_channel_id %=
+        control_channel_id_object %=
     			local_ccid |
 				remote_ccid |
 				unknown_ccid_ctype;
 
+        message_id_object_class =
+				byte_(static_cast<std::underlying_type<lmp::obj::ObjectClass>::type>(lmp::obj::ObjectClass::MessageID));
 
 	    message_id =
 				( byte_(0x01) [ at_c<0>(_val) = false ] |
 				  byte_(0x81) [ at_c<0>(_val) = true  ] ) // c-type
-				>> byte_(0x05) // class
+				>> message_id_object_class
 				>> big_word // length
 				>> big_dword [ at_c<1>(_val) = _1 ];
 
 	    message_id_ack =
 				( byte_(0x02) [ at_c<0>(_val) = false ] |
 				  byte_(0x82) [ at_c<0>(_val) = true  ] ) // c-type
-				>> byte_(0x05) // class
+				>> message_id_object_class
 				>> big_word // length
 				>> big_dword [ at_c<1>(_val) = _1 ];
+
+        unknown_message_id_ctype =
+				byte_  [ at_c<1>(_val) = _1 ] // c-type
+				>> message_id_object_class
+				>> big_word [ at_c<2>(_val) = _1 ] // length
+				>> byte_sequence( at_c<2>(_val) - 4 ) [ at_c<3>(_val) = _1 ];
+
+        message_id_object %=
+      		    message_id |
+				message_id_ack|
+				unknown_message_id_ctype;
+
+        node_id_object_class =
+				byte_(static_cast<std::underlying_type<lmp::obj::ObjectClass>::type>(lmp::obj::ObjectClass::NodeID));
 
 		local_node_id =
 				( byte_(0x01) [ at_c<0>(_val) = false ] |
 				  byte_(0x81) [ at_c<0>(_val) = true  ] ) // c-type
-				>> byte_(0x02) // class
+				>> node_id_object_class
 				>> big_word // length
 				>> big_dword [ at_c<1>(_val) = _1 ];
 
 		remote_node_id =
 				( byte_(0x02) [ at_c<0>(_val) = false ] |
 				  byte_(0x82) [ at_c<0>(_val) = true  ] ) // c-type
-				>> byte_(0x02) // class
+				>> node_id_object_class
 				>> big_word // length
 				>> big_dword [ at_c<1>(_val) = _1 ];
+
+        unknown_node_id_ctype =
+				byte_ [ at_c<1>(_val) = _1 ] // c-type
+				>> node_id_object_class
+				>> big_word [ at_c<2>(_val) = _1 ] // length
+				>> byte_sequence( at_c<2>(_val) - 4 ) [ at_c<3>(_val) = _1 ];
+
+        node_id_object %=
+      		    local_node_id |
+				remote_node_id |
+				unknown_node_id_ctype;
+
+        config_object_class =
+			    byte_(static_cast<std::underlying_type<lmp::obj::ObjectClass>::type>(lmp::obj::ObjectClass::Config));
 
 		hello_config =
 				( byte_(0x01) [ at_c<0>(_val) = false ] |
 				  byte_(0x81) [ at_c<0>(_val) = true  ] ) // c-type
-				>> byte_(0x06) // class
+				>> config_object_class
 				>> big_word // length
 				>> big_word [ at_c<1>(_val) = _1 ]
 				>> big_word [ at_c<2>(_val) = _1 ];
+
+        unknown_config_ctype =
+				byte_ [ at_c<1>(_val) = _1 ] // c-type
+				>> config_object_class
+				>> big_word [ at_c<2>(_val) = _1 ] // length
+				>> byte_sequence( at_c<2>(_val) - 4 ) [ at_c<3>(_val) = _1 ];
+
+        config_object %=
+      		hello_config |
+				unknown_config_ctype;
 
 		byte_sequence =
 				( eps(_r1 > 1) [ std::cout << _r1 << std::endl ]
@@ -161,12 +201,10 @@ namespace lmp
 				// >> repeat(4)[byte_] [ at_c<4>(_val) = _1 ]; //[ push_back(at_c<4>(_val), phoenix::static_cast_<lmp::BYTE>(_1)) ]; // [ Sniffer() ];
 
     	objects %=
-    			control_channel_id |
-				message_id |
-				message_id_ack |
-				local_node_id |
-				remote_node_id |
-				hello_config |
+    			control_channel_id_object |
+				message_id_object |
+				node_id_object |
+				config_object |
 				( unknown_object [ std::cout << _1 << std::endl ] );
 
 
@@ -182,12 +220,21 @@ namespace lmp
       qi::rule<Iterator, LocalCCIdData()>     local_ccid;
       qi::rule<Iterator, RemoteCCIdData()>    remote_ccid;
       qi::rule<Iterator, UnknownCCIdCTypeData()>      unknown_ccid_ctype;
-      qi::rule<Iterator, ControlChannelIdVariants()>  control_channel_id;
+      qi::rule<Iterator, ControlChannelIdVariants()>  control_channel_id_object;
+      qi::rule<Iterator> message_id_object_class;
       qi::rule<Iterator, MessageIdData()>     message_id;
       qi::rule<Iterator, MessageIdAckData()>  message_id_ack;
-      qi::rule<Iterator, LocalNodeIdData()>   local_node_id;
-      qi::rule<Iterator, RemoteNodeIdData()>  remote_node_id;
+      qi::rule<Iterator, UnknownMessageIdCTypeData()>  unknown_message_id_ctype;
+      qi::rule<Iterator, MessageIdVariants()>        message_id_object;
+      qi::rule<Iterator> node_id_object_class;
+      qi::rule<Iterator, LocalNodeIdData()>         local_node_id;
+      qi::rule<Iterator, RemoteNodeIdData()>        remote_node_id;
+      qi::rule<Iterator, UnknownNodeIdCTypeData()>  unknown_node_id_ctype;
+      qi::rule<Iterator, NodeIdVariants()>          node_id_object;
+      qi::rule<Iterator> config_object_class;
       qi::rule<Iterator, HelloConfig()>       hello_config;
+      qi::rule<Iterator, UnknownConfigCTypeData()>  unknown_config_ctype;
+      qi::rule<Iterator, ConfigVariants()>          config_object;
       qi::rule<Iterator, std::vector<lmp::BYTE>(lmp::WORD)>  byte_sequence;
       qi::rule<Iterator, UnknownObject()>     unknown_object;
       qi::rule<Iterator, ObjectVariants()>    objects;
