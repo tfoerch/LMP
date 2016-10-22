@@ -7,10 +7,19 @@
  *      Author: tom
  */
 
+#include "base/ProtocolTypes.hpp"
+
 namespace lmp
 {
   namespace msg
   {
+    enum class MsgType : lmp::BYTE
+	{
+      Config = 1,
+      ConfigAck,
+	  ConfigNack,
+	  Hello
+    };
     namespace mtype
     {
       enum MsgType

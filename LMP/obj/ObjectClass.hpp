@@ -11,6 +11,16 @@ namespace lmp
 {
   namespace obj
   {
+    enum class ObjectClass : lmp::BYTE
+	{
+      ControlChannelID = 1,
+      NodeID,
+	  LinkID,
+	  InterfaceID,
+	  MessageID,
+	  Config,
+	  Hello
+	};
     namespace otype
     {
       enum ObjectClass
