@@ -96,7 +96,7 @@ namespace lmp
       		lmp::obj::ObjectClassIF<lmp::obj::ccid::ClassType>::OptClassType optCType =
       		  lmp::obj::ObjectClassIF<lmp::obj::ccid::ClassType>::classType_cast(header.getClassType());
        	    if (optCType &&
-       	    	*optCType == lmp::obj::ccid::LocalCCId)
+       	    	*optCType == lmp::obj::ccid::ClassType::LocalCCId)
        	    {
        	      localCCIdDecodingResult =
        	        lmp::obj::LocalCCId::decode(header, buffer);
@@ -137,7 +137,7 @@ namespace lmp
 	          lmp::obj::ObjectClassIF<lmp::obj::msgid::ClassType>::OptClassType optCType =
 			    lmp::obj::ObjectClassIF<lmp::obj::msgid::ClassType>::classType_cast(header.getClassType());
 	          if (optCType &&
-	        	  *optCType == lmp::obj::msgid::MessageId)
+	        	  *optCType == lmp::obj::msgid::ClassType::MessageId)
 	          {
 	        	messageIdDecodingResult =
 				  lmp::obj::MessageId::decode(header, buffer);
@@ -167,7 +167,7 @@ namespace lmp
 	    	    lmp::obj::ObjectClassIF<lmp::obj::nodeid::ClassType>::OptClassType optCType =
 			      lmp::obj::ObjectClassIF<lmp::obj::nodeid::ClassType>::classType_cast(header.getClassType());
 	    	    if (optCType &&
-	    		    *optCType == lmp::obj::nodeid::LocalNodeId)
+	    		    *optCType == lmp::obj::nodeid::ClassType::LocalNodeId)
 	    	    {
 	    		  localNodeIdDecodingResult =
 				    lmp::obj::LocalNodeId::decode(header, buffer);
@@ -197,7 +197,7 @@ namespace lmp
 		          lmp::obj::ObjectClassIF<lmp::obj::config::ClassType>::OptClassType optCType =
 			        lmp::obj::ObjectClassIF<lmp::obj::config::ClassType>::classType_cast(header.getClassType());
 		          if (optCType &&
-				      *optCType == lmp::obj::config::HelloConfig)
+				      *optCType == lmp::obj::config::ClassType::HelloConfig)
 		          {
 			        helloConfigDecodingResult =
 				      lmp::obj::HelloConfig::decode(header, buffer);
