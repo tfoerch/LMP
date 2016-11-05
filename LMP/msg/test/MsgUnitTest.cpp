@@ -11,6 +11,13 @@
 #include "msg/ConfigNack.hpp"
 #include "msg/Hello.hpp"
 #include "msg/MsgParseGrammar.hpp"
+#include "msg/Message.hpp"
+#include <boost/spirit/include/qi_binary.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/phoenix/object/static_cast.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/streambuf.hpp>
 #include <boost/asio/buffers_iterator.hpp>
@@ -54,7 +61,7 @@ size_t parseDocument(ConstBuffers const& buffers, int &data)
 	  0 ); // only optionally consume
 }
 
-
+#if 0
 namespace lmp
 {
   namespace msg
@@ -242,7 +249,7 @@ namespace lmp
     } // namespace parse
   } // namespace msg
 } // namespace lmp
-
+#endif
 
 BOOST_AUTO_TEST_SUITE( msg )
 
@@ -446,6 +453,7 @@ BOOST_AUTO_TEST_CASE( unknown_message_spirit )
   }
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE( unknown_object_spirit )
 {
   {
@@ -470,6 +478,7 @@ BOOST_AUTO_TEST_CASE( unknown_object_spirit )
 	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
   }
 }
+#endif
 
 BOOST_AUTO_TEST_CASE( unknown_msg_type_header_spirit )
 {

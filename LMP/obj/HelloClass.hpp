@@ -7,16 +7,23 @@
  *      Author: tom
  */
 
+#include "base/ProtocolTypes.hpp"
+
+#include <iostream>
+
 namespace lmp
 {
   namespace obj
   {
 	namespace hello
 	{
-      enum ClassType
+      enum class ClassType : lmp::BYTE
 	  {
   	    Hello = 1
 	  };
+      std::ostream& operator<<(
+        std::ostream&     os,
+  	    const ClassType&  cType);
 	}
   } // namespace obj
 } // namespace lmp

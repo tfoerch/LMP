@@ -9,6 +9,7 @@
 
 #include "obj/LMPObjectIF.hpp"
 #include "obj/ObjectClassTypeTraits.hpp"
+#include <type_traits>
 
 namespace lmp
 {
@@ -26,7 +27,7 @@ namespace lmp
     	lmp::BYTE                     classTypeByte)
       { return obj_class_traits_type::classType_cast(classTypeByte); }
     private:
-      virtual lmp::BYTE do_getClassTypeByteValue() const { return do_getClassType(); }
+      virtual lmp::BYTE do_getClassTypeByteValue() const { return static_cast<typename std::underlying_type<ClassType>::type>(do_getClassType()); }
       virtual const otype::ObjectClass do_getObjectClass() const
       { return obj_class_traits_type::c_object_class; }
       virtual ClassType do_getClassType() const = 0;

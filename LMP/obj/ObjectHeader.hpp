@@ -10,6 +10,8 @@
 #include "base/ProtocolTypes.hpp"                  // for DWORD
 #include "ObjectClass.hpp"
 
+#include <boost/spirit/include/qi.hpp>
+
 #include <boost/optional/optional.hpp>     // for optional
 
 #include <utility>
@@ -75,6 +77,78 @@ namespace lmp
 	  static const lmp::BYTE       c_negotiableMask;
 	  static const lmp::BYTE       c_classTypeMask;
 	};
+    namespace parse
+    {
+      struct ObjectHeaderFixLengthInput
+	  {
+    	ObjectHeaderFixLengthInput(
+    	  lmp::BYTE               object_class,
+		  lmp::BYTE               class_type,
+		  lmp::WORD               length);
+	    lmp::BYTE               m_object_class;
+	    lmp::BYTE               m_class_type;
+	    lmp::WORD               m_length;
+	  };
+      struct ObjectHeaderVariableLengthInput
+      {
+        lmp::BYTE               m_object_class;
+        lmp::BYTE               m_class_type;
+      };
+      struct ObjectHeaderVariableLengthOutput
+      {
+        bool                    m_negotiable;
+        lmp::WORD               m_length;
+      };
+      struct ObjectHeaderUnknownCTypeOutput
+      {
+	    lmp::BYTE               m_class_type;
+        bool                    m_negotiable;
+        lmp::WORD               m_length;
+      };
+      std::ostream& operator<<(
+        std::ostream&                          os,
+  	    const ObjectHeaderUnknownCTypeOutput&  unknownClassType);
+      struct ObjectHeaderUnknownObjectClassOutput
+      {
+        lmp::BYTE               m_object_class;
+  	    lmp::BYTE               m_class_type;
+        bool                    m_negotiable;
+        lmp::WORD               m_length;
+      };
+      std::ostream& operator<<(
+        std::ostream&                          os,
+  	    const ObjectHeaderUnknownObjectClassOutput&  unknownObjectClass);
+      namespace qi = boost::spirit::qi;
+      template <typename Iterator>
+      struct object_header_fix_length_grammar : qi::grammar<Iterator, bool(ObjectHeaderFixLengthInput)>
+      {
+    	object_header_fix_length_grammar();
+
+        qi::rule<Iterator, bool(ObjectHeaderFixLengthInput)>            object_header_fix_length_rule;
+      };
+      template <typename Iterator>
+      struct object_header_variable_length_grammar : qi::grammar<Iterator, ObjectHeaderVariableLengthOutput(ObjectHeaderVariableLengthInput)>
+      {
+    	object_header_variable_length_grammar();
+
+        qi::rule<Iterator, ObjectHeaderVariableLengthOutput(ObjectHeaderVariableLengthInput)>            object_header_variable_length_rule;
+      };
+      template <typename Iterator>
+      struct object_header_unknown_class_type_grammar : qi::grammar<Iterator, ObjectHeaderUnknownCTypeOutput(lmp::BYTE)>
+      {
+    	object_header_unknown_class_type_grammar();
+
+        qi::rule<Iterator, ObjectHeaderUnknownCTypeOutput(lmp::BYTE)>           object_header_unknown_class_type_rule;
+      };
+      template <typename Iterator>
+      struct object_header_unknown_object_class_grammar : qi::grammar<Iterator, ObjectHeaderUnknownObjectClassOutput()>
+      {
+    	object_header_unknown_object_class_grammar();
+
+        qi::rule<Iterator, ObjectHeaderUnknownObjectClassOutput()>           object_header_unknown_object_class_rule;
+      };
+      const lmp::BYTE negotiableFlagValue = 0x80;
+    }
   } // namespace obj
 } // namespace lmp
 

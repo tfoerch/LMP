@@ -18,7 +18,32 @@ namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<msgid::ClassType, msgid::MessageId>  MessageId;
+    typedef ObjectClassType<msgid::ClassType, msgid::ClassType::MessageId>  MessageId;
+	namespace msgid
+	{
+	  struct MessageIdData
+	  {
+	    bool        m_negotiable;
+	    lmp::DWORD  m_messageId;
+	  };
+	  std::ostream& operator<<(
+	    std::ostream&         os,
+		const MessageIdData&  messageId);
+	  const lmp::WORD messageIdLength = objHeaderLength + 4;
+	  namespace parse
+	  {
+	    namespace qi = boost::spirit::qi;
+        template <typename Iterator>
+        struct message_id_grammar : qi::grammar<Iterator, MessageIdData()>
+        {
+      	  message_id_grammar();
+
+      	  lmp::obj::parse::ObjectHeaderFixLengthInput                   object_header_input;
+		  lmp::obj::parse::object_header_fix_length_grammar<Iterator>   object_header;
+      	  qi::rule<Iterator, MessageIdData()>                           message_id_rule;
+        };
+	  }
+	}
   } // namespace obj
 } // namespace lmp
 

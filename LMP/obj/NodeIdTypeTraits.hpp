@@ -27,8 +27,8 @@ namespace lmp
         const nodeid::ClassType cType = static_cast<nodeid::ClassType>(classTypeByte);
         switch(cType)
         {
-          case nodeid::LocalNodeId:
-          case nodeid::RemoteNodeId:
+          case nodeid::ClassType::LocalNodeId:
+          case nodeid::ClassType::RemoteNodeId:
         	result = cType;
         	break;
           default:
@@ -38,14 +38,14 @@ namespace lmp
 	  }
     };
     template <>
-    struct ObjectClassCTypeTraits<nodeid::ClassType, nodeid::LocalNodeId>
+    struct ObjectClassCTypeTraits<nodeid::ClassType, nodeid::ClassType::LocalNodeId>
     {
       typedef NodeIdIF    object_ctype_if_type;
       typedef NodeIdData  data_type;
       static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
-    struct ObjectClassCTypeTraits<nodeid::ClassType, nodeid::RemoteNodeId>
+    struct ObjectClassCTypeTraits<nodeid::ClassType, nodeid::ClassType::RemoteNodeId>
     {
       typedef NodeIdIF    object_ctype_if_type;
       typedef NodeIdData  data_type;

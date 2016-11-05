@@ -27,7 +27,7 @@ namespace lmp
         const config::ClassType cType = static_cast<config::ClassType>(classTypeByte);
         switch(cType)
         {
-          case config::HelloConfig:
+          case config::ClassType::HelloConfig:
         	result = cType;
         	break;
           default:
@@ -37,7 +37,7 @@ namespace lmp
 	  }
     };
     template <>
-    struct ObjectClassCTypeTraits<config::ClassType, config::HelloConfig>
+    struct ObjectClassCTypeTraits<config::ClassType, config::ClassType::HelloConfig>
     {
       typedef HelloConfigIF    object_ctype_if_type;
       typedef HelloConfigData  data_type;

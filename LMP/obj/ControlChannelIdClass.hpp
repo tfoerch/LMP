@@ -7,17 +7,24 @@
  *      Author: tom
  */
 
+#include "base/ProtocolTypes.hpp"
+
+#include <iostream>
+
 namespace lmp
 {
   namespace obj
   {
 	namespace ccid
 	{
-      enum ClassType
+      enum class ClassType : lmp::BYTE
 	  {
   	    LocalCCId = 1,
 		RemoteCCId
 	  };
+      std::ostream& operator<<(
+        std::ostream&     os,
+  	    const ClassType&  cType);
 	}
   } // namespace obj
 } // namespace lmp

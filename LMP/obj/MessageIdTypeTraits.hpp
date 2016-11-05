@@ -27,8 +27,8 @@ namespace lmp
         const msgid::ClassType cType = static_cast<msgid::ClassType>(classTypeByte);
         switch(cType)
         {
-          case msgid::MessageId:
-          case msgid::MessageIdAck:
+          case msgid::ClassType::MessageId:
+          case msgid::ClassType::MessageIdAck:
         	result = cType;
         	break;
           default:
@@ -38,14 +38,14 @@ namespace lmp
 	  }
     };
     template <>
-    struct ObjectClassCTypeTraits<msgid::ClassType, msgid::MessageId>
+    struct ObjectClassCTypeTraits<msgid::ClassType, msgid::ClassType::MessageId>
     {
       typedef MessageIdIF    object_ctype_if_type;
       typedef MessageIdData  data_type;
       static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
-    struct ObjectClassCTypeTraits<msgid::ClassType, msgid::MessageIdAck>
+    struct ObjectClassCTypeTraits<msgid::ClassType, msgid::ClassType::MessageIdAck>
     {
       typedef MessageIdIF    object_ctype_if_type;
       typedef MessageIdData  data_type;

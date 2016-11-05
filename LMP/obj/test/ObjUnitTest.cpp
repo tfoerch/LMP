@@ -8,13 +8,16 @@
 #include "obj/ObjectHeader.hpp"
 #include "obj/LocalCCId.hpp"
 #include "obj/RemoteCCId.hpp"
+#include "obj/UnknownCCIdCType.hpp"
 #include "obj/LocalNodeId.hpp"
 #include "obj/RemoteNodeId.hpp"
 #include "obj/MessageId.hpp"
 #include "obj/MessageIdAck.hpp"
 #include "obj/HelloConfig.hpp"
 #include "obj/Hello.hpp"
+#include "obj/UnknownObjectClass.hpp"
 #include <boost/asio/buffer.hpp>
+#include <boost/asio/buffers_iterator.hpp>
 #include <iostream>
 
 
@@ -24,6 +27,265 @@
 
 
 BOOST_AUTO_TEST_SUITE( obj )
+
+BOOST_AUTO_TEST_CASE( obj_class_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] = { 0x01 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::parse::control_channel_id_object_class_grammar<BufIterType>  ccidGrammar;
+   lmp::obj::ObjectClass  objClass;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 ccidGrammar,
+					 objClass));
+   BOOST_CHECK_EQUAL(objClass, lmp::obj::ObjectClass::ControlChannelID);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x01, 0x01, 0x00, 0x08,
+       0x01, 0x02, 0x00, 0x08 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::ccid::parse::local_control_channel_id_grammar<BufIterType>  localCcIdGrammar;
+   lmp::obj::ccid::LocalCCIdData  localCCId;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 localCcIdGrammar,
+					 localCCId));
+   BOOST_CHECK_EQUAL(localCCId.m_CCId, 0x1020008);
+   BOOST_CHECK_EQUAL(localCCId.m_negotiable, false);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( remote_control_channel_id_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x02, 0x01, 0x00, 0x08,
+       0x01, 0x13, 0x0a, 0x03 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::ccid::parse::remote_control_channel_id_grammar<BufIterType>  remoteCcIdGrammar;
+   lmp::obj::ccid::RemoteCCIdData  remoteCCId;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 remoteCcIdGrammar,
+					 remoteCCId));
+   BOOST_CHECK_EQUAL(remoteCCId.m_CCId, 0x01130a03);
+   BOOST_CHECK_EQUAL(remoteCCId.m_negotiable, false);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( unknown_control_channel_id_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x07, 0x01, 0x00, 0x08,
+       0x01, 0x13, 0x0a, 0x03 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::ccid::parse::unknown_control_channel_id_grammar<BufIterType>  unknownCcIdGrammar;
+   lmp::obj::ccid::UnknownCCIdCTypeData  unknownCCId;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 unknownCcIdGrammar,
+					 unknownCCId));
+   BOOST_CHECK_EQUAL(unknownCCId.m_header.m_class_type, 0x07);
+   BOOST_CHECK_EQUAL(unknownCCId.m_header.m_negotiable, false);
+   BOOST_CHECK_EQUAL(unknownCCId.m_header.m_length, 8);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x01, 0x02, 0x00, 0x08,
+       0x01, 0x02, 0x00, 0x08 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::nodeid::parse::local_node_id_grammar<BufIterType>  localNodeIdGrammar;
+   lmp::obj::nodeid::LocalNodeIdData  localNodeId;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 localNodeIdGrammar,
+					 localNodeId));
+   BOOST_CHECK_EQUAL(localNodeId.m_nodeId, 0x1020008);
+   BOOST_CHECK_EQUAL(localNodeId.m_negotiable, false);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( remote_node_id_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x02, 0x02, 0x00, 0x08,
+       0x01, 0x13, 0x0a, 0x03 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::nodeid::parse::remote_node_id_grammar<BufIterType>  remoteNodeIdGrammar;
+   lmp::obj::nodeid::RemoteNodeIdData  remoteNodeId;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 remoteNodeIdGrammar,
+					 remoteNodeId));
+   BOOST_CHECK_EQUAL(remoteNodeId.m_nodeId, 0x01130a03);
+   BOOST_CHECK_EQUAL(remoteNodeId.m_negotiable, false);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( message_id_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x01, 0x05, 0x00, 0x08,
+       0x01, 0x02, 0x00, 0x08 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::msgid::parse::message_id_grammar<BufIterType>  messageIdGrammar;
+   lmp::obj::msgid::MessageIdData  messageId;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 messageIdGrammar,
+					 messageId));
+   BOOST_CHECK_EQUAL(messageId.m_messageId, 0x1020008);
+   BOOST_CHECK_EQUAL(messageId.m_negotiable, false);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( message_id_ack_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x02, 0x05, 0x00, 0x08,
+       0x01, 0x02, 0x00, 0x08 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::msgid::parse::message_id_ack_grammar<BufIterType>  messageIdAckGrammar;
+   lmp::obj::msgid::MessageIdAckData  messageIdAck;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 messageIdAckGrammar,
+					 messageIdAck));
+   BOOST_CHECK_EQUAL(messageIdAck.m_messageId, 0x1020008);
+   BOOST_CHECK_EQUAL(messageIdAck.m_negotiable, false);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( hello_config_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x81, 0x06, 0x00, 0x08,
+       0x00, 0x9A, 0x01, 0xCF };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::config::parse::hello_config_grammar<BufIterType>  helloConfigGrammar;
+   lmp::obj::config::HelloConfigData  helloConfig;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 helloConfigGrammar,
+					 helloConfig));
+   BOOST_CHECK_EQUAL(helloConfig.m_helloIntv, 0x009A);
+   BOOST_CHECK_EQUAL(helloConfig.m_helloDeadIntv, 0x01CF);
+   BOOST_CHECK_EQUAL(helloConfig.m_negotiable, true);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( hello_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x01, 0x07, 0x00, 0x0C,
+       0x00, 0x00, 0x00, 0x01,
+       0x00, 0x00, 0x00, 0x00 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::hello::parse::hello_grammar<BufIterType>  helloGrammar;
+   lmp::obj::hello::HelloData  hello;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 helloGrammar,
+					 hello));
+   BOOST_CHECK_EQUAL(hello.m_txSeqNum, 0x00000001);
+   BOOST_CHECK_EQUAL(hello.m_rcvSeqNum, 0x00000000);
+   BOOST_CHECK_EQUAL(hello.m_negotiable, false);
+   // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
+{
+   using boost::spirit::qi::parse;
+
+   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   unsigned char message[] =
+     { 0x01, 0x09, 0x00, 0x0C,
+       0x00, 0x00, 0x00, 0x01,
+       0x00, 0x00, 0x00, 0x00 };
+   boost::asio::const_buffers_1 messageBuffer(message,
+		                                      sizeof(message)/sizeof(unsigned char));
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::parse::unknown_object_class_grammar<BufIterType>  unknownObjectClassGrammar;
+   lmp::obj::UnknownObjectClassData  unknownObjectClass;
+   BOOST_CHECK(parse(begin,
+		             last,
+					 unknownObjectClassGrammar,
+					 unknownObjectClass));
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_data.size(), 8);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_object_class, 9);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_class_type, 1);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_length, 12);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_negotiable, false);
+   // std::cout << msgData << std::endl;
+}
+
 
 BOOST_AUTO_TEST_CASE( obj_header_decode )
 {
@@ -106,7 +368,7 @@ BOOST_AUTO_TEST_CASE( localCCId )
 	  BOOST_CHECK(optCType);
       if (optCType)
       {
-    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::ccid::LocalCCId);
+    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::ccid::ClassType::LocalCCId);
       }
 	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x08);
 	  lmp::obj::LocalCCId::DecodingResult decodingResult =
@@ -158,7 +420,7 @@ BOOST_AUTO_TEST_CASE( remoteCCId )
 	  BOOST_CHECK(optCType);
       if (optCType)
       {
-    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::ccid::RemoteCCId);
+    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::ccid::ClassType::RemoteCCId);
       }
 	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x08);
 	  lmp::obj::RemoteCCId::DecodingResult decodingResult =
@@ -206,7 +468,7 @@ BOOST_AUTO_TEST_CASE( localNodeId )
 	  BOOST_CHECK(optCType);
       if (optCType)
       {
-    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::nodeid::LocalNodeId);
+    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::nodeid::ClassType::LocalNodeId);
       }
 	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x08);
 	  lmp::obj::LocalNodeId::DecodingResult decodingResult =
@@ -258,7 +520,7 @@ BOOST_AUTO_TEST_CASE( remoteNodeId )
 	  BOOST_CHECK(optCType);
       if (optCType)
       {
-    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::nodeid::RemoteNodeId);
+    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::nodeid::ClassType::RemoteNodeId);
       }
 	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x08);
 	  lmp::obj::RemoteNodeId::DecodingResult decodingResult =
@@ -306,7 +568,7 @@ BOOST_AUTO_TEST_CASE( messageId )
 	  BOOST_CHECK(optCType);
       if (optCType)
       {
-    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::msgid::MessageId);
+    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::msgid::ClassType::MessageId);
       }
 	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x08);
 	  lmp::obj::MessageId::DecodingResult decodingResult =
@@ -358,7 +620,7 @@ BOOST_AUTO_TEST_CASE( messageIdAck )
 	  BOOST_CHECK(optCType);
       if (optCType)
       {
-    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::msgid::MessageIdAck);
+    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::msgid::ClassType::MessageIdAck);
       }
 	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x08);
 	  lmp::obj::MessageIdAck::DecodingResult decodingResult =
@@ -406,7 +668,7 @@ BOOST_AUTO_TEST_CASE( helloConfig )
 	  BOOST_CHECK(optCType);
       if (optCType)
       {
-    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::config::HelloConfig);
+    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::config::ClassType::HelloConfig);
       }
 	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x08);
 	  lmp::obj::HelloConfig::DecodingResult decodingResult =
@@ -460,7 +722,7 @@ BOOST_AUTO_TEST_CASE( hello )
 	  BOOST_CHECK(optCType);
       if (optCType)
       {
-    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::hello::Hello);
+    	BOOST_CHECK_EQUAL(*optCType, lmp::obj::hello::ClassType::Hello);
       }
 	  BOOST_CHECK_EQUAL(header.getObjLength(), 0x0C);
 	  lmp::obj::Hello::DecodingResult decodingResult =

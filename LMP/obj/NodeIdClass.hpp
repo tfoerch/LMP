@@ -1,11 +1,15 @@
 #ifndef LMP_OBJ_NODE_ID_CLASS_HPP_
 #define LMP_OBJ_NODE_ID_CLASS_HPP_
 /*
- * ControlChannelIdClass.hpp
+ * NodeIdClass.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom
  */
+
+#include "base/ProtocolTypes.hpp"
+
+#include <iostream>
 
 namespace lmp
 {
@@ -13,11 +17,14 @@ namespace lmp
   {
 	namespace nodeid
 	{
-      enum ClassType
+      enum class ClassType : lmp::BYTE
 	  {
   	    LocalNodeId = 1,
 		RemoteNodeId
 	  };
+      std::ostream& operator<<(
+        std::ostream&     os,
+  	    const ClassType&  cType);
 	}
   } // namespace obj
 } // namespace lmp

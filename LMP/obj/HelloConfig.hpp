@@ -18,7 +18,33 @@ namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<config::ClassType, config::HelloConfig>  HelloConfig;
+    typedef ObjectClassType<config::ClassType, config::ClassType::HelloConfig>  HelloConfig;
+	namespace config
+	{
+	  struct HelloConfigData
+	  {
+	    bool        m_negotiable;
+		lmp::WORD   m_helloIntv;
+		lmp::WORD   m_helloDeadIntv;
+	  };
+	  std::ostream& operator<<(
+	    std::ostream&            os,
+		const HelloConfigData&   helloConfig);
+	  const lmp::WORD helloConfigLength = objHeaderLength + 4;
+	  namespace parse
+	  {
+	    namespace qi = boost::spirit::qi;
+        template <typename Iterator>
+        struct hello_config_grammar : qi::grammar<Iterator, HelloConfigData()>
+        {
+      	  hello_config_grammar();
+
+      	  lmp::obj::parse::ObjectHeaderFixLengthInput                   object_header_input;
+		  lmp::obj::parse::object_header_fix_length_grammar<Iterator>   object_header;
+      	  qi::rule<Iterator, HelloConfigData()>                         hello_config_rule;
+        };
+	  }
+	}
   } // namespace obj
 } // namespace lmp
 

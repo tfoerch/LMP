@@ -27,7 +27,7 @@ namespace lmp
         const hello::ClassType cType = static_cast<hello::ClassType>(classTypeByte);
         switch(cType)
         {
-          case hello::Hello:
+          case hello::ClassType::Hello:
         	result = cType;
         	break;
           default:
@@ -37,7 +37,7 @@ namespace lmp
 	  }
     };
     template <>
-    struct ObjectClassCTypeTraits<hello::ClassType, hello::Hello>
+    struct ObjectClassCTypeTraits<hello::ClassType, hello::ClassType::Hello>
     {
       typedef HelloIF    object_ctype_if_type;
       typedef HelloData  data_type;

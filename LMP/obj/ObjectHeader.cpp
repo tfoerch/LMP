@@ -5,10 +5,16 @@
  *      Author: tom
  */
 
-#include "ObjectHeader.hpp"
+#include "ObjectHeader_def.hpp"
 #include <boost/asio/buffer.hpp>
+#include <boost/asio/buffers_iterator.hpp>
 #include <boost/endian/conversion.hpp>
 #include <iostream>
+
+typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+template struct lmp::obj::parse::object_header_fix_length_grammar<BufIterType>;
+template struct lmp::obj::parse::object_header_unknown_class_type_grammar<BufIterType>;
+template struct lmp::obj::parse::object_header_unknown_object_class_grammar<BufIterType>;
 
 namespace lmp
 {
@@ -125,6 +131,35 @@ namespace lmp
       }
       return result;
     }
-
-  } // namespace msg
+    namespace parse
+    {
+      ObjectHeaderFixLengthInput::ObjectHeaderFixLengthInput(
+        lmp::BYTE               object_class,
+		lmp::BYTE               class_type,
+		lmp::WORD               length)
+      : m_object_class(object_class),
+		m_class_type(class_type),
+		m_length(length)
+	  {}
+      std::ostream& operator<<(
+        std::ostream&                          os,
+  	    const ObjectHeaderUnknownCTypeOutput&  unknownClassType)
+      {
+    	os << static_cast<lmp::WORD>(unknownClassType.m_class_type) << ", "
+    	   << (unknownClassType.m_negotiable ? "negotiable" : "not negotiable") << ", "
+		   << unknownClassType.m_length;
+    	return os;
+      }
+      std::ostream& operator<<(
+        std::ostream&                          os,
+  	    const ObjectHeaderUnknownObjectClassOutput&  unknownObjectClass)
+      {
+    	os << static_cast<lmp::WORD>(unknownObjectClass.m_object_class) << ", "
+    	   << static_cast<lmp::WORD>(unknownObjectClass.m_class_type) << ", "
+    	   << (unknownObjectClass.m_negotiable ? "negotiable" : "not negotiable") << ", "
+		   << unknownObjectClass.m_length;
+    	return os;
+      }
+    } // namespace parse
+  } // namespace obj
 } // namespace lmp

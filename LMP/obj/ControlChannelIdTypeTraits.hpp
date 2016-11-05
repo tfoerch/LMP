@@ -27,8 +27,8 @@ namespace lmp
         const ccid::ClassType cType = static_cast<ccid::ClassType>(classTypeByte);
         switch(cType)
         {
-          case ccid::LocalCCId:
-          case ccid::RemoteCCId:
+          case ccid::ClassType::LocalCCId:
+          case ccid::ClassType::RemoteCCId:
         	result = cType;
         	break;
           default:
@@ -38,14 +38,14 @@ namespace lmp
 	  }
     };
     template <>
-    struct ObjectClassCTypeTraits<ccid::ClassType, ccid::LocalCCId>
+    struct ObjectClassCTypeTraits<ccid::ClassType, ccid::ClassType::LocalCCId>
     {
       typedef ControlChannelIdIF    object_ctype_if_type;
       typedef ControlChannelIdData  data_type;
       static bool isNegotiable(const data_type&) { return false; }
     };
     template <>
-    struct ObjectClassCTypeTraits<ccid::ClassType, ccid::RemoteCCId>
+    struct ObjectClassCTypeTraits<ccid::ClassType, ccid::ClassType::RemoteCCId>
     {
       typedef ControlChannelIdIF    object_ctype_if_type;
       typedef ControlChannelIdData  data_type;

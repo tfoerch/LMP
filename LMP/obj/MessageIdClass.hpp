@@ -7,17 +7,24 @@
  *      Author: tom
  */
 
+#include "base/ProtocolTypes.hpp"
+
+#include <iostream>
+
 namespace lmp
 {
   namespace obj
   {
 	namespace msgid
 	{
-      enum ClassType
+      enum class ClassType : lmp::BYTE
 	  {
   	    MessageId = 1,
 		MessageIdAck
 	  };
+      std::ostream& operator<<(
+        std::ostream&     os,
+  	    const ClassType&  cType);
 	}
   } // namespace obj
 } // namespace lmp
