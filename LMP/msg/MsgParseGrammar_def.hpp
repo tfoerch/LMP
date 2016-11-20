@@ -10,7 +10,6 @@
 #include "msg/MsgParseGrammar.hpp"
 #include "msg/Message.hpp"
 #include "msg/MsgType.hpp"
-#include "obj/ObjectClass.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
@@ -55,43 +54,6 @@ namespace lmp
 				   big_word [_val = _1] // length
 				>> big_word;            // reserved
 
-          control_channel_id_object %=
-      			local_ccid |
-  				remote_ccid |
-				unknown_ccid_ctype;
-
-          message_id_object %=
-        		message_id |
-				message_id_ack|
-				unknown_message_id_ctype;
-
-          node_id_object %=
-        		local_node_id |
-				remote_node_id |
-				unknown_node_id_ctype;
-
-          config_object %=
-        		hello_config |
-				unknown_config_ctype;
-
-          hello_object %=
-        		hello |
-				unknown_hello_ctype;
-
-          unknown_object =
-				byte_  [ at_c<1>(_val) = _1 ] // c-type
-				>> byte_ [ at_c<2>(_val) = _1 ] // object class
-				>> big_word [ at_c<3>(_val) = _1 ] // length
-				>> byte_sequence( at_c<3>(_val) - 4 ) [ at_c<4>(_val) = _1 ];
-				// >> repeat(4)[byte_] [ at_c<4>(_val) = _1 ]; //[ push_back(at_c<4>(_val), phoenix::static_cast_<lmp::BYTE>(_1)) ]; // [ Sniffer() ];
-
-          objects %=
-    			control_channel_id_object |
-				message_id_object |
-				node_id_object |
-				config_object |
-				hello_object |
-				unknown_object;
 
           config_body %=
    	    		local_ccid
@@ -113,10 +75,6 @@ namespace lmp
     			>> message_id_ack
 				>> remote_node_id
 				>> hello_config;
-
-
-          object_sequence =
-    		    +objects [push_back(at_c<0>(_val), _1)];
 
           config_msg =
     			byte_(static_cast<std::underlying_type<MsgType>::type>(MsgType::Config))

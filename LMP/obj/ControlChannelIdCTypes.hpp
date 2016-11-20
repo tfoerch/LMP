@@ -26,7 +26,7 @@ namespace lmp
 					 lmp::obj::ccid::UnknownCCIdCTypeData>   ControlChannelIdCTypes;
       std::ostream& operator<<(
         std::ostream&                  os,
-  	    const ControlChannelIdCTypes&  ControlChannelIdCTypes);
+  	    const ControlChannelIdCTypes&  controlChannelIdCTypes);
 	  namespace parse
 	  {
 	    namespace qi = boost::spirit::qi;
