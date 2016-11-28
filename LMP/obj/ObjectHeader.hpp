@@ -11,6 +11,7 @@
 #include "ObjectClass.hpp"
 
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 #include <boost/optional/optional.hpp>     // for optional
 
@@ -77,7 +78,22 @@ namespace lmp
 	  static const lmp::BYTE       c_negotiableMask;
 	  static const lmp::BYTE       c_classTypeMask;
 	};
-    namespace parse
+    struct ObjectHeaderData
+    {
+      ObjectHeaderData();
+      ObjectHeaderData(
+    	lmp::BYTE               object_class,
+		lmp::BYTE               class_type,
+		lmp::WORD               length);
+      lmp::BYTE               m_object_class;
+	  lmp::BYTE               m_class_type;
+      bool                    m_negotiable;
+      lmp::WORD               m_length;
+    };
+    std::ostream& operator<<(
+      std::ostream&            os,
+	  const ObjectHeaderData&  objectHeader);
+   namespace parse
     {
       struct ObjectHeaderFixLengthInput
 	  {
@@ -108,16 +124,6 @@ namespace lmp
       std::ostream& operator<<(
         std::ostream&                          os,
   	    const ObjectHeaderUnknownCTypeOutput&  unknownClassType);
-      struct ObjectHeaderUnknownObjectClassOutput
-      {
-        lmp::BYTE               m_object_class;
-  	    lmp::BYTE               m_class_type;
-        bool                    m_negotiable;
-        lmp::WORD               m_length;
-      };
-      std::ostream& operator<<(
-        std::ostream&                          os,
-  	    const ObjectHeaderUnknownObjectClassOutput&  unknownObjectClass);
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
       struct object_header_fix_length_grammar : qi::grammar<Iterator, bool(ObjectHeaderFixLengthInput)>
@@ -141,14 +147,25 @@ namespace lmp
         qi::rule<Iterator, ObjectHeaderUnknownCTypeOutput(lmp::BYTE)>           object_header_unknown_class_type_rule;
       };
       template <typename Iterator>
-      struct object_header_unknown_object_class_grammar : qi::grammar<Iterator, ObjectHeaderUnknownObjectClassOutput()>
+      struct object_header_unknown_object_class_grammar : qi::grammar<Iterator, ObjectHeaderData()>
       {
     	object_header_unknown_object_class_grammar();
 
-        qi::rule<Iterator, ObjectHeaderUnknownObjectClassOutput()>           object_header_unknown_object_class_rule;
+        qi::rule<Iterator, ObjectHeaderData()>           object_header_unknown_object_class_rule;
       };
       const lmp::BYTE negotiableFlagValue = 0x80;
     }
+	namespace generate
+	{
+	  namespace karma = boost::spirit::karma;
+	  template <typename OutputIterator>
+	  struct object_header_grammar : karma::grammar<OutputIterator, ObjectHeaderData()>
+	  {
+		object_header_grammar();
+
+		karma::rule<OutputIterator, ObjectHeaderData()>   object_header_rule;
+	  };
+	}
   } // namespace obj
 } // namespace lmp
 

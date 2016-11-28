@@ -131,7 +131,6 @@ namespace lmp
 
           hello_object_class_rule.name("hello_object_class");
       }
-
     } // namespace parse
   } // namespace obj
 } // namespace lmp

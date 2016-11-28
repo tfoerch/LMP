@@ -46,7 +46,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::obj::parse::ObjectHeaderUnknownObjectClassOutput,
+  lmp::obj::ObjectHeaderData,
   (lmp::BYTE,       m_object_class)
   (lmp::BYTE,       m_class_type)
   (bool,            m_negotiable)
@@ -116,6 +116,32 @@ namespace lmp
         object_header_unknown_object_class_rule.name("object_header_unknown_object_class");
 	  }
 	} // namespace parse
+    namespace generate
+    {
+      namespace fusion = boost::fusion;
+      namespace phoenix = boost::phoenix;
+      namespace qi = boost::spirit::qi;
+
+      template <typename OutputIterator>
+      object_header_grammar<OutputIterator>::object_header_grammar()
+	  : object_header_grammar::base_type(object_header_rule, "object_header")
+      {
+        using qi::byte_;
+        using qi::big_word;
+        using qi::eps;
+        using phoenix::at_c;
+        using namespace qi::labels;
+
+        object_header_rule =
+        	(  eps(at_c<2>(_val)) << byte_ [ _1 = ( at_c<1>(_val) | lmp::obj::ObjectHeader::c_negotiableMask ) ] |
+        	   byte_ [ _1 = at_c<1>(_val) ] ) // class type
+			<< byte_ [ _1 = at_c<0>(_val) ] // object class
+			<< big_word [ _1 = at_c<3>(_val) ] // length
+       		;
+
+        object_header_rule.name("object_header");
+      }
+    }
   } // namespace obj
 } // namespace lmp
 

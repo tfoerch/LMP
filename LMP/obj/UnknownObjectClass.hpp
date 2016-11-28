@@ -24,8 +24,8 @@ namespace lmp
   {
     struct UnknownObjectClassData
 	{
-      lmp::obj::parse::ObjectHeaderUnknownObjectClassOutput  m_header;
-      ByteSequence                                           m_data;
+      lmp::obj::ObjectHeaderData  m_header;
+      ByteSequence                m_data;
 	};
     std::ostream& operator<<(
       std::ostream&                  os,

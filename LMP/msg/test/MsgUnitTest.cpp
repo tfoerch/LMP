@@ -10,7 +10,6 @@
 #include "msg/ConfigAck.hpp"
 #include "msg/ConfigNack.hpp"
 #include "msg/Hello.hpp"
-#include "msg/MsgParseGrammar.hpp"
 #include "msg/Message.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -409,12 +408,12 @@ BOOST_AUTO_TEST_CASE( config_message_spirit )
 	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
 	BufIterType last = boost::asio::buffers_end(messageBuffer);
 	lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-	lmp::msg::parse::MsgData msgData;
+	lmp::msg::parse::Message parsedMessage;
 	BOOST_CHECK(parse(begin,
 		              last,
 					  msgGrammar,
-					  msgData));
-	std::cout << msgData << std::endl;
+					  parsedMessage));
+	std::cout << parsedMessage << std::endl;
 	// BOOST_CHECK_EQUAL(msgData.m_type, lmp::msg::parse::MsgType::Config);
 	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
   }
@@ -442,12 +441,12 @@ BOOST_AUTO_TEST_CASE( unknown_message_spirit )
 	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
 	BufIterType last = boost::asio::buffers_end(messageBuffer);
 	lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-	lmp::msg::parse::MsgData msgData;
+	lmp::msg::parse::Message parsedMessage;
 	BOOST_CHECK(parse(begin,
 		              last,
 					  msgGrammar,
-					  msgData));
-	std::cout << msgData << std::endl;
+					  parsedMessage));
+	std::cout << parsedMessage << std::endl;
 	// BOOST_CHECK_EQUAL(msgData.m_type, lmp::msg::parse::MsgType::Config);
 	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
   }
@@ -494,11 +493,11 @@ BOOST_AUTO_TEST_CASE( unknown_msg_type_header_spirit )
 	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
 	BufIterType last = boost::asio::buffers_end(messageBuffer);
 	lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-	lmp::msg::parse::MsgData msgData;
+	lmp::msg::parse::Message parsedMessage;
 	BOOST_CHECK(!parse(begin,
 			           last,
 					   msgGrammar,
-					   msgData));
+					   parsedMessage));
 
   }
 }

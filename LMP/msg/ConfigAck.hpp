@@ -13,7 +13,9 @@
 #include "obj/RemoteCCId.hpp"
 #include "obj/MessageIdAck.hpp"
 #include "obj/RemoteNodeId.hpp"
-#include "base/ProtocolTypes.hpp"                  // for DWORD
+#include "CommonHeader.hpp"
+#include "base/ProtocolTypes.hpp"
+#include <boost/spirit/include/qi.hpp>
 
 namespace lmp
 {
@@ -44,6 +46,34 @@ namespace lmp
 	  lmp::obj::MessageIdAck  m_messageIdAck;
 	  lmp::obj::RemoteNodeId  m_remoteNodeId;
 	};
+    namespace parse
+    {
+	  struct ConfigAckMsgData
+	  {
+	    lmp::BYTE                           m_flags;
+	    lmp::obj::ccid::LocalCCIdData       m_localCCId;
+	    lmp::obj::nodeid::LocalNodeIdData   m_localNodeId;
+	    lmp::obj::ccid::RemoteCCIdData      m_remoteCCId;
+	    lmp::obj::msgid::MessageIdAckData   m_messageId;
+	    lmp::obj::nodeid::RemoteNodeIdData  m_remoteNodeId;
+	  };
+	  std::ostream& operator<<(
+	    std::ostream&             os,
+		const ConfigAckMsgData& configAck);
+      namespace qi = boost::spirit::qi;
+      template <typename Iterator>
+      struct config_ack_grammar : qi::grammar<Iterator, ConfigAckMsgData(CommonHeaderOutput)>
+      {
+    	config_ack_grammar();
+
+        lmp::obj::ccid::parse::local_control_channel_id_grammar<Iterator>    local_ccid;
+        lmp::obj::ccid::parse::remote_control_channel_id_grammar<Iterator>   remote_ccid;
+        lmp::obj::nodeid::parse::local_node_id_grammar<Iterator>             local_node_id;
+        lmp::obj::nodeid::parse::remote_node_id_grammar<Iterator>            remote_node_id;
+        lmp::obj::msgid::parse::message_id_ack_grammar<Iterator>             message_id_ack;
+    	qi::rule<Iterator, ConfigAckMsgData(CommonHeaderOutput)>             config_ack_rule;
+      };
+    }
   } // namespace msg
 } // namespace lmp
 

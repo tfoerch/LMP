@@ -21,8 +21,8 @@
 
 BOOST_FUSION_ADAPT_STRUCT(
   lmp::obj::UnknownObjectClassData,
-  (lmp::obj::parse::ObjectHeaderUnknownObjectClassOutput,  m_header)
-  (lmp::obj::ByteSequence,                                 m_data)
+  (lmp::obj::ObjectHeaderData,  m_header)
+  (lmp::obj::ByteSequence,      m_data)
 )
 
 namespace lmp

@@ -12,7 +12,9 @@
 #include "obj/MessageId.hpp"
 #include "obj/LocalNodeId.hpp"
 #include "obj/HelloConfig.hpp"
-#include "base/ProtocolTypes.hpp"                 // for DWORD
+#include "CommonHeader.hpp"
+#include "base/ProtocolTypes.hpp"
+#include <boost/spirit/include/qi.hpp>
 
 namespace lmp
 {
@@ -52,6 +54,32 @@ namespace lmp
 	  lmp::obj::LocalNodeId  m_localNodeId;
 	  lmp::obj::HelloConfig  m_helloConfig;
 	};
+    namespace parse
+    {
+      struct ConfigMsgData
+	  {
+	    lmp::BYTE                          m_flags;
+		lmp::obj::ccid::LocalCCIdData      m_localCCId;
+		lmp::obj::msgid::MessageIdData     m_messageId;
+		lmp::obj::nodeid::LocalNodeIdData  m_localNodeId;
+		lmp::obj::config::HelloConfigData  m_helloConfig;
+	  };
+      std::ostream& operator<<(
+        std::ostream&         os,
+	    const ConfigMsgData&  config);
+      namespace qi = boost::spirit::qi;
+      template <typename Iterator>
+      struct config_grammar : qi::grammar<Iterator, ConfigMsgData(CommonHeaderOutput)>
+      {
+    	config_grammar();
+
+        lmp::obj::ccid::parse::local_control_channel_id_grammar<Iterator>    local_ccid;
+        lmp::obj::nodeid::parse::local_node_id_grammar<Iterator>             local_node_id;
+        lmp::obj::msgid::parse::message_id_grammar<Iterator>                 message_id;
+        lmp::obj::config::parse::hello_config_grammar<Iterator>              hello_config;
+    	qi::rule<Iterator, ConfigMsgData(CommonHeaderOutput)>                config_rule;
+      };
+    }
   } // namespace msg
 } // namespace lmp
 

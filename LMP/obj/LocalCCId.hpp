@@ -17,6 +17,7 @@
 #include "obj/ControlChannelIdData.hpp"
 
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -46,6 +47,19 @@ namespace lmp
 		  lmp::obj::parse::object_header_fix_length_grammar<Iterator>   object_header;
       	  qi::rule<Iterator, LocalCCIdData()>                           local_control_channel_id_rule;
         };
+	  }
+	  namespace generate
+	  {
+	    namespace karma = boost::spirit::karma;
+	    template <typename OutputIterator>
+	    struct local_control_channel_id__grammar : karma::grammar<OutputIterator, LocalCCIdData()>
+	    {
+	      local_control_channel_id__grammar();
+
+	      lmp::obj::ObjectHeaderData                                    object_header_output;
+	      lmp::obj::generate::object_header_grammar<OutputIterator>     object_header;
+	      karma::rule<OutputIterator, LocalCCIdData()>                  local_control_channel_id_rule;
+	    };
 	  }
 	}
   } // namespace obj

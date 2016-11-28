@@ -60,6 +60,34 @@ namespace lmp
         }
 
 	  } // namespace parse
+	  namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
+
+        template <typename OutputIterator>
+        local_control_channel_id__grammar<OutputIterator>::local_control_channel_id__grammar()
+		: local_control_channel_id__grammar::base_type(local_control_channel_id_rule, "local_control_channel_id"),
+	      object_header_output(static_cast<std::underlying_type<ObjectClass>::type>(ObjectClass::ControlChannelID),
+	    		               static_cast<std::underlying_type<lmp::obj::ccid::ClassType>::type>(lmp::obj::ccid::ClassType::LocalCCId),
+							   localCCIdLength)
+
+        {
+          using qi::byte_;
+          using qi::big_dword;
+          using qi::eps;
+          using phoenix::at_c;
+          using namespace qi::labels;
+
+          local_control_channel_id_rule =
+        		object_header[ at_c<2>(phoenix::ref(object_header_output)) = at_c<0>(_val), _1 = phoenix::cref(object_header_output) ]
+  		        << big_dword [ _1 = at_c<1>(_val) ]
+				;
+
+          local_control_channel_id_rule.name("local_control_channel_id");
+        }
+      }
 	} // namespace ccid
   } // namespace obj
 } // namespace lmp

@@ -5,10 +5,14 @@
  *      Author: tom
  */
 
-#include "CommonHeader.hpp"
+#include "CommonHeader_def.hpp"
 #include <boost/asio/buffer.hpp>
+#include <boost/asio/buffers_iterator.hpp>
 #include <boost/endian/conversion.hpp>
-//#include <iostream>
+#include <iostream>
+
+typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+template struct lmp::msg::parse::common_header_grammar<BufIterType>;
 
 namespace lmp
 {
@@ -165,6 +169,17 @@ namespace lmp
       }
       return result;
     }
-
+    namespace parse
+    {
+      std::ostream& operator<<(
+        std::ostream&              os,
+	    const CommonHeaderOutput&  commonHeader)
+      {
+      	os << static_cast<lmp::WORD>(commonHeader.m_flags) << ", "
+      	   << static_cast<lmp::WORD>(commonHeader.m_msg_type) << ", "
+		   << commonHeader.m_length;
+    	return os;
+      }
+    }
   } // namespace msg
 } // namespace lmp
