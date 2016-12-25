@@ -5,7 +5,13 @@
  *      Author: tom
  */
 
-#include "obj/ControlChannelIdClass.hpp"
+#include "obj/ControlChannelIdClass_def.hpp"
+
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/buffers_iterator.hpp>
+
+typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+template struct lmp::obj::ccid::parse::control_channel_id_body_grammar<BufIterType>;
 
 std::ostream& lmp::obj::ccid::operator<<(
   std::ostream&                     os,
@@ -22,3 +28,11 @@ std::ostream& lmp::obj::ccid::operator<<(
   }
   return os;
 }
+std::ostream& lmp::obj::ccid::operator<<(
+  std::ostream&                                  os,
+  const lmp::obj::ccid::ControlChannelIdBody&  controlChannelIdBody)
+{
+  os << controlChannelIdBody.m_CCId;
+  return os;
+}
+

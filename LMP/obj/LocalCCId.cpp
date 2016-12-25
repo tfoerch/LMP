@@ -6,20 +6,26 @@
  */
 
 #include "obj/LocalCCId_def.hpp"
+#include "obj/ObjectClass_def.hpp"
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
-typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
 template struct lmp::obj::ccid::parse::local_control_channel_id_grammar<BufIterType>;
-template struct lmp::obj::ccid::generate::local_control_channel_id__grammar<BufOutIterType>;
+template struct lmp::obj::parse::object_class_grammar<BufIterType, lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::LocalCCId>;
+typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+template struct lmp::obj::ccid::generate::local_control_channel_id_grammar<BufOutIterType>;
+template struct lmp::obj::generate::object_class_grammar<BufOutIterType, lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::LocalCCId>;
+template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::LocalCCId>>(
+  std::ostream&,
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::LocalCCId>>&);
 
-std::ostream& lmp::obj::ccid::operator<<(
-  std::ostream&                         os,
-  const lmp::obj::ccid::LocalCCIdData&  localCCId)
-{
-  os << (localCCId.m_negotiable ? "negotiable" : "not negotiable") << ", "
-	 << localCCId.m_CCId;
-  return os;
-}
+//std::ostream& lmp::obj::ccid::operator<<(
+//  std::ostream&                         os,
+//  const lmp::obj::ccid::LocalCCIdData&  localCCId)
+//{
+//  os << (localCCId.m_negotiable ? "negotiable" : "not negotiable") << ", "
+//	 << localCCId.m_CCId;
+//  return os;
+//}

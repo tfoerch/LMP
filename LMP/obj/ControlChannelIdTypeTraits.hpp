@@ -17,6 +17,11 @@ namespace lmp
     class ControlChannelIdData;
     class ControlChannelIdIF;
     template <>
+    struct ObjectClassTraits<ObjectClass::ControlChannelID>
+    {
+      typedef ccid::ClassType  object_class_type;
+    };
+    template <>
     struct ObjectClassBaseTraits<ccid::ClassType>
     {
       static const otype::ObjectClass  c_object_class = otype::ControlChannelID;
@@ -36,6 +41,12 @@ namespace lmp
         }
         return result;
 	  }
+    };
+
+    template <>
+    struct ObjectClassTypeConst<ccid::ClassType>
+    {
+      static const ObjectClass  obj_class = ObjectClass::ControlChannelID;
     };
     template <>
     struct ObjectClassCTypeTraits<ccid::ClassType, ccid::ClassType::LocalCCId>

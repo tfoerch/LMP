@@ -6,7 +6,8 @@
  */
 
 #include "obj/ObjectClass_def.hpp"
-
+#include "obj/ControlChannelIdTypeTraits.hpp"
+#include "obj/ConfigTypeTraits.hpp"
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 
@@ -18,7 +19,7 @@ template struct lmp::obj::parse::interface_id_object_class_grammar<BufIterType>;
 template struct lmp::obj::parse::message_id_object_class_grammar<BufIterType>;
 template struct lmp::obj::parse::config_object_class_grammar<BufIterType>;
 template struct lmp::obj::parse::hello_object_class_grammar<BufIterType>;
-
+typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
 std::ostream& lmp::obj::operator<<(
   std::ostream&                 os,
   const lmp::obj::ObjectClass&  objClass)

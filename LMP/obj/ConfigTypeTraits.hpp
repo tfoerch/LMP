@@ -10,12 +10,19 @@
 #include "obj/ConfigClass.hpp"
 #include "obj/ObjectClassTypeTraits.hpp"
 #include "obj/HelloConfigData.hpp"
+#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace lmp
 {
   namespace obj
   {
     class HelloConfigIF;
+    template <>
+    struct ObjectClassTypeConst<config::ClassType>
+    {
+      static const ObjectClass  obj_class = ObjectClass::Config;
+    };
     template <>
     struct ObjectClassBaseTraits<config::ClassType>
     {

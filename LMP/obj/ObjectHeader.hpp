@@ -80,11 +80,11 @@ namespace lmp
 	};
     struct ObjectHeaderData
     {
-      ObjectHeaderData();
-      ObjectHeaderData(
-    	lmp::BYTE               object_class,
-		lmp::BYTE               class_type,
-		lmp::WORD               length);
+//      ObjectHeaderData();
+//      ObjectHeaderData(
+//    	lmp::BYTE               object_class,
+//		lmp::BYTE               class_type,
+//		lmp::WORD               length);
       lmp::BYTE               m_object_class;
 	  lmp::BYTE               m_class_type;
       bool                    m_negotiable;

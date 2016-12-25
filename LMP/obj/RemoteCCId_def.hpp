@@ -9,6 +9,7 @@
 
 #include "obj/RemoteCCId.hpp"
 #include "obj/ObjectHeader_def.hpp"
+#include "obj/ObjectClass_def.hpp"
 #include "obj/ControlChannelIdClass.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -19,11 +20,11 @@
 
 #include <type_traits>
 
-BOOST_FUSION_ADAPT_STRUCT(
-  lmp::obj::ccid::RemoteCCIdData,
-  (bool,            m_negotiable)
-  (lmp::DWORD,      m_CCId)
-)
+//BOOST_FUSION_ADAPT_STRUCT(
+//  lmp::obj::ccid::RemoteCCIdData,
+//  (bool,            m_negotiable)
+//  (lmp::DWORD,      m_CCId)
+//)
 
 namespace lmp
 {
@@ -54,7 +55,7 @@ namespace lmp
 
           remote_control_channel_id_rule =
           		object_header(phoenix::cref(object_header_input))  [ at_c<0>(_val) = _1 ]
-  		        >> big_dword [ at_c<1>(_val) = _1 ]
+  		        >> control_channel_id_body [ at_c<1>(_val) = _1 ]
 				;
 
           remote_control_channel_id_rule.name("remote_control_channel_id");

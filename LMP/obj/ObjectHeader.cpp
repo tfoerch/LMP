@@ -143,16 +143,16 @@ namespace lmp
 		   << objectHeader.m_length;
   	  return os;
     }
-    ObjectHeaderData::ObjectHeaderData()
-    {}
-    ObjectHeaderData::ObjectHeaderData(
-  	  lmp::BYTE               object_class,
-	  lmp::BYTE               class_type,
-	  lmp::WORD               length)
-    : m_object_class(object_class),
-	  m_class_type(class_type),
-	  m_length(length)
-    {}
+//    ObjectHeaderData::ObjectHeaderData()
+//    {}
+//    ObjectHeaderData::ObjectHeaderData(
+//  	  lmp::BYTE               object_class,
+//	  lmp::BYTE               class_type,
+//	  lmp::WORD               length)
+//    : m_object_class(object_class),
+//	  m_class_type(class_type),
+//	  m_length(length)
+//    {}
     namespace parse
     {
       ObjectHeaderFixLengthInput::ObjectHeaderFixLengthInput(

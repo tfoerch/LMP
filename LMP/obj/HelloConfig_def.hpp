@@ -9,6 +9,7 @@
 
 #include "obj/HelloConfig.hpp"
 #include "obj/ObjectHeader_def.hpp"
+#include "obj/ObjectClass_def.hpp"
 #include "obj/ControlChannelIdClass.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -20,8 +21,7 @@
 #include <type_traits>
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::obj::config::HelloConfigData,
-  (bool,            m_negotiable)
+  lmp::obj::config::HelloConfigBody,
   (lmp::WORD,       m_helloIntv)
   (lmp::WORD,       m_helloDeadIntv)
 )
@@ -39,6 +39,23 @@ namespace lmp
         namespace qi = boost::spirit::qi;
 
         template <typename Iterator>
+        hello_config_body_grammar<Iterator>::hello_config_body_grammar()
+		: hello_config_body_grammar::base_type(hello_config_body_rule,
+				                          "hello_config")
+        {
+     	  using qi::big_word;
+          using qi::_1;
+          using phoenix::at_c;
+          using namespace qi::labels;
+
+          hello_config_body_rule =
+        		big_word [ at_c<0>(_val) = _1 ]
+				>> big_word [ at_c<1>(_val) = _1 ]
+				;
+
+          hello_config_body_rule.name("hello_config");
+        }
+        template <typename Iterator>
         hello_config_grammar<Iterator>::hello_config_grammar()
 		: hello_config_grammar::base_type(hello_config_rule,
 				                          "hello_config"),
@@ -54,8 +71,7 @@ namespace lmp
 
           hello_config_rule =
         		object_header(phoenix::cref(object_header_input))  [ at_c<0>(_val) = _1 ]
-			    >> big_word [ at_c<1>(_val) = _1 ]
-				>> big_word [ at_c<2>(_val) = _1 ]
+			    >> hello_config_body [ at_c<1>(_val) = _1 ]
 				;
 
           hello_config_rule.name("hello_config");

@@ -19,7 +19,11 @@
 
 #include <type_traits>
 
-#if 0
+BOOST_FUSION_ADAPT_STRUCT(
+  lmp::obj::ccid::ControlChannelIdBody,
+  (lmp::DWORD,       m_CCId)
+)
+
 namespace lmp
 {
   namespace obj
@@ -33,48 +37,47 @@ namespace lmp
 	    namespace qi = boost::spirit::qi;
 
 	    template <typename Iterator>
-	    local_control_channel_id_ctype_grammar<Iterator>::local_control_channel_id_ctype_grammar()
-		: local_control_channel_id_ctype_grammar::base_type(local_control_channel_id_ctype_rule, "local_control_channel_id_ctype")
-	    {
-	    	using qi::byte_;
-	        using phoenix::at_c;
-	    	using namespace qi::labels;
+        control_channel_id_body_grammar<Iterator>::control_channel_id_body_grammar()
+		: control_channel_id_body_grammar::base_type(control_channel_id_body_rule,
+				                          "control_channel_id")
+        {
+     	  using qi::big_dword;
+          using qi::_1;
+          using phoenix::at_c;
+          using namespace qi::labels;
 
-	    	local_control_channel_id_ctype_rule =
-	    			( byte_(static_cast<std::underlying_type<ClassType>::type>(ClassType::LocalCCId))
-	    			  [ at_c<1>(_val) = false ] |
-	    			  byte_(static_cast<std::underlying_type<ClassType>::type>(ClassType::LocalCCId) +
-	    				lmp::obj::parse::negotiableFlagValue)
-					  [ at_c<1>(_val) = true  ] ) // c-type
-					[ at_c<0>(_val) = ClassType::LocalCCId ]
-					;
+          control_channel_id_body_rule =
+        		big_dword [ at_c<0>(_val) = _1 ]
+				;
 
-	    	local_control_channel_id_ctype_rule.name("local_control_channel_id_ctype");
-	    }
-
-	    template <typename Iterator>
-	    remote_control_channel_id_ctype_grammar<Iterator>::remote_control_channel_id_ctype_grammar()
-		: remote_control_channel_id_ctype_grammar::base_type(remote_control_channel_id_ctype_rule, "remote_control_channel_id_ctype")
-	    {
-	    	using qi::byte_;
-	        using phoenix::at_c;
-	    	using namespace qi::labels;
-
-	    	remote_control_channel_id_ctype_rule =
-	    			( byte_(static_cast<std::underlying_type<ClassType>::type>(ClassType::RemoteCCId))
-	    			  [ at_c<1>(_val) = false ] |
-	    			  byte_(static_cast<std::underlying_type<ClassType>::type>(ClassType::RemoteCCId) +
-	    				lmp::obj::parse::negotiableFlagValue)
-					  [ at_c<1>(_val) = true  ] ) // c-type
-					[ at_c<0>(_val) = ClassType::RemoteCCId ]
-					;
-
-	    	remote_control_channel_id_ctype_rule.name("remote_control_channel_id_ctype");
-	    }
+          control_channel_id_body_rule.name("control_channel_id");
+        }
 	  } // namespace parse
+	  namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
+
+        template <typename OutputIterator>
+        control_channel_id_body_grammar<OutputIterator>::control_channel_id_body_grammar()
+		: control_channel_id_body_grammar::base_type(control_channel_id_body_rule, "control_channel_id_body")
+        {
+          using qi::byte_;
+          using qi::big_dword;
+          using qi::eps;
+          using phoenix::at_c;
+          using namespace qi::labels;
+
+          control_channel_id_body_rule =
+                big_dword [ _1 = at_c<0>(_val) ]
+				;
+
+          control_channel_id_body_rule.name("control_channel_id_body");
+        }
+      }
     } // namespace ccid
   } // namespace obj
 } // namespace lmp
-#endif
 
 #endif /* LMP_OBJ_CONTROL_CHANNEL_ID_CLASS_DEF_HPP_ */
