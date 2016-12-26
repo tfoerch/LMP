@@ -55,29 +55,31 @@ namespace lmp
 
           hello_config_body_rule.name("hello_config");
         }
-        template <typename Iterator>
-        hello_config_grammar<Iterator>::hello_config_grammar()
-		: hello_config_grammar::base_type(hello_config_rule,
-				                          "hello_config"),
-	      object_header_input(static_cast<std::underlying_type<ObjectClass>::type>(ObjectClass::Config),
-	    		              static_cast<std::underlying_type<lmp::obj::config::ClassType>::type>(lmp::obj::config::ClassType::HelloConfig),
-							  helloConfigLength)
+	  } // namespace parse
+	  namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
+
+        template <typename OutputIterator>
+        hello_config_body_grammar<OutputIterator>::hello_config_body_grammar()
+		: hello_config_body_grammar::base_type(hello_config_body_rule, "hello_config_body")
         {
-     	  using qi::big_word;
-          using qi::big_dword;
-          using qi::_1;
+          using qi::byte_;
+          using qi::big_word;
+          using qi::eps;
           using phoenix::at_c;
           using namespace qi::labels;
 
-          hello_config_rule =
-        		object_header(phoenix::cref(object_header_input))  [ at_c<0>(_val) = _1 ]
-			    >> hello_config_body [ at_c<1>(_val) = _1 ]
+          hello_config_body_rule =
+                big_word [ _1 = at_c<0>(_val) ]
+			    << big_word [ _1 = at_c<1>(_val) ]
 				;
 
-          hello_config_rule.name("hello_config");
+          hello_config_body_rule.name("hello_config_body");
         }
-
-	  } // namespace parse
+      }
 	} // namespace config
   } // namespace obj
 } // namespace lmp

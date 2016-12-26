@@ -11,15 +11,6 @@
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 
-typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
-template struct lmp::obj::parse::control_channel_id_object_class_grammar<BufIterType>;
-template struct lmp::obj::parse::node_id_object_class_grammar<BufIterType>;
-template struct lmp::obj::parse::link_id_object_class_grammar<BufIterType>;
-template struct lmp::obj::parse::interface_id_object_class_grammar<BufIterType>;
-template struct lmp::obj::parse::message_id_object_class_grammar<BufIterType>;
-template struct lmp::obj::parse::config_object_class_grammar<BufIterType>;
-template struct lmp::obj::parse::hello_object_class_grammar<BufIterType>;
-typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
 std::ostream& lmp::obj::operator<<(
   std::ostream&                 os,
   const lmp::obj::ObjectClass&  objClass)

@@ -73,10 +73,14 @@ namespace lmp
       {
     	config_grammar();
 
-        lmp::obj::ccid::parse::local_control_channel_id_grammar<Iterator>    local_ccid;
+        lmp::obj::parse::object_class_grammar<Iterator,
+		                                      lmp::obj::ccid::ClassType,
+											  lmp::obj::ccid::ClassType::LocalCCId>    local_ccid;
         lmp::obj::nodeid::parse::local_node_id_grammar<Iterator>             local_node_id;
         lmp::obj::msgid::parse::message_id_grammar<Iterator>                 message_id;
-        lmp::obj::config::parse::hello_config_grammar<Iterator>              hello_config;
+        lmp::obj::parse::object_class_grammar<Iterator,
+		                                      lmp::obj::config::ClassType,
+											  lmp::obj::config::ClassType::HelloConfig>     hello_config;
     	qi::rule<Iterator, ConfigMsgData(CommonHeaderOutput)>                config_rule;
       };
     }
