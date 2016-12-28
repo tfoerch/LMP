@@ -72,9 +72,15 @@ namespace lmp
         lmp::obj::parse::object_class_grammar<Iterator,
 		                                      lmp::obj::ccid::ClassType,
 											  lmp::obj::ccid::ClassType::RemoteCCId>    remote_ccid;
-        lmp::obj::nodeid::parse::local_node_id_grammar<Iterator>             local_node_id;
-        lmp::obj::nodeid::parse::remote_node_id_grammar<Iterator>            remote_node_id;
-        lmp::obj::msgid::parse::message_id_ack_grammar<Iterator>             message_id_ack;
+        lmp::obj::parse::object_class_grammar<Iterator,
+		                                      lmp::obj::nodeid::ClassType,
+											  lmp::obj::nodeid::ClassType::LocalNodeId>    local_node_id;
+        lmp::obj::parse::object_class_grammar<Iterator,
+           		                              lmp::obj::nodeid::ClassType,
+											  lmp::obj::nodeid::ClassType::RemoteNodeId>   remote_node_id;
+        lmp::obj::parse::object_class_grammar<Iterator,
+                                              lmp::obj::msgid::ClassType,
+											  lmp::obj::msgid::ClassType::MessageIdAck>    message_id_ack;
     	qi::rule<Iterator, ConfigAckMsgData(CommonHeaderOutput)>             config_ack_rule;
       };
     }

@@ -19,30 +19,28 @@ namespace lmp
   namespace obj
   {
     typedef ObjectClassType<msgid::ClassType, msgid::ClassType::MessageIdAck>  MessageIdAck;
+    template <>
+    struct ObjectClassTypeTraits<msgid::ClassType, msgid::ClassType::MessageIdAck>
+    {
+      typedef msgid::ClassType      ctype_type;
+      static const ctype_type       ctype = msgid::ClassType::MessageIdAck;
+      typedef msgid::MessageIdBody  data_type;
+    };
+    template <typename Iterator>
+    struct ObjectClassTypeParseTraits<Iterator, msgid::ClassType, msgid::ClassType::MessageIdAck>
+    {
+      typedef msgid::parse::message_id_body_grammar<Iterator>  grammar_type;
+    };
+    template <typename OutputIterator>
+    struct ObjectClassTypeGenerateTraits<OutputIterator, msgid::ClassType, msgid::ClassType::MessageIdAck>
+	{
+      typedef msgid::generate::message_id_body_grammar<OutputIterator>  grammar_type;
+	};
 	namespace msgid
 	{
-	  struct MessageIdAckData
-	  {
-	    bool        m_negotiable;
-	    lmp::DWORD  m_messageId;
-	  };
-	  std::ostream& operator<<(
-	    std::ostream&            os,
-		const MessageIdAckData&  messageId);
+	  typedef ObjectClassTypeData<ObjectClassTypeTraits<msgid::ClassType,
+			                                            msgid::ClassType::MessageIdAck>>  MessageIdAckData;
 	  const lmp::WORD messageIdAckLength = objHeaderLength + 4;
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
-        template <typename Iterator>
-        struct message_id_ack_grammar : qi::grammar<Iterator, MessageIdAckData()>
-        {
-      	  message_id_ack_grammar();
-
-      	  lmp::obj::parse::ObjectHeaderFixLengthInput                   object_header_input;
-		  lmp::obj::parse::object_header_fix_length_grammar<Iterator>   object_header;
-      	  qi::rule<Iterator, MessageIdAckData()>                        message_id_ack_rule;
-        };
-	  }
 	}
   } // namespace obj
 } // namespace lmp

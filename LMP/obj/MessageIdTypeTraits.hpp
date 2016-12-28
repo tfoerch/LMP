@@ -38,6 +38,11 @@ namespace lmp
 	  }
     };
     template <>
+    struct ObjectClassTypeConst<msgid::ClassType>
+    {
+      static const ObjectClass  obj_class = ObjectClass::MessageID;
+    };
+    template <>
     struct ObjectClassCTypeTraits<msgid::ClassType, msgid::ClassType::MessageId>
     {
       typedef MessageIdIF    object_ctype_if_type;

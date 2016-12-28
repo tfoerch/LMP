@@ -8,7 +8,8 @@
  */
 
 #include "base/ProtocolTypes.hpp"
-
+#include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 #include <iostream>
 
 namespace lmp
@@ -25,6 +26,35 @@ namespace lmp
       std::ostream& operator<<(
         std::ostream&     os,
   	    const ClassType&  cType);
+      struct NodeIdBody
+	  {
+	    lmp::DWORD  m_nodeId;
+	  };
+      std::ostream& operator<<(
+        std::ostream&      os,
+	    const NodeIdBody&  nodeIdBody);
+      namespace parse
+	  {
+	    namespace qi = boost::spirit::qi;
+	    template <typename Iterator>
+	    struct node_id_body_grammar : qi::grammar<Iterator, NodeIdBody()>
+	    {
+    	  node_id_body_grammar();
+
+    	  qi::rule<Iterator, NodeIdBody()>  node_id_body_rule;
+	    };
+	  }
+	  namespace generate
+	  {
+	    namespace karma = boost::spirit::karma;
+	    template <typename OutputIterator>
+	    struct node_id_body_grammar : karma::grammar<OutputIterator, NodeIdBody()>
+	    {
+	      node_id_body_grammar();
+
+	      karma::rule<OutputIterator, NodeIdBody()>                  node_id_body_rule;
+	    };
+	  }
 	}
   } // namespace obj
 } // namespace lmp

@@ -35,8 +35,12 @@ namespace lmp
         {
       	  message_id_ctypes_grammar();
 
-          lmp::obj::msgid::parse::message_id_grammar<Iterator>          local_msgid;
-          lmp::obj::msgid::parse::message_id_ack_grammar<Iterator>      remote_msgid;
+      	  lmp::obj::parse::object_class_grammar<Iterator,
+		                                        lmp::obj::msgid::ClassType,
+												lmp::obj::msgid::ClassType::MessageId>      local_msgid;
+      	  lmp::obj::parse::object_class_grammar<Iterator,
+                                                lmp::obj::msgid::ClassType,
+												lmp::obj::msgid::ClassType::MessageIdAck>   remote_msgid;
           lmp::obj::msgid::parse::unknown_message_id_grammar<Iterator>  unknown_msgid_ctype;
       	  qi::rule<Iterator, MessageIdCTypes()>                         message_id_ctypes_rule;
         };

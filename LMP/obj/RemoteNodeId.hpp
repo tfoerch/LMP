@@ -19,30 +19,28 @@ namespace lmp
   namespace obj
   {
     typedef ObjectClassType<nodeid::ClassType, nodeid::ClassType::RemoteNodeId>  RemoteNodeId;
+    template <>
+    struct ObjectClassTypeTraits<nodeid::ClassType, nodeid::ClassType::RemoteNodeId>
+    {
+      typedef nodeid::ClassType   ctype_type;
+      static const ctype_type     ctype = nodeid::ClassType::RemoteNodeId;
+      typedef nodeid::NodeIdBody  data_type;
+    };
+    template <typename Iterator>
+    struct ObjectClassTypeParseTraits<Iterator, nodeid::ClassType, nodeid::ClassType::RemoteNodeId>
+    {
+      typedef nodeid::parse::node_id_body_grammar<Iterator>  grammar_type;
+    };
+    template <typename OutputIterator>
+    struct ObjectClassTypeGenerateTraits<OutputIterator, nodeid::ClassType, nodeid::ClassType::RemoteNodeId>
+	{
+      typedef nodeid::generate::node_id_body_grammar<OutputIterator>  grammar_type;
+	};
 	namespace nodeid
 	{
-	  struct RemoteNodeIdData
-	  {
-	    bool        m_negotiable;
-	    lmp::DWORD  m_nodeId;
-	  };
-	  std::ostream& operator<<(
-		std::ostream&            os,
-		const RemoteNodeIdData&  nodeId);
+	  typedef ObjectClassTypeData<ObjectClassTypeTraits<nodeid::ClassType,
+			                                            nodeid::ClassType::RemoteNodeId>>  RemoteNodeIdData;
 	  const lmp::WORD remoteNodeIdLength = objHeaderLength + 4;
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
-	    template <typename Iterator>
-      struct remote_node_id_grammar : qi::grammar<Iterator, RemoteNodeIdData()>
-      {
-    	  remote_node_id_grammar();
-
-    	  lmp::obj::parse::ObjectHeaderFixLengthInput                   object_header_input;
-		  lmp::obj::parse::object_header_fix_length_grammar<Iterator>   object_header;
-    	  qi::rule<Iterator, RemoteNodeIdData()>                        remote_node_id_rule;
-      };
-	}
 	}
   } // namespace obj
 } // namespace lmp

@@ -7,6 +7,7 @@
  *      Author: tom
  */
 
+#include "obj/ObjectClass.hpp"
 #include "obj/NodeIdClass.hpp"
 #include "obj/ObjectClassTypeTraits.hpp"
 #include "obj/ObjectClassType.hpp"
@@ -19,30 +20,28 @@ namespace lmp
   namespace obj
   {
     typedef ObjectClassType<nodeid::ClassType, nodeid::ClassType::LocalNodeId>  LocalNodeId;
+    template <>
+    struct ObjectClassTypeTraits<nodeid::ClassType, nodeid::ClassType::LocalNodeId>
+    {
+      typedef nodeid::ClassType   ctype_type;
+      static const ctype_type     ctype = nodeid::ClassType::LocalNodeId;
+      typedef nodeid::NodeIdBody  data_type;
+    };
+    template <typename Iterator>
+    struct ObjectClassTypeParseTraits<Iterator, nodeid::ClassType, nodeid::ClassType::LocalNodeId>
+    {
+      typedef nodeid::parse::node_id_body_grammar<Iterator>  grammar_type;
+    };
+    template <typename OutputIterator>
+    struct ObjectClassTypeGenerateTraits<OutputIterator, nodeid::ClassType, nodeid::ClassType::LocalNodeId>
+	{
+      typedef nodeid::generate::node_id_body_grammar<OutputIterator>  grammar_type;
+	};
 	namespace nodeid
 	{
-	  struct LocalNodeIdData
-	  {
-	    bool        m_negotiable;
-	    lmp::DWORD  m_nodeId;
-	  };
-	  std::ostream& operator<<(
-		std::ostream&           os,
-		const LocalNodeIdData&  nodeId);
+	  typedef ObjectClassTypeData<ObjectClassTypeTraits<nodeid::ClassType,
+			                                            nodeid::ClassType::LocalNodeId>>  LocalNodeIdData;
 	  const lmp::WORD localNodeIdLength = objHeaderLength + 4;
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
-	    template <typename Iterator>
-        struct local_node_id_grammar : qi::grammar<Iterator, LocalNodeIdData()>
-        {
-      	  local_node_id_grammar();
-
-      	  lmp::obj::parse::ObjectHeaderFixLengthInput                   object_header_input;
-		  lmp::obj::parse::object_header_fix_length_grammar<Iterator>   object_header;
-      	  qi::rule<Iterator, LocalNodeIdData()>                         local_node_id_rule;
-        };
-	  }
 	}
   } // namespace obj
 } // namespace lmp

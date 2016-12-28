@@ -189,13 +189,15 @@ BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
 		                                      sizeof(message)/sizeof(unsigned char));
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::nodeid::parse::local_node_id_grammar<BufIterType>  localNodeIdGrammar;
+   lmp::obj::parse::object_class_grammar<BufIterType,
+	                                     lmp::obj::nodeid::ClassType,
+										 lmp::obj::nodeid::ClassType::LocalNodeId>    localNodeIdGrammar;
    lmp::obj::nodeid::LocalNodeIdData  localNodeId;
    BOOST_CHECK(parse(begin,
 		             last,
 					 localNodeIdGrammar,
 					 localNodeId));
-   BOOST_CHECK_EQUAL(localNodeId.m_nodeId, 0x1020008);
+   BOOST_CHECK_EQUAL(localNodeId.m_data.m_nodeId, 0x1020008);
    BOOST_CHECK_EQUAL(localNodeId.m_negotiable, false);
    // std::cout << msgData << std::endl;
 }
@@ -212,13 +214,15 @@ BOOST_AUTO_TEST_CASE( remote_node_id_decode_spirit )
 		                                      sizeof(message)/sizeof(unsigned char));
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::nodeid::parse::remote_node_id_grammar<BufIterType>  remoteNodeIdGrammar;
+   lmp::obj::parse::object_class_grammar<BufIterType,
+   		                                 lmp::obj::nodeid::ClassType,
+										 lmp::obj::nodeid::ClassType::RemoteNodeId>  remoteNodeIdGrammar;
    lmp::obj::nodeid::RemoteNodeIdData  remoteNodeId;
    BOOST_CHECK(parse(begin,
 		             last,
 					 remoteNodeIdGrammar,
 					 remoteNodeId));
-   BOOST_CHECK_EQUAL(remoteNodeId.m_nodeId, 0x01130a03);
+   BOOST_CHECK_EQUAL(remoteNodeId.m_data.m_nodeId, 0x01130a03);
    BOOST_CHECK_EQUAL(remoteNodeId.m_negotiable, false);
    // std::cout << msgData << std::endl;
 }
@@ -235,13 +239,15 @@ BOOST_AUTO_TEST_CASE( message_id_decode_spirit )
 		                                      sizeof(message)/sizeof(unsigned char));
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::msgid::parse::message_id_grammar<BufIterType>  messageIdGrammar;
+   lmp::obj::parse::object_class_grammar<BufIterType,
+                                         lmp::obj::msgid::ClassType,
+										 lmp::obj::msgid::ClassType::MessageId>  messageIdGrammar;
    lmp::obj::msgid::MessageIdData  messageId;
    BOOST_CHECK(parse(begin,
 		             last,
 					 messageIdGrammar,
 					 messageId));
-   BOOST_CHECK_EQUAL(messageId.m_messageId, 0x1020008);
+   BOOST_CHECK_EQUAL(messageId.m_data.m_messageId, 0x1020008);
    BOOST_CHECK_EQUAL(messageId.m_negotiable, false);
    // std::cout << msgData << std::endl;
 }
@@ -258,13 +264,15 @@ BOOST_AUTO_TEST_CASE( message_id_ack_decode_spirit )
 		                                      sizeof(message)/sizeof(unsigned char));
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::msgid::parse::message_id_ack_grammar<BufIterType>  messageIdAckGrammar;
+   lmp::obj::parse::object_class_grammar<BufIterType,
+                                         lmp::obj::msgid::ClassType,
+										 lmp::obj::msgid::ClassType::MessageIdAck>  messageIdAckGrammar;
    lmp::obj::msgid::MessageIdAckData  messageIdAck;
    BOOST_CHECK(parse(begin,
 		             last,
 					 messageIdAckGrammar,
 					 messageIdAck));
-   BOOST_CHECK_EQUAL(messageIdAck.m_messageId, 0x1020008);
+   BOOST_CHECK_EQUAL(messageIdAck.m_data.m_messageId, 0x1020008);
    BOOST_CHECK_EQUAL(messageIdAck.m_negotiable, false);
    // std::cout << msgData << std::endl;
 }

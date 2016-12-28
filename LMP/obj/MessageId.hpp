@@ -19,30 +19,28 @@ namespace lmp
   namespace obj
   {
     typedef ObjectClassType<msgid::ClassType, msgid::ClassType::MessageId>  MessageId;
+    template <>
+    struct ObjectClassTypeTraits<msgid::ClassType, msgid::ClassType::MessageId>
+    {
+      typedef msgid::ClassType      ctype_type;
+      static const ctype_type       ctype = msgid::ClassType::MessageId;
+      typedef msgid::MessageIdBody  data_type;
+    };
+    template <typename Iterator>
+    struct ObjectClassTypeParseTraits<Iterator, msgid::ClassType, msgid::ClassType::MessageId>
+    {
+      typedef msgid::parse::message_id_body_grammar<Iterator>  grammar_type;
+    };
+    template <typename OutputIterator>
+    struct ObjectClassTypeGenerateTraits<OutputIterator, msgid::ClassType, msgid::ClassType::MessageId>
+	{
+      typedef msgid::generate::message_id_body_grammar<OutputIterator>  grammar_type;
+	};
 	namespace msgid
 	{
-	  struct MessageIdData
-	  {
-	    bool        m_negotiable;
-	    lmp::DWORD  m_messageId;
-	  };
-	  std::ostream& operator<<(
-	    std::ostream&         os,
-		const MessageIdData&  messageId);
+	  typedef ObjectClassTypeData<ObjectClassTypeTraits<msgid::ClassType,
+			                                            msgid::ClassType::MessageId>>  MessageIdData;
 	  const lmp::WORD messageIdLength = objHeaderLength + 4;
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
-        template <typename Iterator>
-        struct message_id_grammar : qi::grammar<Iterator, MessageIdData()>
-        {
-      	  message_id_grammar();
-
-      	  lmp::obj::parse::ObjectHeaderFixLengthInput                   object_header_input;
-		  lmp::obj::parse::object_header_fix_length_grammar<Iterator>   object_header;
-      	  qi::rule<Iterator, MessageIdData()>                           message_id_rule;
-        };
-	  }
 	}
   } // namespace obj
 } // namespace lmp

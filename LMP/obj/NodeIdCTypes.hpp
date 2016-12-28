@@ -35,8 +35,12 @@ namespace lmp
         {
       	  node_id_ctypes_grammar();
 
-          lmp::obj::nodeid::parse::local_node_id_grammar<Iterator>    local_nodeid;
-          lmp::obj::nodeid::parse::remote_node_id_grammar<Iterator>   remote_nodeid;
+          lmp::obj::parse::object_class_grammar<Iterator,
+		                                        lmp::obj::nodeid::ClassType,
+												lmp::obj::nodeid::ClassType::LocalNodeId>    local_nodeid;
+          lmp::obj::parse::object_class_grammar<Iterator,
+		                                        lmp::obj::nodeid::ClassType,
+												lmp::obj::nodeid::ClassType::RemoteNodeId>    remote_nodeid;
           lmp::obj::nodeid::parse::unknown_node_id_grammar<Iterator>  unknown_nodeid_ctype;
       	  qi::rule<Iterator, NodeIdCTypes()>                          node_id_ctypes_rule;
         };

@@ -38,6 +38,11 @@ namespace lmp
 	  }
     };
     template <>
+    struct ObjectClassTypeConst<nodeid::ClassType>
+    {
+      static const ObjectClass  obj_class = ObjectClass::NodeID;
+    };
+    template <>
     struct ObjectClassCTypeTraits<nodeid::ClassType, nodeid::ClassType::LocalNodeId>
     {
       typedef NodeIdIF    object_ctype_if_type;

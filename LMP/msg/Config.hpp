@@ -76,8 +76,12 @@ namespace lmp
         lmp::obj::parse::object_class_grammar<Iterator,
 		                                      lmp::obj::ccid::ClassType,
 											  lmp::obj::ccid::ClassType::LocalCCId>    local_ccid;
-        lmp::obj::nodeid::parse::local_node_id_grammar<Iterator>             local_node_id;
-        lmp::obj::msgid::parse::message_id_grammar<Iterator>                 message_id;
+        lmp::obj::parse::object_class_grammar<Iterator,
+		                                      lmp::obj::nodeid::ClassType,
+											  lmp::obj::nodeid::ClassType::LocalNodeId>    local_node_id;
+        lmp::obj::parse::object_class_grammar<Iterator,
+		                                      lmp::obj::msgid::ClassType,
+											  lmp::obj::msgid::ClassType::MessageId>       message_id;
         lmp::obj::parse::object_class_grammar<Iterator,
 		                                      lmp::obj::config::ClassType,
 											  lmp::obj::config::ClassType::HelloConfig>     hello_config;
