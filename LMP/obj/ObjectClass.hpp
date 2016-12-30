@@ -8,6 +8,7 @@
  */
 
 #include "base/ProtocolTypes.hpp"
+#include "obj/ByteSequence.hpp"
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
@@ -31,6 +32,8 @@ namespace lmp
     template <ObjectClass objClass>
     struct ObjectClassTraits
 	{
+      typedef ObjectClass            obj_class_type;
+      static const  obj_class_type   obj_class = objClass;
 	};
     template <typename ClassType>
     struct ObjectClassTypeConst
@@ -62,8 +65,23 @@ namespace lmp
 	};
     template <typename   ObjCTypeTraits>
     std::ostream& operator<<(
-      std::ostream&                        os,
-	  const ObjectClassTypeData<ObjCTypeTraits>&  objClass);
+      std::ostream&                               os,
+	  const ObjectClassTypeData<ObjCTypeTraits>&  objClassCTypeData);
+    template <typename  ObjClassTraits>
+    class ObjectClassUnknownCTypeData
+	{
+	public:
+      typedef typename ObjClassTraits::obj_class_type  obj_class_type;
+      static const  obj_class_type                     obj_class;
+	  lmp::BYTE                                        m_class_type;
+	  bool                                             m_negotiable;
+      lmp::WORD                                        m_length;
+	  ByteSequence                                     m_data;
+	};
+    template <typename   ObjClassTraits>
+    std::ostream& operator<<(
+      std::ostream&                                       os,
+	  const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData);
 	const lmp::WORD objHeaderLength = 4;
     namespace parse
     {
@@ -77,7 +95,15 @@ namespace lmp
     	typename ObjectClassTypeParseTraits<Iterator, ClassType, ctype>::grammar_type       object_body;
     	qi::rule<Iterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>  object_class_rule;
       };
-    }
+	  template <typename Iterator, ObjectClass objClass>
+      struct object_class_unknown_ctype_grammar : qi::grammar<Iterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>
+      {
+    	object_class_unknown_ctype_grammar();
+
+    	byte_sequence_grammar<Iterator>                                                 byte_sequence;
+    	qi::rule<Iterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>  object_class_unknown_ctype_rule;
+      };
+   }
 	namespace generate
 	{
 	  namespace karma = boost::spirit::karma;
@@ -89,6 +115,14 @@ namespace lmp
     	typename ObjectClassTypeGenerateTraits<OutputIterator, ClassType, ctype>::grammar_type       object_body;
 		karma::rule<OutputIterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>  object_class_rule;
 	  };
+	  template <typename OutputIterator, ObjectClass objClass>
+      struct object_class_unknown_ctype_grammar : karma::grammar<OutputIterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>
+      {
+    	object_class_unknown_ctype_grammar();
+
+    	byte_sequence_grammar<OutputIterator>                                                    byte_sequence;
+    	karma::rule<OutputIterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>  object_class_unknown_ctype_rule;
+      };
 	}
     namespace otype
     {

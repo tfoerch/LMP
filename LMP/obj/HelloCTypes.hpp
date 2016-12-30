@@ -33,8 +33,11 @@ namespace lmp
         {
       	  hello_ctypes_grammar();
 
-          lmp::obj::hello::parse::hello_grammar<Iterator>          hello;
-          lmp::obj::hello::parse::unknown_hello_grammar<Iterator>  unknown_hello_ctype;
+      	  lmp::obj::parse::object_class_grammar<Iterator,
+		                                        lmp::obj::hello::ClassType,
+											    lmp::obj::hello::ClassType::Hello>    hello;
+          lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
+		                                                      lmp::obj::ObjectClass::Hello>  unknown_hello_ctype;
       	  qi::rule<Iterator, HelloCTypes()>                        hello_ctypes_rule;
         };
 	  }

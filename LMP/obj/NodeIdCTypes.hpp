@@ -41,7 +41,8 @@ namespace lmp
           lmp::obj::parse::object_class_grammar<Iterator,
 		                                        lmp::obj::nodeid::ClassType,
 												lmp::obj::nodeid::ClassType::RemoteNodeId>    remote_nodeid;
-          lmp::obj::nodeid::parse::unknown_node_id_grammar<Iterator>  unknown_nodeid_ctype;
+          lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
+		                                                      lmp::obj::ObjectClass::NodeID>  unknown_nodeid_ctype;
       	  qi::rule<Iterator, NodeIdCTypes()>                          node_id_ctypes_rule;
         };
 	  }

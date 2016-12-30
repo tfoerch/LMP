@@ -36,12 +36,13 @@ namespace lmp
       	  control_channel_id_ctypes_grammar();
 
           lmp::obj::parse::object_class_grammar<Iterator,
-  		                                      lmp::obj::ccid::ClassType,
-  											  lmp::obj::ccid::ClassType::LocalCCId>    local_ccid;
+  		                                        lmp::obj::ccid::ClassType,
+  											    lmp::obj::ccid::ClassType::LocalCCId>    local_ccid;
           lmp::obj::parse::object_class_grammar<Iterator,
-  		                                      lmp::obj::ccid::ClassType,
-  											  lmp::obj::ccid::ClassType::RemoteCCId>    remote_ccid;
-          lmp::obj::ccid::parse::unknown_control_channel_id_grammar<Iterator>  unknown_ccid_ctype;
+  		                                        lmp::obj::ccid::ClassType,
+  											    lmp::obj::ccid::ClassType::RemoteCCId>    remote_ccid;
+          lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
+                                                              lmp::obj::ObjectClass::ControlChannelID>  unknown_ccid_ctype;
       	  qi::rule<Iterator, ControlChannelIdCTypes()>                         control_channel_id_ctypes_rule;
         };
 	  }

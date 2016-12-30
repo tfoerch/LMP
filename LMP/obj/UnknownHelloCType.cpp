@@ -5,21 +5,18 @@
  *      Author: tom
  */
 
-#include "obj/UnknownHelloCType_def.hpp"
+#include "obj/UnknownHelloCType.hpp"
+#include "obj/ObjectClass_def.hpp"
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
-template struct lmp::obj::hello::parse::unknown_hello_grammar<BufIterType>;
+template struct lmp::obj::parse::object_class_unknown_ctype_grammar<BufIterType, lmp::obj::ObjectClass::Hello>;
+typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+template struct lmp::obj::generate::object_class_unknown_ctype_grammar<BufOutIterType, lmp::obj::ObjectClass::Hello>;
+template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTraits<lmp::obj::ObjectClass::Hello>>(
+  std::ostream&,
+  const lmp::obj::ObjectClassUnknownCTypeData<lmp::obj::ObjectClassTraits<lmp::obj::ObjectClass::Hello>>&);
 
-std::ostream& lmp::obj::hello::operator<<(
-  std::ostream&                                os,
-  const lmp::obj::hello::UnknownHelloCTypeData&  unknownHelloCType)
-{
-  using lmp::obj::hex_stream::operator<<;
 
-  os << unknownHelloCType.m_header << ", "
-	 << unknownHelloCType.m_data;
-  return os;
-}

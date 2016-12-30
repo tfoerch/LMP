@@ -36,7 +36,8 @@ namespace lmp
           lmp::obj::parse::object_class_grammar<Iterator,
   		                                      lmp::obj::config::ClassType,
   											  lmp::obj::config::ClassType::HelloConfig>     hello_config;
-          lmp::obj::config::parse::unknown_config_grammar<Iterator>  unknown_config_ctype;
+          lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
+		                                                      lmp::obj::ObjectClass::Config>  unknown_config_ctype;
       	  qi::rule<Iterator, ConfigCTypes()>                         config_ctypes_rule;
         };
 	  }

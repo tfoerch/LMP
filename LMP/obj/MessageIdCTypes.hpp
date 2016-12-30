@@ -41,7 +41,8 @@ namespace lmp
       	  lmp::obj::parse::object_class_grammar<Iterator,
                                                 lmp::obj::msgid::ClassType,
 												lmp::obj::msgid::ClassType::MessageIdAck>   remote_msgid;
-          lmp::obj::msgid::parse::unknown_message_id_grammar<Iterator>  unknown_msgid_ctype;
+          lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
+		                                                      lmp::obj::ObjectClass::MessageID>  unknown_msgid_ctype;
       	  qi::rule<Iterator, MessageIdCTypes()>                         message_id_ctypes_rule;
         };
 	  }

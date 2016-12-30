@@ -10,6 +10,7 @@
 #include "base/ProtocolTypes.hpp"
 #include <vector>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -30,11 +31,22 @@ namespace lmp
       template <typename Iterator>
       struct byte_sequence_grammar : qi::grammar<Iterator, ByteSequence(lmp::WORD)>
       {
-    	  byte_sequence_grammar();
+    	byte_sequence_grammar();
 
         qi::rule<Iterator, ByteSequence(lmp::WORD)>  byte_sequence;
       };
     } // namespace parse
+	namespace generate
+	{
+	  namespace karma = boost::spirit::karma;
+	  template <typename OutputIterator>
+	  struct byte_sequence_grammar : karma::grammar<OutputIterator, ByteSequence()>
+	  {
+		byte_sequence_grammar();
+
+		karma::rule<OutputIterator, ByteSequence()>  byte_sequence;
+	  };
+	}
   } // namespace obj
 } // namespace lmp
 

@@ -5,21 +5,16 @@
  *      Author: tom
  */
 
-#include "obj/UnknownConfigCType_def.hpp"
+#include "obj/UnknownConfigCType.hpp"
+#include "obj/ObjectClass_def.hpp"
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
-template struct lmp::obj::config::parse::unknown_config_grammar<BufIterType>;
-
-std::ostream& lmp::obj::config::operator<<(
-  std::ostream&                                os,
-  const lmp::obj::config::UnknownConfigCTypeData&  unknownConfigCType)
-{
-  using lmp::obj::hex_stream::operator<<;
-
-  os << unknownConfigCType.m_header << ", "
-	 << unknownConfigCType.m_data;
-  return os;
-}
+template struct lmp::obj::parse::object_class_unknown_ctype_grammar<BufIterType, lmp::obj::ObjectClass::Config>;
+typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+template struct lmp::obj::generate::object_class_unknown_ctype_grammar<BufOutIterType, lmp::obj::ObjectClass::Config>;
+template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTraits<lmp::obj::ObjectClass::Config>>(
+  std::ostream&,
+  const lmp::obj::ObjectClassUnknownCTypeData<lmp::obj::ObjectClassTraits<lmp::obj::ObjectClass::Config>>&);

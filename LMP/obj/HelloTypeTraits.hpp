@@ -17,6 +17,11 @@ namespace lmp
     class HelloData;
     class HelloIF;
     template <>
+    struct ObjectClassTypeConst<hello::ClassType>
+    {
+      static const ObjectClass  obj_class = ObjectClass::Hello;
+    };
+    template <>
     struct ObjectClassBaseTraits<hello::ClassType>
     {
       static const otype::ObjectClass  c_object_class = otype::Hello;

@@ -51,6 +51,27 @@ namespace lmp
           byte_sequence.name("byte_sequence");
       }
     } // namespace parse
+	namespace generate
+	{
+      namespace fusion = boost::fusion;
+      namespace phoenix = boost::phoenix;
+      namespace qi = boost::spirit::qi;
+
+      template <typename OutputIterator>
+      byte_sequence_grammar<OutputIterator>::byte_sequence_grammar()
+	  : byte_sequence_grammar::base_type(byte_sequence, "byte_sequence")
+      {
+    	using qi::byte_;
+    	using phoenix::at_c;
+    	using namespace qi::labels;
+
+    	byte_sequence =
+            *byte_
+			;
+
+    	byte_sequence.name("byte_sequence");
+      }
+	}
   } // namespace obj
 } // namespace lmp
 
