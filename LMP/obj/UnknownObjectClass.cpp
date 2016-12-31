@@ -19,7 +19,10 @@ std::ostream& lmp::obj::operator<<(
 {
   using lmp::obj::hex_stream::operator<<;
 
-  os << unknownObjectClass.m_header << ", "
+  os << static_cast<lmp::WORD>(unknownObjectClass.m_object_class) << ", "
+	 << static_cast<lmp::WORD>(unknownObjectClass.m_class_type) << ", "
+	 << (unknownObjectClass.m_negotiable ? "negotiable" : "not negotiable") << ", "
+	 << unknownObjectClass.m_length << ", "
 	 << unknownObjectClass.m_data;
   return os;
 }

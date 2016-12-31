@@ -8,7 +8,7 @@
  */
 
 #include "obj/ControlChannelIdCTypes.hpp"
-#include "obj/ObjectHeader_def.hpp"
+#include "obj/ObjectHeader.hpp"
 #include "obj/ControlChannelIdClass.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>

@@ -85,6 +85,7 @@ namespace lmp
 	const lmp::WORD objHeaderLength = 4;
     namespace parse
     {
+      const lmp::BYTE negotiableFlagValue = 0x80;
       namespace qi = boost::spirit::qi;
 
 	  template <typename Iterator, typename ClassType, ClassType ctype>
@@ -103,7 +104,7 @@ namespace lmp
     	byte_sequence_grammar<Iterator>                                                 byte_sequence;
     	qi::rule<Iterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>  object_class_unknown_ctype_rule;
       };
-   }
+    }
 	namespace generate
 	{
 	  namespace karma = boost::spirit::karma;

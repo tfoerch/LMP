@@ -8,7 +8,7 @@
  */
 
 #include "obj/UnknownObjectClass.hpp"
-#include "obj/ObjectHeader_def.hpp"
+#include "obj/ObjectHeader.hpp"
 #include "obj/ControlChannelIdClass.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -21,8 +21,11 @@
 
 BOOST_FUSION_ADAPT_STRUCT(
   lmp::obj::UnknownObjectClassData,
-  (lmp::obj::ObjectHeaderData,  m_header)
-  (lmp::obj::ByteSequence,      m_data)
+  (lmp::BYTE,               m_object_class)
+  (lmp::BYTE,               m_class_type)
+  (bool,                    m_negotiable)
+  (lmp::WORD,               m_length)
+  (lmp::obj::ByteSequence,  m_data)
 )
 
 namespace lmp
@@ -40,15 +43,17 @@ namespace lmp
 	  : unknown_object_class_grammar::base_type(unknown_object_class_rule,
 			                                    "unknown_object_class")
       {
+        using qi::byte_;
     	using qi::big_word;
-    	using qi::big_dword;
     	using qi::_1;
     	using phoenix::at_c;
     	using namespace qi::labels;
 
     	unknown_object_class_rule =
-    		object_header [ at_c<0>(_val) = _1 ]
-			>> byte_sequence( at_c<3>(at_c<0>(_val)) - 4 ) [ at_c<1>(_val) = _1 ]
+    	    byte_ [at_c<1>(_val) = (_1 & lmp::obj::ObjectHeader::c_classTypeMask), at_c<2>(_val) = (_1 & lmp::obj::ObjectHeader::c_negotiableMask) ]  // class type
+    		>> byte_  [at_c<0>(_val) = _1 ] // object class
+    		>> big_word  [ at_c<3>(_val) = _1 ] // length
+			>> byte_sequence( at_c<3>(_val) - 4 ) [ at_c<4>(_val) = _1 ]
 			;
 
     	unknown_object_class_rule.name("unknown_object_class");

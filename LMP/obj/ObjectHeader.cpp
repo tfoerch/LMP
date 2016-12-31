@@ -5,18 +5,11 @@
  *      Author: tom
  */
 
-#include "ObjectHeader_def.hpp"
+#include "ObjectHeader.hpp"
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 #include <boost/endian/conversion.hpp>
 #include <iostream>
-
-typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
-typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
-template struct lmp::obj::parse::object_header_fix_length_grammar<BufIterType>;
-template struct lmp::obj::parse::object_header_unknown_class_type_grammar<BufIterType>;
-template struct lmp::obj::parse::object_header_unknown_object_class_grammar<BufIterType>;
-template struct lmp::obj::generate::object_header_grammar<BufOutIterType>;
 
 namespace lmp
 {
@@ -133,45 +126,5 @@ namespace lmp
       }
       return result;
     }
-    std::ostream& operator<<(
-      std::ostream&            os,
-	  const ObjectHeaderData&  objectHeader)
-    {
-  	  os << static_cast<lmp::WORD>(objectHeader.m_object_class) << ", "
-  	     << static_cast<lmp::WORD>(objectHeader.m_class_type) << ", "
-		 << (objectHeader.m_negotiable ? "negotiable" : "not negotiable") << ", "
-		   << objectHeader.m_length;
-  	  return os;
-    }
-//    ObjectHeaderData::ObjectHeaderData()
-//    {}
-//    ObjectHeaderData::ObjectHeaderData(
-//  	  lmp::BYTE               object_class,
-//	  lmp::BYTE               class_type,
-//	  lmp::WORD               length)
-//    : m_object_class(object_class),
-//	  m_class_type(class_type),
-//	  m_length(length)
-//    {}
-    namespace parse
-    {
-      ObjectHeaderFixLengthInput::ObjectHeaderFixLengthInput(
-        lmp::BYTE               object_class,
-		lmp::BYTE               class_type,
-		lmp::WORD               length)
-      : m_object_class(object_class),
-		m_class_type(class_type),
-		m_length(length)
-	  {}
-      std::ostream& operator<<(
-        std::ostream&                          os,
-  	    const ObjectHeaderUnknownCTypeOutput&  unknownClassType)
-      {
-    	os << static_cast<lmp::WORD>(unknownClassType.m_class_type) << ", "
-    	   << (unknownClassType.m_negotiable ? "negotiable" : "not negotiable") << ", "
-		   << unknownClassType.m_length;
-    	return os;
-      }
-    } // namespace parse
   } // namespace obj
 } // namespace lmp

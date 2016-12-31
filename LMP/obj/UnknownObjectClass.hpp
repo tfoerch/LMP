@@ -24,8 +24,11 @@ namespace lmp
   {
     struct UnknownObjectClassData
 	{
-      lmp::obj::ObjectHeaderData  m_header;
-      ByteSequence                m_data;
+      lmp::BYTE               m_object_class;
+	  lmp::BYTE               m_class_type;
+      bool                    m_negotiable;
+      lmp::WORD               m_length;
+      ByteSequence            m_data;
 	};
     std::ostream& operator<<(
       std::ostream&                  os,
@@ -38,7 +41,6 @@ namespace lmp
       {
     	unknown_object_class_grammar();
 
-    	lmp::obj::parse::object_header_unknown_object_class_grammar<Iterator>  object_header;
     	lmp::obj::parse::byte_sequence_grammar<Iterator>                       byte_sequence;
     	qi::rule<Iterator, UnknownObjectClassData()>                           unknown_object_class_rule;
       };

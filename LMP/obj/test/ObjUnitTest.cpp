@@ -29,43 +29,6 @@
 BOOST_AUTO_TEST_SUITE( obj )
 
 
-BOOST_AUTO_TEST_CASE( object_header_decode_and_encode_spirit )
-{
-   using boost::spirit::qi::parse;
-   using boost::spirit::karma::generate;
-
-   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
-   typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
-   unsigned char message[] =
-     { 0x01, 0x09, 0x00, 0x0C };
-   boost::asio::const_buffers_1 messageBuffer(message,
-		                                      sizeof(message)/sizeof(unsigned char));
-   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
-   BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::object_header_unknown_object_class_grammar<BufIterType>  objectHeaderUnknownObjClassGrammar;
-   lmp::obj::ObjectHeaderData  objectHeader;
-   BOOST_CHECK(parse(begin,
-		             last,
-					 objectHeaderUnknownObjClassGrammar,
-					 objectHeader));
-   BOOST_CHECK_EQUAL(objectHeader.m_object_class, 9);
-   BOOST_CHECK_EQUAL(objectHeader.m_class_type, 1);
-   BOOST_CHECK_EQUAL(objectHeader.m_length, 12);
-   BOOST_CHECK_EQUAL(objectHeader.m_negotiable, false);
-   // std::cout << msgData << std::endl;
-   const lmp::WORD msgLength = objectHeader.m_length;
-   unsigned char emptySpace[msgLength];
-   boost::asio::mutable_buffers_1 emptyBuffer(emptySpace,
-                                              sizeof(emptySpace)/sizeof(unsigned char));
-   BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
-   BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-   lmp::obj::generate::object_header_grammar<BufOutIterType> objectHeaderGenerateGrammar;
-   BOOST_CHECK(generate(gen_begin,
-		                objectHeaderGenerateGrammar,
-		                objectHeader));
-	  BOOST_CHECK_EQUAL_COLLECTIONS(message, message + lmp::obj::ObjectHeader::c_headerLength,
-			                        emptySpace, emptySpace + lmp::obj::ObjectHeader::c_headerLength);
-}
 
 BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
 {
@@ -384,10 +347,10 @@ BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
 					 unknownObjectClassGrammar,
 					 unknownObjectClass));
    BOOST_CHECK_EQUAL(unknownObjectClass.m_data.size(), 8);
-   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_object_class, 9);
-   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_class_type, 1);
-   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_length, 12);
-   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_negotiable, false);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_object_class, 9);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_class_type, 1);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_length, 12);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_negotiable, false);
    // std::cout << msgData << std::endl;
 }
 

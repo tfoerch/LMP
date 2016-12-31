@@ -8,7 +8,7 @@
  */
 
 #include "obj/NodeIdCTypes.hpp"
-#include "obj/ObjectHeader_def.hpp"
+#include "obj/ObjectHeader.hpp"
 #include "obj/NodeIdClass.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
