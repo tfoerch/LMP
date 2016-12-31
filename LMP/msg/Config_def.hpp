@@ -21,7 +21,7 @@
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::msg::parse::ConfigMsgData,
+  lmp::msg::ConfigMsg,
   (lmp::BYTE,                          m_flags)
   (lmp::obj::ccid::LocalCCIdData,      m_localCCId)
   (lmp::obj::msgid::MessageIdData,     m_messageId)

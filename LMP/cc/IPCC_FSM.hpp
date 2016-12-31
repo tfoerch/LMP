@@ -16,7 +16,7 @@ namespace lmp
 {
   namespace msg
   {
-    class Config;
+    class ConfigMsg;
   }
   namespace cc
   {
@@ -69,10 +69,10 @@ namespace lmp
     class EvContenLost
 	{
 	public:
-      explicit EvContenLost(const msg::Config&  configMsg)
+      explicit EvContenLost(const msg::ConfigMsg&  configMsg)
 	  : theConfigMsg(configMsg)
 	  {}
-      const msg::Config&  theConfigMsg;
+      const msg::ConfigMsg&  theConfigMsg;
       static lmp::cc::appl::EvContenLost  theApplEvent;
 	};
     class EvAdminDown

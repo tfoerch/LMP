@@ -5,34 +5,26 @@
  *      Author: tom
  */
 
-#include "Hello.hpp"
+#include "Hello_def.hpp"
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/buffers_iterator.hpp>
+#include <iostream>
+
+typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+template struct lmp::msg::parse::hello_grammar<BufIterType>;
 
 namespace lmp
 {
   namespace msg
   {
-    Hello::Hello(
-      const lmp::obj::Hello&  hello)
-    : m_hello(hello)
-    {}
-    const mtype::MsgType Hello::do_getMsgType() const
+    std::ostream& operator<<(
+      std::ostream&     os,
+	  const HelloMsg&  hello)
     {
-      return mtype::Hello;
-    }
-    lmp::WORD Hello::do_getContentsLength() const
-    {
-      return m_hello.getObjLength();
-    }
-    CommonHeader::OptEncError Hello::do_encodeContents(
-  	  boost::asio::mutable_buffer&  buffer) const
-    {
-      obj::ObjectHeader::OptEncError optEncError = m_hello.encode(buffer);
-      if (optEncError &&
-    	  *optEncError == obj::ObjectHeader::insufficient_buffer_length)
-      {
-    	return CommonHeader::OptEncError(CommonHeader::insufficient_buffer_length);
-      }
-      return boost::none;
+      std::cout << "HelloMsg(" << static_cast<lmp::WORD>(hello.m_flags)
+			    << ", " << hello.m_hello
+				<< ")";
+      return os;
     }
   } // namespace msg
 } // namespace lmp

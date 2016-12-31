@@ -1,13 +1,13 @@
-#ifndef LMP_MSG_MESSAGE_DEF_HPP_
-#define LMP_MSG_MESSAGE_DEF_HPP_
+#ifndef LMP_MSG_HELLO_DEF_HPP_
+#define LMP_MSG_HELLO_DEF_HPP_
 /*
- * Message_def.hpp
+ * Hello_def.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom
  */
 
-#include "Message.hpp"
+#include "Hello.hpp"
 #include "CommonHeader_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -18,6 +18,13 @@
 #include <boost/phoenix/object/static_cast.hpp>
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+
+
+BOOST_FUSION_ADAPT_STRUCT(
+  lmp::msg::HelloMsg,
+  (lmp::BYTE,                          m_flags)
+  (lmp::obj::hello::HelloData,         m_hello)
+)
 
 namespace lmp
 {
@@ -30,34 +37,26 @@ namespace lmp
       namespace qi = boost::spirit::qi;
 
       template <typename Iterator>
-      message_grammar<Iterator>::message_grammar()
-	  : message_grammar<Iterator>::base_type(message_rule, "message")
+      hello_grammar<Iterator>::hello_grammar()
+	  : hello_grammar<Iterator>::base_type(hello_rule, "hello")
 	  {
         using qi::byte_;
         using qi::big_word;
-        using qi::eps;
         using qi::_a;
         using qi::_1;
+        using qi::attr;
         using phoenix::at_c;
         using namespace qi::labels;
 
-        message_rule =
-        		common_header(CommonHeader::c_supportedVersion << 4) [ _a = _1 ]
-				>> ( ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::Config) )
-				       >> config_msg(_a) ) |
-				     ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigAck) )
-					   >> config_ack_msg(_a) ) |
-				     ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigNack) )
-					   >>  config_nack_msg(_a) ) |
-					 ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::Hello) )
-					   >>  hello_msg(_a) ) |
-				     unknown_msg(_a) ) [ _val = _1 ]
+        hello_rule %=
+        		attr(at_c<0>(_r1))
+ 	    		>> hello
 				;
 
-        message_rule.name("message");
+        hello_rule.name("hello");
 	  }
 	} // namespace parse
   } // namespace msg
 } // namespace lmp
 
-#endif /* LMP_MSG_MESSAGE_DEF_HPP_ */
+#endif /* LMP_MSG_HELLO_DEF_HPP_ */

@@ -12,6 +12,7 @@
 #include "Config.hpp"
 #include "ConfigAck.hpp"
 #include "ConfigNack.hpp"
+#include "Hello.hpp"
 #include "UnknownMessage.hpp"
 
 #include <boost/variant.hpp>
@@ -25,9 +26,10 @@ namespace lmp
 	namespace parse
 	{
 	  typedef
-		boost::variant<ConfigMsgData,
-					   ConfigAckMsgData,
-					   ConfigNackMsgData,
+		boost::variant<ConfigMsg,
+					   ConfigAckMsg,
+					   ConfigNackMsg,
+					   HelloMsg,
 					   UnknownMessage>     Message;
 	  std::ostream& operator<<(
 		std::ostream&    os,
@@ -45,6 +47,7 @@ namespace lmp
         lmp::msg::parse::config_grammar<Iterator>                                       config_msg;
         lmp::msg::parse::config_ack_grammar<Iterator>                                   config_ack_msg;
         lmp::msg::parse::config_nack_grammar<Iterator>                                  config_nack_msg;
+        lmp::msg::parse::hello_grammar<Iterator>                                        hello_msg;
         lmp::msg::parse::unknown_message_grammar<Iterator>                              unknown_msg;
         qi::rule<Iterator, Message(), qi::locals<lmp::msg::parse::CommonHeaderOutput>>  message_rule;
       };

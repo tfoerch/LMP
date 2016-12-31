@@ -18,13 +18,6 @@
 
 namespace lmp
 {
-  namespace msg
-  {
-    class Config;
-    class ConfigAck;
-    class ConfigNack;
-    class Hello;
-  }
   namespace cc
   {
     namespace appl
@@ -64,7 +57,7 @@ namespace lmp
       virtual bool do_isConntentionWinning(
         lmp::DWORD  remoteNodeId) const;
       virtual bool do_isConfigAcceptable(
-        const msg::Config&  configMsg) const;
+        const msg::ConfigMsg&  configMsg) const;
       virtual void do_reportTransition(
     	const appl::State&   sourceState,
 		const appl::Event&   event,
@@ -73,17 +66,17 @@ namespace lmp
       virtual void do_sendHelloMsg();
       // implement IpccMsgReceiveIF
       virtual void do_processReceivedMessage(
-    	const msg::Config&  configMsg);
+    	const msg::ConfigMsg&   configMsg);
       virtual void do_processReceivedMessage(
-    	const msg::ConfigAck&   configAckMsg);
+    	const msg::ConfigAckMsg&   configAckMsg);
       virtual void do_processReceivedMessage(
-    	const msg::ConfigNack&  configNackMsg);
+    	const msg::ConfigNackMsg&  configNackMsg);
       virtual void do_processReceivedMessage(
-    	const msg::Hello&       helloMsg);
+    	const msg::HelloMsg&       helloMsg);
       // internal
       bool canAcceptNewConfig() const;
       bool isConntentionWinning(
-    	const msg::Config&  configMsg) const;
+    	const msg::ConfigMsg&  configMsg) const;
 
       lmp::DWORD                                   theLocalNodeId;
       lmp::DWORD                                   theLocalCCId;

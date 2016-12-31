@@ -12,10 +12,10 @@ namespace lmp
 {
   namespace msg
   {
-    class Config;
-    class ConfigAck;
-    class ConfigNack;
-    class Hello;
+    class ConfigMsg;
+    class ConfigAckMsg;
+    class ConfigNackMsg;
+    class HelloMsg;
   }
   namespace cc
   {
@@ -23,23 +23,23 @@ namespace lmp
     {
     public:
       inline void processReceivedMessage(
-    	const msg::Config&      configMsg) { do_processReceivedMessage(configMsg); }
+    	const msg::ConfigMsg&   configMsg) { do_processReceivedMessage(configMsg); }
       inline void processReceivedMessage(
-    	const msg::ConfigAck&   configAckMsg) { do_processReceivedMessage(configAckMsg); }
+    	const msg::ConfigAckMsg&   configAckMsg) { do_processReceivedMessage(configAckMsg); }
       inline void processReceivedMessage(
-    	const msg::ConfigNack&  configNackMsg) { do_processReceivedMessage(configNackMsg); }
+    	const msg::ConfigNackMsg&  configNackMsg) { do_processReceivedMessage(configNackMsg); }
       inline void processReceivedMessage(
-    	const msg::Hello&       helloMsg) { do_processReceivedMessage(helloMsg); }
+    	const msg::HelloMsg&       helloMsg) { do_processReceivedMessage(helloMsg); }
       virtual ~IpccMsgReceiveIF(){}
     private:
       virtual void do_processReceivedMessage(
-    	const msg::Config&      configMsg) = 0;
+    	const msg::ConfigMsg&   configMsg) = 0;
       virtual void do_processReceivedMessage(
-    	const msg::ConfigAck&   configAckMsg) = 0;
+    	const msg::ConfigAckMsg&   configAckMsg) = 0;
       virtual void do_processReceivedMessage(
-    	const msg::ConfigNack&  configNackMsg) = 0;
+    	const msg::ConfigNackMsg&  configNackMsg) = 0;
       virtual void do_processReceivedMessage(
-    	const msg::Hello&       helloMsg) = 0;
+    	const msg::HelloMsg&       helloMsg) = 0;
     };
   } // namespace cc
 } // namespace lmp

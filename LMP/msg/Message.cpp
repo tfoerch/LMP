@@ -19,19 +19,24 @@ namespace
     msg_variants_printer(std::ostream& os)
     : m_os(os)
 	{}
-    std::ostream& operator()(const lmp::msg::parse::ConfigMsgData& config) const
+    std::ostream& operator()(const lmp::msg::ConfigMsg& config) const
     {
 	  m_os << config << std::endl;
 	  return m_os;
     }
-    std::ostream& operator()(const lmp::msg::parse::ConfigAckMsgData& configAck) const
+    std::ostream& operator()(const lmp::msg::ConfigAckMsg& configAck) const
     {
 	  m_os << configAck << std::endl;
 	  return m_os;
     }
-    std::ostream& operator()(const lmp::msg::parse::ConfigNackMsgData& configNack) const
+    std::ostream& operator()(const lmp::msg::ConfigNackMsg& configNack) const
     {
 	  m_os << configNack << std::endl;
+	  return m_os;
+    }
+    std::ostream& operator()(const lmp::msg::HelloMsg& hello) const
+    {
+	  m_os << hello << std::endl;
 	  return m_os;
     }
     std::ostream& operator()(const lmp::msg::parse::UnknownMessage& unknownMessage) const

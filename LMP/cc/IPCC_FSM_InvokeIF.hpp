@@ -14,7 +14,7 @@ namespace lmp
 {
   namespace msg
   {
-  	class Config;
+  	class ConfigMsg;
   }
   namespace cc
   {
@@ -30,7 +30,7 @@ namespace lmp
       inline bool isConntentionWinning(
         lmp::DWORD  remoteNodeId) const { return do_isConntentionWinning(remoteNodeId); }
       inline bool isConfigAcceptable(
-        const msg::Config&  configMsg) const { return do_isConfigAcceptable(configMsg); }
+        const msg::ConfigMsg&  configMsg) const { return do_isConfigAcceptable(configMsg); }
       inline void reportTransition(
         const appl::State&   sourceState,
 		const appl::Event&   event,
@@ -43,7 +43,7 @@ namespace lmp
       virtual bool do_isConntentionWinning(
         lmp::DWORD  remoteNodeId) const = 0;
       virtual bool do_isConfigAcceptable(
-        const msg::Config&  configMsg) const = 0;
+        const msg::ConfigMsg&  configMsg) const = 0;
       virtual void do_reportTransition(
     	const appl::State&   sourceState,
 		const appl::Event&   event,

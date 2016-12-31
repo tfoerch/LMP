@@ -20,7 +20,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::msg::parse::ConfigNackMsgData,
+  lmp::msg::ConfigNackMsg,
   (lmp::BYTE,                           m_flags)
   (lmp::obj::ccid::LocalCCIdData,       m_localCCId)
   (lmp::obj::nodeid::LocalNodeIdData,   m_localNodeId)

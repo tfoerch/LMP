@@ -15,19 +15,28 @@ namespace lmp
 {
   namespace msg
   {
-    class Hello : public LMPMessageIF
+    struct HelloMsg
+	{
+      lmp::BYTE                          m_flags;
+	  lmp::obj::hello::HelloData         m_hello;
+	};
+    std::ostream& operator<<(
+      std::ostream&        os,
+	  const HelloMsg&      hello);
+    namespace parse
     {
-	public:
-      Hello(
-        const lmp::obj::Hello&  hello);
-      inline const lmp::obj::Hello& getHello() const { return m_hello; }
-    private:
-      virtual const mtype::MsgType do_getMsgType() const;
-      virtual lmp::WORD do_getContentsLength() const;
-      virtual CommonHeader::OptEncError do_encodeContents(
-    	boost::asio::mutable_buffer&  buffer) const;
-      lmp::obj::Hello  m_hello;
-    };
+      namespace qi = boost::spirit::qi;
+      template <typename Iterator>
+      struct hello_grammar : qi::grammar<Iterator, HelloMsg(CommonHeaderOutput)>
+      {
+    	hello_grammar();
+
+        lmp::obj::parse::object_class_grammar<Iterator,
+		                                      lmp::obj::hello::ClassType,
+											  lmp::obj::hello::ClassType::Hello>      hello;
+    	qi::rule<Iterator, HelloMsg(CommonHeaderOutput)>                              hello_rule;
+      };
+    }
   } // namespace msg
 } // namespace lmp
 

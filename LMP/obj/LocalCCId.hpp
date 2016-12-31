@@ -13,8 +13,8 @@
 #include "obj/ObjectClassTypeTraits.hpp"
 #include "obj/ObjectClassType.hpp"
 #include "obj/ControlChannelIdTypeTraits.hpp"
-#include "obj/ControlChannelIdIF.hpp"
-#include "obj/ControlChannelIdData.hpp"
+//#include "obj/ControlChannelIdIF.hpp"
+//#include "obj/ControlChannelIdData.hpp"
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>

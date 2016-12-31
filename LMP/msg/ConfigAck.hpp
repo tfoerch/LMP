@@ -21,48 +21,23 @@ namespace lmp
 {
   namespace msg
   {
-    class ConfigAck : public LMPMessageIF
+    struct ConfigAckMsg
 	{
-	public:
-      ConfigAck(
-    	const lmp::obj::LocalCCId&     localCCId,
-		const lmp::obj::LocalNodeId&   localNodeId,
-    	const lmp::obj::RemoteCCId&    remoteCCId,
-		const lmp::obj::MessageIdAck&  messageIdAck,
-		const lmp::obj::RemoteNodeId&  remoteNodeId);
-      inline const lmp::obj::LocalCCId& getLocalCCId() const { return m_localCCId; }
-      inline const lmp::obj::LocalNodeId& getLocalNodeId() const { return m_localNodeId; }
-      inline const lmp::obj::RemoteCCId& getRemoteCCId() const { return m_remoteCCId; }
-      inline const lmp::obj::MessageIdAck& getMessageIdAck() const { return m_messageIdAck; }
-      inline const lmp::obj::RemoteNodeId& getRemoteNodeId() const { return m_remoteNodeId; }
-    private:
-      virtual const mtype::MsgType do_getMsgType() const;
-      virtual lmp::WORD do_getContentsLength() const;
-      virtual CommonHeader::OptEncError do_encodeContents(
-    	boost::asio::mutable_buffer&  buffer) const;
-	  lmp::obj::LocalCCId     m_localCCId;
-	  lmp::obj::LocalNodeId   m_localNodeId;
-	  lmp::obj::RemoteCCId    m_remoteCCId;
-	  lmp::obj::MessageIdAck  m_messageIdAck;
-	  lmp::obj::RemoteNodeId  m_remoteNodeId;
+      lmp::BYTE                           m_flags;
+      lmp::obj::ccid::LocalCCIdData       m_localCCId;
+      lmp::obj::nodeid::LocalNodeIdData   m_localNodeId;
+      lmp::obj::ccid::RemoteCCIdData      m_remoteCCId;
+      lmp::obj::msgid::MessageIdAckData   m_messageId;
+      lmp::obj::nodeid::RemoteNodeIdData  m_remoteNodeId;
 	};
+    std::ostream& operator<<(
+      std::ostream&             os,
+	  const ConfigAckMsg& configAck);
     namespace parse
     {
-	  struct ConfigAckMsgData
-	  {
-	    lmp::BYTE                           m_flags;
-	    lmp::obj::ccid::LocalCCIdData       m_localCCId;
-	    lmp::obj::nodeid::LocalNodeIdData   m_localNodeId;
-	    lmp::obj::ccid::RemoteCCIdData      m_remoteCCId;
-	    lmp::obj::msgid::MessageIdAckData   m_messageId;
-	    lmp::obj::nodeid::RemoteNodeIdData  m_remoteNodeId;
-	  };
-	  std::ostream& operator<<(
-	    std::ostream&             os,
-		const ConfigAckMsgData& configAck);
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
-      struct config_ack_grammar : qi::grammar<Iterator, ConfigAckMsgData(CommonHeaderOutput)>
+      struct config_ack_grammar : qi::grammar<Iterator, ConfigAckMsg(CommonHeaderOutput)>
       {
     	config_ack_grammar();
 
@@ -81,7 +56,7 @@ namespace lmp
         lmp::obj::parse::object_class_grammar<Iterator,
                                               lmp::obj::msgid::ClassType,
 											  lmp::obj::msgid::ClassType::MessageIdAck>    message_id_ack;
-    	qi::rule<Iterator, ConfigAckMsgData(CommonHeaderOutput)>             config_ack_rule;
+    	qi::rule<Iterator, ConfigAckMsg(CommonHeaderOutput)>             config_ack_rule;
       };
     }
   } // namespace msg

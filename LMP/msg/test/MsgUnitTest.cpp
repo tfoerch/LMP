@@ -330,61 +330,61 @@ BOOST_AUTO_TEST_CASE( msg_header_decode )
   }
 }
 
-BOOST_AUTO_TEST_CASE( config )
-{
-  {
-	unsigned char message[] =
-      { 0x10, 0x00, 0x00, 0x01, // <Common Header>
-        0x00, 0x28, 0x00, 0x00,
-	    0x01, 0x01, 0x00, 0x08, // <LOCAL_CCID>
-        0x01, 0x02, 0x00, 0x08,
-		0x01, 0x05, 0x00, 0x08, // <MESSAGE_ID>
-        0x01, 0x02, 0x05, 0x08,
-		0x01, 0x02, 0x00, 0x08, // <LOCAL_NODE_ID>
-		0x01, 0x02, 0x05, 0x08,
-		0x81, 0x06, 0x00, 0x08, // <CONFIG> = HelloConfig
-		0x00, 0x9A, 0x01, 0xCF };
-	boost::asio::const_buffer messageBuffer(message,
-                                            sizeof(message)/sizeof(unsigned char));
-	boost::asio::streambuf strbuf;
-	boost::asio::streambuf::mutable_buffers_type bufs = strbuf.prepare(1024);
-	size_t numBytes = boost::asio::buffer_copy(bufs, messageBuffer);
-	strbuf.commit(numBytes);
-    lmp::msg::CommonHeader::DecodingResult headerDecodingResult =
-      lmp::msg::CommonHeader::decode(messageBuffer);
-    BOOST_CHECK(headerDecodingResult.first);
-    BOOST_CHECK(!headerDecodingResult.second);
-    if (headerDecodingResult.first)
-    {
-	  const lmp::msg::CommonHeader& header = *headerDecodingResult.first;
-	  BOOST_CHECK_EQUAL(header.getVersion(), static_cast<lmp::BYTE>(1));
-	  BOOST_CHECK_EQUAL(header.isControlChannelDown(), false);
-	  BOOST_CHECK_EQUAL(header.isLmpRestart(), false);
-	  BOOST_CHECK_EQUAL(header.getMsgType(), lmp::msg::mtype::Config);
-	  BOOST_CHECK_EQUAL(header.getLmpLength(), 0x28);
-	  lmp::msg::Config::DecodingResult decodingResult =
-	    lmp::msg::Config::decode(header, messageBuffer);
-	  BOOST_CHECK(decodingResult.first);
-	  BOOST_CHECK(!decodingResult.second);
-	  if (decodingResult.first)
-	  {
-		const lmp::msg::Config& configMsg = *decodingResult.first;
-		BOOST_CHECK_EQUAL(configMsg.getLocalCCId().getControlChannelId(), 0x1020008);
-		BOOST_CHECK_EQUAL(configMsg.getMessageId().getMessageId(), 0x1020508);
-		BOOST_CHECK_EQUAL(configMsg.getLocalNodeId().getNodeId(), 0x1020508);
-		BOOST_CHECK_EQUAL(configMsg.getHelloConfig().getHelloIntv(), 0x009A);
-		BOOST_CHECK_EQUAL(configMsg.getHelloConfig().getHelloDeadIntv(), 0x01CF);
-	  }
-	  unsigned char emptySpace[lmp::msg::CommonHeader::c_headerLength];
-	  boost::asio::mutable_buffer emptyBuffer(emptySpace,
-	                                          sizeof(message)/sizeof(unsigned char));
-	  lmp::msg::CommonHeader::OptEncError optEncError = header.encode(emptyBuffer);
-	  BOOST_CHECK(!optEncError);
-	  BOOST_CHECK_EQUAL_COLLECTIONS(message, message + lmp::msg::CommonHeader::c_headerLength,
-			                        emptySpace, emptySpace + lmp::msg::CommonHeader::c_headerLength);
-    }
-  }
-}
+//BOOST_AUTO_TEST_CASE( config )
+//{
+//  {
+//	unsigned char message[] =
+//      { 0x10, 0x00, 0x00, 0x01, // <Common Header>
+//        0x00, 0x28, 0x00, 0x00,
+//	    0x01, 0x01, 0x00, 0x08, // <LOCAL_CCID>
+//        0x01, 0x02, 0x00, 0x08,
+//		0x01, 0x05, 0x00, 0x08, // <MESSAGE_ID>
+//        0x01, 0x02, 0x05, 0x08,
+//		0x01, 0x02, 0x00, 0x08, // <LOCAL_NODE_ID>
+//		0x01, 0x02, 0x05, 0x08,
+//		0x81, 0x06, 0x00, 0x08, // <CONFIG> = HelloConfig
+//		0x00, 0x9A, 0x01, 0xCF };
+//	boost::asio::const_buffer messageBuffer(message,
+//                                            sizeof(message)/sizeof(unsigned char));
+//	boost::asio::streambuf strbuf;
+//	boost::asio::streambuf::mutable_buffers_type bufs = strbuf.prepare(1024);
+//	size_t numBytes = boost::asio::buffer_copy(bufs, messageBuffer);
+//	strbuf.commit(numBytes);
+//    lmp::msg::CommonHeader::DecodingResult headerDecodingResult =
+//      lmp::msg::CommonHeader::decode(messageBuffer);
+//    BOOST_CHECK(headerDecodingResult.first);
+//    BOOST_CHECK(!headerDecodingResult.second);
+//    if (headerDecodingResult.first)
+//    {
+//	  const lmp::msg::CommonHeader& header = *headerDecodingResult.first;
+//	  BOOST_CHECK_EQUAL(header.getVersion(), static_cast<lmp::BYTE>(1));
+//	  BOOST_CHECK_EQUAL(header.isControlChannelDown(), false);
+//	  BOOST_CHECK_EQUAL(header.isLmpRestart(), false);
+//	  BOOST_CHECK_EQUAL(header.getMsgType(), lmp::msg::mtype::Config);
+//	  BOOST_CHECK_EQUAL(header.getLmpLength(), 0x28);
+//	  lmp::msg::Config::DecodingResult decodingResult =
+//	    lmp::msg::Config::decode(header, messageBuffer);
+//	  BOOST_CHECK(decodingResult.first);
+//	  BOOST_CHECK(!decodingResult.second);
+//	  if (decodingResult.first)
+//	  {
+//		const lmp::msg::Config& configMsg = *decodingResult.first;
+//		BOOST_CHECK_EQUAL(configMsg.getLocalCCId().getControlChannelId(), 0x1020008);
+//		BOOST_CHECK_EQUAL(configMsg.getMessageId().getMessageId(), 0x1020508);
+//		BOOST_CHECK_EQUAL(configMsg.getLocalNodeId().getNodeId(), 0x1020508);
+//		BOOST_CHECK_EQUAL(configMsg.getHelloConfig().getHelloIntv(), 0x009A);
+//		BOOST_CHECK_EQUAL(configMsg.getHelloConfig().getHelloDeadIntv(), 0x01CF);
+//	  }
+//	  unsigned char emptySpace[lmp::msg::CommonHeader::c_headerLength];
+//	  boost::asio::mutable_buffer emptyBuffer(emptySpace,
+//	                                          sizeof(message)/sizeof(unsigned char));
+//	  lmp::msg::CommonHeader::OptEncError optEncError = header.encode(emptyBuffer);
+//	  BOOST_CHECK(!optEncError);
+//	  BOOST_CHECK_EQUAL_COLLECTIONS(message, message + lmp::msg::CommonHeader::c_headerLength,
+//			                        emptySpace, emptySpace + lmp::msg::CommonHeader::c_headerLength);
+//    }
+//  }
+//}
 
 BOOST_AUTO_TEST_CASE( config_message_spirit )
 {

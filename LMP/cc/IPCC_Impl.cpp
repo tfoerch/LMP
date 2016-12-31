@@ -119,11 +119,11 @@ namespace lmp
       return (theLocalNodeId > remoteNodeId);
     }
     bool IpccImpl::do_isConfigAcceptable(
-  	  const msg::Config&  configMsg) const
+  	  const msg::ConfigMsg&  configMsg) const
     {
       // remoteNodeId, remoeCCId valid; HelloConfig in acceptable range
       return
-        ( ( 3 * configMsg.getHelloConfig().getHelloIntv() ) < configMsg.getHelloConfig().getHelloDeadIntv());
+        ( ( 3 * configMsg.m_helloConfig.m_data.m_helloIntv ) < configMsg.m_helloConfig.m_data.m_helloDeadIntv);
     }
     void IpccImpl::do_reportTransition(
       const appl::State&   sourceState,
@@ -154,7 +154,7 @@ namespace lmp
       // create an send Hello message and schedule Hello retransmit timer
     }
     void IpccImpl::do_processReceivedMessage(
-  	  const msg::Config&  configMsg)
+  	  const msg::ConfigMsg&  configMsg)
     {
       if (canAcceptNewConfig())
       {
@@ -180,24 +180,24 @@ namespace lmp
       }
     }
     void IpccImpl::do_processReceivedMessage(
-  	  const msg::ConfigAck&   configAckMsg)
+  	  const msg::ConfigAckMsg&   configAckMsg)
     {
         theFSM.process_event(EvConfDone());
     }
     void IpccImpl::do_processReceivedMessage(
-      const msg::ConfigNack&  configNackMsg)
+      const msg::ConfigNackMsg&  configNackMsg)
     {
       theFSM.process_event(EvConfErr());
     }
     void IpccImpl::do_processReceivedMessage(
-  	  const msg::Hello&       helloMsg)
+  	  const msg::HelloMsg&       helloMsg)
     {
 //      std::cout << "processReceivedMessage helloMsg.theRcvSeqNum = " << helloMsg.theRcvSeqNum
 //    	        << ", theTxSeqNum = " << theTxSeqNum << std::endl;
-      if (helloMsg.getHello().getRcvSeqNum() == theTxSeqNum)
+      if (helloMsg.m_hello.m_data.m_rcvSeqNum == theTxSeqNum)
       {
         theFSM.process_event(EvHelloRcvd());
-        theRcvSeqNum = helloMsg.getHello().getTxSeqNum();
+        theRcvSeqNum = helloMsg.m_hello.m_data.m_txSeqNum;
       }
       else
       {
@@ -217,9 +217,9 @@ namespace lmp
     		*activeState == stateUp ) );
     }
     bool IpccImpl::isConntentionWinning(
-  	  const msg::Config&  configMsg) const
+  	  const msg::ConfigMsg&  configMsg) const
     {
-      return do_isConntentionWinning(configMsg.getLocalNodeId().getNodeId());
+      return do_isConntentionWinning(configMsg.m_localNodeId.m_data.m_nodeId);
     }
     namespace appl
     {
