@@ -41,7 +41,7 @@ namespace lmp
       lmp::DWORD  getLocalNodeId() const;
       lmp::DWORD  getLocalCCId() const;
       void reconfigure(
-        const obj::HelloConfig&  helloConfig);
+        const obj::config::HelloConfigBody&  helloConfig);
       void evtCCDown();
       void evtConfRet();
       void evtHelloRet();

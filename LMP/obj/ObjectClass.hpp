@@ -82,10 +82,11 @@ namespace lmp
     std::ostream& operator<<(
       std::ostream&                                       os,
 	  const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData);
-	const lmp::WORD objHeaderLength = 4;
+	const lmp::WORD  c_objHeaderLength = 4;
+    const lmp::BYTE  c_negotiableMask = 0x80;
+    const lmp::BYTE  c_classTypeMask = 0x7f;
     namespace parse
     {
-      const lmp::BYTE negotiableFlagValue = 0x80;
       namespace qi = boost::spirit::qi;
 
 	  template <typename Iterator, typename ClassType, ClassType ctype>

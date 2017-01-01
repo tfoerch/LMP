@@ -8,21 +8,12 @@
  */
 
 #include "obj/ObjectClass.hpp"
-#include "obj/ObjectHeader.hpp"
 #include "obj/ControlChannelIdClass.hpp"
-#include "obj/ObjectClassTypeTraits.hpp"
-#include "obj/ObjectClassType.hpp"
-#include "obj/ControlChannelIdTypeTraits.hpp"
-#include "obj/ControlChannelIdIF.hpp"
-#include "obj/ControlChannelIdData.hpp"
-
-#include <boost/spirit/include/qi.hpp>
 
 namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<ccid::ClassType, ccid::ClassType::RemoteCCId>  RemoteCCId;
     template <>
     struct ObjectClassTypeTraits<ccid::ClassType, ccid::ClassType::RemoteCCId>
     {
@@ -44,7 +35,7 @@ namespace lmp
 	{
 	  typedef ObjectClassTypeData<ObjectClassTypeTraits<ccid::ClassType,
 			                                            ccid::ClassType::RemoteCCId>>  RemoteCCIdData;
-	  const lmp::DWORD remoteCCIdLength = objHeaderLength + 4;
+	  const lmp::DWORD remoteCCIdLength = c_objHeaderLength + 4;
 	}
   } // namespace obj
 } // namespace lmp

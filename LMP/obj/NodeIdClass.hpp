@@ -8,6 +8,7 @@
  */
 
 #include "base/ProtocolTypes.hpp"
+#include "obj/ObjectClass.hpp"
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 #include <iostream>
@@ -56,6 +57,11 @@ namespace lmp
 	    };
 	  }
 	}
+    template <>
+    struct ObjectClassTypeConst<nodeid::ClassType>
+    {
+      static const ObjectClass  obj_class = ObjectClass::NodeID;
+    };
   } // namespace obj
 } // namespace lmp
 

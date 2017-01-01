@@ -8,8 +8,6 @@
  */
 
 #include "obj/UnknownObjectClass.hpp"
-#include "obj/ObjectHeader.hpp"
-#include "obj/ControlChannelIdClass.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
@@ -50,7 +48,7 @@ namespace lmp
     	using namespace qi::labels;
 
     	unknown_object_class_rule =
-    	    byte_ [at_c<1>(_val) = (_1 & lmp::obj::ObjectHeader::c_classTypeMask), at_c<2>(_val) = (_1 & lmp::obj::ObjectHeader::c_negotiableMask) ]  // class type
+    	    byte_ [at_c<1>(_val) = (_1 & lmp::obj::c_classTypeMask), at_c<2>(_val) = (_1 & lmp::obj::c_negotiableMask) ]  // class type
     		>> byte_  [at_c<0>(_val) = _1 ] // object class
     		>> big_word  [ at_c<3>(_val) = _1 ] // length
 			>> byte_sequence( at_c<3>(_val) - 4 ) [ at_c<4>(_val) = _1 ]

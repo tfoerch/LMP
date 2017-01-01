@@ -8,22 +8,12 @@
  */
 
 #include "obj/ObjectClass.hpp"
-#include "obj/ObjectHeader.hpp"
 #include "obj/ControlChannelIdClass.hpp"
-#include "obj/ObjectClassTypeTraits.hpp"
-#include "obj/ObjectClassType.hpp"
-#include "obj/ControlChannelIdTypeTraits.hpp"
-//#include "obj/ControlChannelIdIF.hpp"
-//#include "obj/ControlChannelIdData.hpp"
-
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<ccid::ClassType, ccid::ClassType::LocalCCId>  LocalCCId;
     template <>
     struct ObjectClassTypeTraits<ccid::ClassType, ccid::ClassType::LocalCCId>
     {
@@ -45,7 +35,7 @@ namespace lmp
 	{
 	  typedef ObjectClassTypeData<ObjectClassTypeTraits<ccid::ClassType,
 			                                            ccid::ClassType::LocalCCId>>  LocalCCIdData;
-	  const lmp::WORD localCCIdLength = objHeaderLength + 4;
+	  const lmp::WORD localCCIdLength = c_objHeaderLength + 4;
 	}
   } // namespace obj
 } // namespace lmp

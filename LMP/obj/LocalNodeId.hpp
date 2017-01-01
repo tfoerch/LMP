@@ -9,17 +9,11 @@
 
 #include "obj/ObjectClass.hpp"
 #include "obj/NodeIdClass.hpp"
-#include "obj/ObjectClassTypeTraits.hpp"
-#include "obj/ObjectClassType.hpp"
-#include "obj/NodeIdTypeTraits.hpp"
-#include "obj/NodeIdIF.hpp"
-#include "obj/NodeIdData.hpp"
 
 namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<nodeid::ClassType, nodeid::ClassType::LocalNodeId>  LocalNodeId;
     template <>
     struct ObjectClassTypeTraits<nodeid::ClassType, nodeid::ClassType::LocalNodeId>
     {
@@ -41,7 +35,7 @@ namespace lmp
 	{
 	  typedef ObjectClassTypeData<ObjectClassTypeTraits<nodeid::ClassType,
 			                                            nodeid::ClassType::LocalNodeId>>  LocalNodeIdData;
-	  const lmp::WORD localNodeIdLength = objHeaderLength + 4;
+	  const lmp::WORD localNodeIdLength = c_objHeaderLength + 4;
 	}
   } // namespace obj
 } // namespace lmp

@@ -7,18 +7,13 @@
  *      Author: tom
  */
 
+#include "obj/ObjectClass.hpp"
 #include "obj/NodeIdClass.hpp"
-#include "obj/ObjectClassTypeTraits.hpp"
-#include "obj/ObjectClassType.hpp"
-#include "obj/NodeIdTypeTraits.hpp"
-#include "obj/NodeIdIF.hpp"
-#include "obj/NodeIdData.hpp"
 
 namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<nodeid::ClassType, nodeid::ClassType::RemoteNodeId>  RemoteNodeId;
     template <>
     struct ObjectClassTypeTraits<nodeid::ClassType, nodeid::ClassType::RemoteNodeId>
     {
@@ -40,7 +35,7 @@ namespace lmp
 	{
 	  typedef ObjectClassTypeData<ObjectClassTypeTraits<nodeid::ClassType,
 			                                            nodeid::ClassType::RemoteNodeId>>  RemoteNodeIdData;
-	  const lmp::WORD remoteNodeIdLength = objHeaderLength + 4;
+	  const lmp::WORD remoteNodeIdLength = c_objHeaderLength + 4;
 	}
   } // namespace obj
 } // namespace lmp

@@ -7,22 +7,18 @@
  *      Author: tom
  */
 
+#include "obj/ObjectClass.hpp"
 #include "obj/HelloClass.hpp"
-#include "obj/ObjectClassTypeTraits.hpp"
-#include "obj/ObjectClassType.hpp"
-#include "obj/HelloTypeTraits.hpp"
-#include "obj/HelloIF.hpp"
-#include "obj/HelloData.hpp"
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
+
 #include <iostream>
 
 namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<hello::ClassType, hello::ClassType::Hello>  Hello;
 	namespace hello
 	{
       struct HelloBody
@@ -77,7 +73,7 @@ namespace lmp
 	{
 	  typedef ObjectClassTypeData<ObjectClassTypeTraits<hello::ClassType,
 			                                            hello::ClassType::Hello>>  HelloData;
-	  const lmp::WORD helloLength = objHeaderLength + 4 + 4;
+	  const lmp::WORD helloLength = c_objHeaderLength + 4 + 4;
 	}
   } // namespace obj
 } // namespace lmp

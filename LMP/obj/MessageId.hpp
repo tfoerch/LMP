@@ -8,17 +8,11 @@
  */
 
 #include "obj/MessageIdClass.hpp"
-#include "obj/ObjectClassTypeTraits.hpp"
-#include "obj/ObjectClassType.hpp"
-#include "obj/MessageIdTypeTraits.hpp"
-#include "obj/MessageIdIF.hpp"
-#include "obj/MessageIdData.hpp"
 
 namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<msgid::ClassType, msgid::ClassType::MessageId>  MessageId;
     template <>
     struct ObjectClassTypeTraits<msgid::ClassType, msgid::ClassType::MessageId>
     {
@@ -40,7 +34,7 @@ namespace lmp
 	{
 	  typedef ObjectClassTypeData<ObjectClassTypeTraits<msgid::ClassType,
 			                                            msgid::ClassType::MessageId>>  MessageIdData;
-	  const lmp::WORD messageIdLength = objHeaderLength + 4;
+	  const lmp::WORD messageIdLength = c_objHeaderLength + 4;
 	}
   } // namespace obj
 } // namespace lmp

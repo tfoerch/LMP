@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_Reconfig )
 	  BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
 	}
   }
-  lmp::obj::HelloConfig  helloConfig(lmp::obj::HelloConfigData(150, 600));
+  lmp::obj::config::HelloConfigBody  helloConfig = { 150, 600 };
   activeIPCC.reconfigure(helloConfig);
   {
 	const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();

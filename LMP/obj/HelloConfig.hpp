@@ -8,21 +8,16 @@
  */
 
 #include "obj/ConfigClass.hpp"
-#include "obj/ObjectClassTypeTraits.hpp"
-#include "obj/ObjectClassType.hpp"
-#include "obj/ConfigTypeTraits.hpp"
-#include "obj/HelloConfigIF.hpp"
-#include "obj/HelloConfigData.hpp"
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
+
 #include <iostream>
 
 namespace lmp
 {
   namespace obj
   {
-    typedef ObjectClassType<config::ClassType, config::ClassType::HelloConfig>  HelloConfig;
 	namespace config
 	{
       struct HelloConfigBody
@@ -77,7 +72,7 @@ namespace lmp
 	{
 	  typedef ObjectClassTypeData<ObjectClassTypeTraits<config::ClassType,
 			                                            config::ClassType::HelloConfig>>  HelloConfigData;
-	  const lmp::WORD helloConfigLength = objHeaderLength + 4;
+	  const lmp::WORD helloConfigLength = c_objHeaderLength + 4;
 	}
   } // namespace obj
 } // namespace lmp

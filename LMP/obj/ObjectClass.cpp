@@ -6,8 +6,6 @@
  */
 
 #include "obj/ObjectClass_def.hpp"
-#include "obj/ControlChannelIdTypeTraits.hpp"
-#include "obj/ConfigTypeTraits.hpp"
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 

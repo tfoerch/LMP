@@ -8,7 +8,6 @@
  */
 
 #include "obj/HelloConfig.hpp"
-#include "obj/ObjectHeader.hpp"
 #include "obj/ObjectClass_def.hpp"
 #include "obj/ControlChannelIdClass.hpp"
 #include <boost/spirit/include/qi_binary.hpp>

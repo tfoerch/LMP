@@ -8,13 +8,7 @@
  */
 
 #include "obj/ObjectClass.hpp"
-#include "obj/ObjectHeader.hpp"
 #include "obj/ByteSequence.hpp"
-#include "obj/ObjectClassTypeTraits.hpp"
-#include "obj/ObjectClassType.hpp"
-#include "obj/ControlChannelIdTypeTraits.hpp"
-#include "obj/ControlChannelIdIF.hpp"
-#include "obj/ControlChannelIdData.hpp"
 
 #include <boost/spirit/include/qi.hpp>
 

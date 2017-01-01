@@ -8,7 +8,6 @@
  */
 
 #include "obj/ObjectClass.hpp"
-#include "obj/ObjectHeader.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
@@ -82,9 +81,9 @@ namespace lmp
 
 		object_class_rule =
 		    ( byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype))                                        [ at_c<0>(_val) = false ] |
-		      byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype) + lmp::obj::parse::negotiableFlagValue) [ at_c<0>(_val) = true  ] ) // class type
+		      byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype) + lmp::obj::c_negotiableMask) [ at_c<0>(_val) = true  ] ) // class type
 			>> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(ObjectClassTypeConst<ClassType>::obj_class))    // object class
-			>> big_word(objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) // length
+			>> big_word(c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) // length
 			>> object_body [ at_c<1>(_val) = _1 ]
 //			>> big_dword [ at_c<1>(_val) = _1 ]
 			;
@@ -102,7 +101,7 @@ namespace lmp
         using namespace qi::labels;
 
         object_class_unknown_ctype_rule =
-            byte_ [at_c<0>(_val) = (_1 & lmp::obj::ObjectHeader::c_classTypeMask), at_c<1>(_val) = (_1 & lmp::obj::ObjectHeader::c_negotiableMask) ]  // class type
+            byte_ [at_c<0>(_val) = (_1 & lmp::obj::c_classTypeMask), at_c<1>(_val) = (_1 & lmp::obj::c_negotiableMask) ]  // class type
       		>> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(objClass))    // object class
       		>> big_word  [ at_c<2>(_val) = _1 ] // length
 		    >> byte_sequence( at_c<2>(_val) - 4 ) [ at_c<3>(_val) = _1 ]
@@ -130,10 +129,10 @@ namespace lmp
     	using namespace qi::labels;
 
     	object_class_rule =
-            (  eps(at_c<0>(_val)) << byte_ [ _1 = ( static_cast<typename std::underlying_type<ClassType>::type>(ctype) | lmp::obj::ObjectHeader::c_negotiableMask ) ] |
+            (  eps(at_c<0>(_val)) << byte_ [ _1 = ( static_cast<typename std::underlying_type<ClassType>::type>(ctype) | lmp::obj::c_negotiableMask ) ] |
                byte_ [ _1 = static_cast<typename std::underlying_type<ClassType>::type>(ctype) ] ) // class type
     		<< byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(ObjectClassTypeConst<ClassType>::obj_class) ] // object class
-			<< big_word [ _1 = (objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) ] // length
+			<< big_word [ _1 = (c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) ] // length
 		    << object_body [ _1 = at_c<1>(_val) ]
 //            << big_dword [ _1 = at_c<1>(_val) ]
 			;
@@ -152,7 +151,7 @@ namespace lmp
     	using namespace qi::labels;
 
     	object_class_unknown_ctype_rule =
-            (  eps(at_c<1>(_val)) << byte_ [ _1 = ( at_c<0>(_val) | lmp::obj::ObjectHeader::c_negotiableMask ) ] |
+            (  eps(at_c<1>(_val)) << byte_ [ _1 = ( at_c<0>(_val) | lmp::obj::c_negotiableMask ) ] |
                byte_ [ _1 = at_c<0>(_val) ] ) // class type
     		<< byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(objClass) ] // object class
 			<< big_word [ _1 = at_c<2>(_val) ] // length

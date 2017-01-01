@@ -8,6 +8,7 @@
  */
 
 #include "base/ProtocolTypes.hpp"
+#include "obj/ObjectClass.hpp"
 
 #include <iostream>
 
@@ -25,6 +26,11 @@ namespace lmp
         std::ostream&     os,
   	    const ClassType&  cType);
 	}
+    template <>
+    struct ObjectClassTypeConst<config::ClassType>
+    {
+      static const ObjectClass  obj_class = ObjectClass::Config;
+    };
   } // namespace obj
 } // namespace lmp
 

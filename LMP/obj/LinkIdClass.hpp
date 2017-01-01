@@ -7,7 +7,8 @@
  *      Author: tom
  */
 
-#include <LMPObjectIF.hpp>
+#include "base/ProtocolTypes.hpp"
+#include "obj/ObjectClass.hpp"
 
 namespace lmp
 {
@@ -15,7 +16,7 @@ namespace lmp
   {
 	namespace linkid
 	{
-      enum ClassType
+      enum class ClassType : lmp::BYTE
 	  {
   	    IPv4LocalLinkId = 1,
 		IPv4RemoteLinkId,
@@ -24,7 +25,15 @@ namespace lmp
 		UnnumberedLocalLinkId,
 		UnnumberedRemoteLinkId
 	  };
+      std::ostream& operator<<(
+        std::ostream&     os,
+  	    const ClassType&  cType);
 	}
+    template <>
+    struct ObjectClassTypeConst<linkid::ClassType>
+    {
+      static const ObjectClass  obj_class = ObjectClass::LinkID;
+    };
   } // namespace obj
 } // namespace lmp
 
