@@ -19,12 +19,12 @@ template struct lmp::obj::generate::byte_sequence_grammar<BufOutIterType>;
 
 std::ostream& lmp::obj::hex_stream::operator<<(
     std::ostream&        os,
-	const ByteSequence&  byteSequence)
+    const ByteSequence&  byteSequence)
 {
   os << "'" << std::hex;
   for (ByteSequence::const_iterator iter = byteSequence.begin();
-	   iter != byteSequence.end();
-	   ++iter)
+      iter != byteSequence.end();
+      ++iter)
   {
     if (iter != byteSequence.begin())
     {

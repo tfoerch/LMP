@@ -25,29 +25,28 @@ namespace lmp
   namespace obj
   {
     namespace parse
-	{
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
       template <typename Iterator>
       object_sequence_grammar<Iterator>::object_sequence_grammar()
-	  : object_sequence_grammar::base_type(object_sequence,
-	    		                           "object_sequence")
+      : object_sequence_grammar::base_type(object_sequence,
+                                           "object_sequence")
       {
-    	using qi::_1;
-    	using phoenix::at_c;
+        using qi::_1;
+        using phoenix::at_c;
         using phoenix::push_back;
-    	using namespace qi::labels;
+        using namespace qi::labels;
 
-    	object_sequence =
-    		+objects [push_back(at_c<0>(_val), _1)]
-			;
+        object_sequence =
+            +objects [push_back(at_c<0>(_val), _1)]
+            ;
 
-    	object_sequence.name("object_sequence");
+        object_sequence.name("object_sequence");
       }
-
-	} // namespace parse
+    } // namespace parse
   } // namespace obj
 } // namespace lmp
 

@@ -17,31 +17,30 @@ namespace lmp
 {
   namespace obj
   {
-	namespace config
-	{
-	typedef
-	  boost::variant<lmp::obj::config::HelloConfigData,
-					 lmp::obj::config::UnknownConfigCTypeData>   ConfigCTypes;
+    namespace config
+    {
+      typedef boost::variant<lmp::obj::config::HelloConfigData,
+                             lmp::obj::config::UnknownConfigCTypeData>   ConfigCTypes;
       std::ostream& operator<<(
         std::ostream&                  os,
-  	    const ConfigCTypes&            configCTypes);
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
-	    template <typename Iterator>
+        const ConfigCTypes&            configCTypes);
+      namespace parse
+      {
+        namespace qi = boost::spirit::qi;
+        template <typename Iterator>
         struct config_ctypes_grammar : qi::grammar<Iterator, ConfigCTypes()>
         {
-      	  config_ctypes_grammar();
+          config_ctypes_grammar();
 
           lmp::obj::parse::object_class_grammar<Iterator,
-  		                                      lmp::obj::config::ClassType,
-  											  lmp::obj::config::ClassType::HelloConfig>     hello_config;
+                                                lmp::obj::config::ClassType,
+                                                lmp::obj::config::ClassType::HelloConfig>     hello_config;
           lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
-		                                                      lmp::obj::ObjectClass::Config>  unknown_config_ctype;
-      	  qi::rule<Iterator, ConfigCTypes()>                         config_ctypes_rule;
+                                                              lmp::obj::ObjectClass::Config>  unknown_config_ctype;
+          qi::rule<Iterator, ConfigCTypes()>                                                  config_ctypes_rule;
         };
-	  }
-	}
+      }
+    }
   } // namespace obj
 } // namespace lmp
 

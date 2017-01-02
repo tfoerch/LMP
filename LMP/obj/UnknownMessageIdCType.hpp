@@ -13,10 +13,10 @@ namespace lmp
 {
   namespace obj
   {
-	namespace msgid
-	{
-	  typedef ObjectClassUnknownCTypeData<ObjectClassTraits<ObjectClass::MessageID>>  UnknownMessageIdCTypeData;
-	}
+    namespace msgid
+    {
+      typedef ObjectClassUnknownCTypeData<ObjectClassTraits<ObjectClass::MessageID>>  UnknownMessageIdCTypeData;
+    }
   } // namespace obj
 } // namespace lmp
 

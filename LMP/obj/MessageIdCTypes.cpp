@@ -18,8 +18,8 @@ namespace
   struct MessageIdCTypes_Printer : boost::static_visitor<std::ostream&>
   {
     MessageIdCTypes_Printer(std::ostream& os)
-	: m_os(os)
-	{}
+    : m_os(os)
+    {}
     std::ostream& operator()(const lmp::obj::msgid::MessageIdData& messageId) const
     {
       m_os << messageId;
@@ -36,8 +36,7 @@ namespace
       return m_os;
     }
     std::ostream&   m_os;
-};
-
+  };
 }
 
 std::ostream& lmp::obj::msgid::operator<<(

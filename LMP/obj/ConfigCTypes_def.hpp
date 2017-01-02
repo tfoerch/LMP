@@ -21,35 +21,34 @@ namespace lmp
 {
   namespace obj
   {
-	namespace config
-	{
+    namespace config
+    {
       namespace parse
-	  {
+      {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
         namespace qi = boost::spirit::qi;
 
         template <typename Iterator>
         config_ctypes_grammar<Iterator>::config_ctypes_grammar()
-		: config_ctypes_grammar::base_type(config_ctypes_rule,
-				                           "config_ctypes")
+        : config_ctypes_grammar::base_type(config_ctypes_rule,
+                                           "config_ctypes")
         {
-     	  using qi::big_word;
+          using qi::big_word;
           using qi::big_dword;
           using qi::_1;
           using phoenix::at_c;
           using namespace qi::labels;
 
           config_ctypes_rule %=
-        		hello_config |
-  				unknown_config_ctype
-				;
+              hello_config |
+              unknown_config_ctype
+              ;
 
           config_ctypes_rule.name("config_ctypes");
         }
-
-	  } // namespace parse
-	} // namespace config
+      } // namespace parse
+    } // namespace config
   } // namespace obj
 } // namespace lmp
 

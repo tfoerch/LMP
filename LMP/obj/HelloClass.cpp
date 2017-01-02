@@ -11,21 +11,21 @@ namespace lmp
 {
   namespace obj
   {
-	namespace hello
-	{
-	  std::ostream& operator<<(
-	    std::ostream&     os,
-		const ClassType&  cType)
-	  {
-		switch(cType)
-		{
-		  case ClassType::Hello:
-			os << "Hello";
-			break;
-		}
-		return os;
-	  }
-	}
+    namespace hello
+    {
+      std::ostream& operator<<(
+          std::ostream&     os,
+          const ClassType&  cType)
+      {
+        switch(cType)
+        {
+          case ClassType::Hello:
+            os << "Hello";
+            break;
+        }
+        return os;
+      }
+    }
   } // namespace obj
 } // namespace lmp
 

@@ -22,11 +22,11 @@ std::ostream& lmp::obj::ccid::operator<<(
   switch(cType)
   {
     case lmp::obj::ccid::ClassType::LocalCCId:
-	  os << "LocalCCId";
-	  break;
+      os << "LocalCCId";
+      break;
     case lmp::obj::ccid::ClassType::RemoteCCId:
-  	  os << "RemoteCCId";
-  	  break;
+      os << "RemoteCCId";
+      break;
   }
   return os;
 }

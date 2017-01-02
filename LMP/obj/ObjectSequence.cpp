@@ -18,8 +18,8 @@ std::ostream& lmp::obj::operator<<(
   const lmp::obj::ObjectSequence&  objectSequence)
 {
   for (std::vector<lmp::obj::Objects>::const_iterator iter = objectSequence.m_objects.begin();
-	   iter != objectSequence.m_objects.end();
-	   ++iter)
+       iter != objectSequence.m_objects.end();
+       ++iter)
   {
     if (iter != objectSequence.m_objects.begin())
     {

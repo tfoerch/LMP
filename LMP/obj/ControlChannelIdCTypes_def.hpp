@@ -16,41 +16,39 @@
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/phoenix/object/static_cast.hpp>
 
-
 namespace lmp
 {
   namespace obj
   {
-	namespace ccid
-	{
+    namespace ccid
+    {
       namespace parse
-	  {
+      {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
         namespace qi = boost::spirit::qi;
 
         template <typename Iterator>
         control_channel_id_ctypes_grammar<Iterator>::control_channel_id_ctypes_grammar()
-		: control_channel_id_ctypes_grammar::base_type(control_channel_id_ctypes_rule,
-				                                      "control_channel_id_ctypes")
+        : control_channel_id_ctypes_grammar::base_type(control_channel_id_ctypes_rule,
+                                                       "control_channel_id_ctypes")
         {
-     	  using qi::big_word;
+          using qi::big_word;
           using qi::big_dword;
           using qi::_1;
           using phoenix::at_c;
           using namespace qi::labels;
 
           control_channel_id_ctypes_rule %=
-        		local_ccid |
-    			remote_ccid |
-  				unknown_ccid_ctype
-				;
+              local_ccid |
+              remote_ccid |
+              unknown_ccid_ctype
+              ;
 
           control_channel_id_ctypes_rule.name("control_channel_id_ctypes");
         }
-
-	  } // namespace parse
-	} // namespace ccid
+      } // namespace parse
+    } // namespace ccid
   } // namespace obj
 } // namespace lmp
 

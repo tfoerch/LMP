@@ -17,31 +17,30 @@ namespace lmp
 {
   namespace obj
   {
-	namespace hello
-	{
-	typedef
-	  boost::variant<lmp::obj::hello::HelloData,
-					 lmp::obj::hello::UnknownHelloCTypeData>   HelloCTypes;
+    namespace hello
+    {
+      typedef boost::variant<lmp::obj::hello::HelloData,
+                             lmp::obj::hello::UnknownHelloCTypeData>   HelloCTypes;
       std::ostream& operator<<(
         std::ostream&                  os,
-  	    const HelloCTypes&             helloCTypes);
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
-	    template <typename Iterator>
+        const HelloCTypes&             helloCTypes);
+      namespace parse
+      {
+        namespace qi = boost::spirit::qi;
+        template <typename Iterator>
         struct hello_ctypes_grammar : qi::grammar<Iterator, HelloCTypes()>
         {
-      	  hello_ctypes_grammar();
+          hello_ctypes_grammar();
 
-      	  lmp::obj::parse::object_class_grammar<Iterator,
-		                                        lmp::obj::hello::ClassType,
-											    lmp::obj::hello::ClassType::Hello>    hello;
+          lmp::obj::parse::object_class_grammar<Iterator,
+                                                lmp::obj::hello::ClassType,
+                                                lmp::obj::hello::ClassType::Hello>           hello;
           lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
-		                                                      lmp::obj::ObjectClass::Hello>  unknown_hello_ctype;
-      	  qi::rule<Iterator, HelloCTypes()>                        hello_ctypes_rule;
+                                                              lmp::obj::ObjectClass::Hello>  unknown_hello_ctype;
+          qi::rule<Iterator, HelloCTypes()>                                                  hello_ctypes_rule;
         };
-	  }
-	}
+      }
+    }
   } // namespace obj
 } // namespace lmp
 

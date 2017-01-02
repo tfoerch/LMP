@@ -16,16 +16,16 @@ namespace lmp
 {
   namespace obj
   {
-	namespace hello
-	{
+    namespace hello
+    {
       enum class ClassType : lmp::BYTE
-	  {
-  	    Hello = 1
-	  };
+      {
+        Hello = 1
+      };
       std::ostream& operator<<(
         std::ostream&     os,
-  	    const ClassType&  cType);
-	}
+        const ClassType&  cType);
+    }
     template <>
     struct ObjectClassTypeConst<hello::ClassType>
     {

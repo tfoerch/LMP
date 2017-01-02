@@ -22,13 +22,13 @@ namespace
     {}
     std::ostream& operator()(const lmp::obj::hello::HelloData& hello) const
     {
-	  m_os << hello;
-	  return m_os;
+      m_os << hello;
+      return m_os;
     }
     std::ostream& operator()(const lmp::obj::hello::UnknownHelloCTypeData& unknownHello) const
     {
-	  m_os << unknownHello;
-	  return m_os;
+      m_os << unknownHello;
+      return m_os;
     }
     std::ostream&   m_os;
   };

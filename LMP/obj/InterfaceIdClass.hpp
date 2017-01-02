@@ -14,21 +14,21 @@ namespace lmp
 {
   namespace obj
   {
-	namespace ifid
-	{
+    namespace ifid
+    {
       enum class ClassType : lmp::BYTE
-	  {
-  	    IPv4LocalInterfaceId = 1,
-		IPv4RemoteInterfaceId,
-		IPv6LocalInterfaceId,
-		IPv6RemoteInterfaceId,
-		UnnumberedLocalInterfaceId,
-		UnnumberedRemoteInterfaceId
-	  };
+      {
+        IPv4LocalInterfaceId = 1,
+        IPv4RemoteInterfaceId,
+        IPv6LocalInterfaceId,
+        IPv6RemoteInterfaceId,
+        UnnumberedLocalInterfaceId,
+        UnnumberedRemoteInterfaceId
+      };
       std::ostream& operator<<(
         std::ostream&     os,
-  	    const ClassType&  cType);
-	}
+        const ClassType&  cType);
+    }
     template <>
     struct ObjectClassTypeConst<ifid::ClassType>
     {

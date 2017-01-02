@@ -13,10 +13,10 @@ namespace lmp
 {
   namespace obj
   {
-	namespace ccid
-	{
-	  typedef ObjectClassUnknownCTypeData<ObjectClassTraits<ObjectClass::ControlChannelID>>  UnknownCCIdCTypeData;
-	}
+    namespace ccid
+    {
+      typedef ObjectClassUnknownCTypeData<ObjectClassTraits<ObjectClass::ControlChannelID>>  UnknownCCIdCTypeData;
+    }
   } // namespace obj
 } // namespace lmp
 

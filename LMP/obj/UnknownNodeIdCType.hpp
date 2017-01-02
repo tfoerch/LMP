@@ -13,10 +13,10 @@ namespace lmp
 {
   namespace obj
   {
-	namespace nodeid
-	{
-	  typedef ObjectClassUnknownCTypeData<ObjectClassTraits<ObjectClass::NodeID>>  UnknownNodeIdCTypeData;
-	}
+    namespace nodeid
+    {
+      typedef ObjectClassUnknownCTypeData<ObjectClassTraits<ObjectClass::NodeID>>  UnknownNodeIdCTypeData;
+    }
   } // namespace obj
 } // namespace lmp
 

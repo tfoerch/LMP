@@ -18,8 +18,8 @@ namespace
   struct ControlChannelIdCTypes_Printer : boost::static_visitor<std::ostream&>
   {
     ControlChannelIdCTypes_Printer(std::ostream& os)
-	: m_os(os)
-	{}
+    : m_os(os)
+    {}
     std::ostream& operator()(const lmp::obj::ccid::LocalCCIdData& localCCId) const
     {
       m_os << localCCId;

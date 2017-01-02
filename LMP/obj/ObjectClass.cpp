@@ -16,26 +16,26 @@ std::ostream& lmp::obj::operator<<(
   switch(objClass)
   {
     case lmp::obj::ObjectClass::ControlChannelID:
-	  os << "ControlChannelID";
-	  break;
+      os << "ControlChannelID";
+      break;
     case lmp::obj::ObjectClass::NodeID:
-  	  os << "NodeID";
-  	  break;
+      os << "NodeID";
+      break;
     case lmp::obj::ObjectClass::LinkID:
-  	  os << "LinkID";
-  	  break;
+      os << "LinkID";
+      break;
     case lmp::obj::ObjectClass::InterfaceID:
-  	  os << "InterfaceID";
-  	  break;
+      os << "InterfaceID";
+      break;
     case lmp::obj::ObjectClass::MessageID:
-  	  os << "MessageID";
-  	  break;
+      os << "MessageID";
+      break;
     case lmp::obj::ObjectClass::Config:
-  	  os << "Config";
-  	  break;
+      os << "Config";
+      break;
     case lmp::obj::ObjectClass::Hello:
-  	  os << "Hello";
-  	  break;
+      os << "Hello";
+      break;
   }
   return os;
 }

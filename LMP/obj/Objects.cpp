@@ -22,33 +22,33 @@ namespace
     {}
     std::ostream& operator()(const lmp::obj::ccid::ControlChannelIdCTypes& controlChannelId) const
     {
-	  m_os << controlChannelId;
-	  return m_os;
+      m_os << controlChannelId;
+      return m_os;
     }
     std::ostream& operator()(const lmp::obj::msgid::MessageIdCTypes& messageId) const
     {
-	  m_os << messageId;
-	  return m_os;
+      m_os << messageId;
+      return m_os;
     }
     std::ostream& operator()(const lmp::obj::nodeid::NodeIdCTypes& nodeId) const
     {
-	  m_os << nodeId;
-	  return m_os;
+      m_os << nodeId;
+      return m_os;
     }
     std::ostream& operator()(const lmp::obj::config::ConfigCTypes& config) const
     {
-	  m_os << config;
-	  return m_os;
+      m_os << config;
+      return m_os;
     }
     std::ostream& operator()(const lmp::obj::hello::HelloCTypes& hello) const
     {
-	  m_os << hello;
-	  return m_os;
+      m_os << hello;
+      return m_os;
     }
     std::ostream& operator()(const lmp::obj::UnknownObjectClassData& unknownObject) const
     {
-	  m_os << unknownObject;
-	  return m_os;
+      m_os << unknownObject;
+      return m_os;
     }
     std::ostream&   m_os;
   };

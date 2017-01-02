@@ -18,12 +18,11 @@ namespace lmp
   {
     typedef std::vector<lmp::BYTE>  ByteSequence;
     namespace hex_stream
-	{
+    {
       std::ostream& operator<<(
-        std::ostream&        os,
-		const ByteSequence&  byteSequence);
-	}
-
+          std::ostream&        os,
+          const ByteSequence&  byteSequence);
+    }
     namespace parse
     {
       namespace qi = boost::spirit::qi;
@@ -36,17 +35,17 @@ namespace lmp
         qi::rule<Iterator, ByteSequence(lmp::WORD)>  byte_sequence;
       };
     } // namespace parse
-	namespace generate
-	{
-	  namespace karma = boost::spirit::karma;
-	  template <typename OutputIterator>
-	  struct byte_sequence_grammar : karma::grammar<OutputIterator, ByteSequence()>
-	  {
-		byte_sequence_grammar();
+    namespace generate
+    {
+      namespace karma = boost::spirit::karma;
+      template <typename OutputIterator>
+      struct byte_sequence_grammar : karma::grammar<OutputIterator, ByteSequence()>
+      {
+        byte_sequence_grammar();
 
-		karma::rule<OutputIterator, ByteSequence()>  byte_sequence;
-	  };
-	}
+        karma::rule<OutputIterator, ByteSequence()>  byte_sequence;
+      };
+    }
   } // namespace obj
 } // namespace lmp
 

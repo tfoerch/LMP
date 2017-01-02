@@ -27,15 +27,15 @@ namespace lmp
     };
     template <typename OutputIterator>
     struct ObjectClassTypeGenerateTraits<OutputIterator, msgid::ClassType, msgid::ClassType::MessageId>
-	{
+    {
       typedef msgid::generate::message_id_body_grammar<OutputIterator>  grammar_type;
-	};
-	namespace msgid
-	{
-	  typedef ObjectClassTypeData<ObjectClassTypeTraits<msgid::ClassType,
-			                                            msgid::ClassType::MessageId>>  MessageIdData;
-	  const lmp::WORD messageIdLength = c_objHeaderLength + 4;
-	}
+    };
+    namespace msgid
+    {
+      typedef ObjectClassTypeData<ObjectClassTypeTraits<msgid::ClassType,
+                                                        msgid::ClassType::MessageId>>  MessageIdData;
+      const lmp::WORD messageIdLength = c_objHeaderLength + 4;
+    }
   } // namespace obj
 } // namespace lmp
 

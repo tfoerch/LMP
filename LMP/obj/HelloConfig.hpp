@@ -18,39 +18,39 @@ namespace lmp
 {
   namespace obj
   {
-	namespace config
-	{
+    namespace config
+    {
       struct HelloConfigBody
-	  {
-  	    lmp::WORD  m_helloIntv;
-  	    lmp::WORD  m_helloDeadIntv;
-	  };
-	  std::ostream& operator<<(
-	    std::ostream&            os,
-		const HelloConfigBody&   helloConfig);
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
+      {
+        lmp::WORD  m_helloIntv;
+        lmp::WORD  m_helloDeadIntv;
+      };
+      std::ostream& operator<<(
+        std::ostream&            os,
+        const HelloConfigBody&   helloConfig);
+      namespace parse
+      {
+        namespace qi = boost::spirit::qi;
         template <typename Iterator>
         struct hello_config_body_grammar : qi::grammar<Iterator, HelloConfigBody()>
         {
-      	  hello_config_body_grammar();
+          hello_config_body_grammar();
 
-      	  qi::rule<Iterator, HelloConfigBody()>                         hello_config_body_rule;
+          qi::rule<Iterator, HelloConfigBody()>                         hello_config_body_rule;
         };
-	  }
-	  namespace generate
-	  {
-	    namespace karma = boost::spirit::karma;
-	    template <typename OutputIterator>
-	    struct hello_config_body_grammar : karma::grammar<OutputIterator, HelloConfigBody()>
-	    {
-	      hello_config_body_grammar();
+      }
+      namespace generate
+      {
+        namespace karma = boost::spirit::karma;
+        template <typename OutputIterator>
+        struct hello_config_body_grammar : karma::grammar<OutputIterator, HelloConfigBody()>
+        {
+          hello_config_body_grammar();
 
-	      karma::rule<OutputIterator, HelloConfigBody()>                hello_config_body_rule;
-	    };
-	  }
-	}
+          karma::rule<OutputIterator, HelloConfigBody()>                hello_config_body_rule;
+        };
+      }
+    }
     template <>
     struct ObjectClassTypeTraits<config::ClassType, config::ClassType::HelloConfig>
     {
@@ -65,15 +65,15 @@ namespace lmp
     };
     template <typename OutputIterator>
     struct ObjectClassTypeGenerateTraits<OutputIterator, config::ClassType, config::ClassType::HelloConfig>
-	{
+    {
       typedef config::generate::hello_config_body_grammar<OutputIterator>  grammar_type;
-	};
-	namespace config
-	{
-	  typedef ObjectClassTypeData<ObjectClassTypeTraits<config::ClassType,
-			                                            config::ClassType::HelloConfig>>  HelloConfigData;
-	  const lmp::WORD helloConfigLength = c_objHeaderLength + 4;
-	}
+    };
+    namespace config
+    {
+      typedef ObjectClassTypeData<ObjectClassTypeTraits<config::ClassType,
+                                                        config::ClassType::HelloConfig>>  HelloConfigData;
+      const lmp::WORD helloConfigLength = c_objHeaderLength + 4;
+    }
   } // namespace obj
 } // namespace lmp
 

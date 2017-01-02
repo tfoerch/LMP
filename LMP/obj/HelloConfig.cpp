@@ -25,6 +25,6 @@ std::ostream& lmp::obj::config::operator<<(
   const lmp::obj::config::HelloConfigBody&  helloConfig)
 {
   os << helloConfig.m_helloIntv << ", "
-	 << helloConfig.m_helloDeadIntv;
+     << helloConfig.m_helloDeadIntv;
   return os;
 }

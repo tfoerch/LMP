@@ -17,28 +17,28 @@ namespace lmp
   namespace obj
   {
     struct UnknownObjectClassData
-	{
+    {
       lmp::BYTE               m_object_class;
-	  lmp::BYTE               m_class_type;
+      lmp::BYTE               m_class_type;
       bool                    m_negotiable;
       lmp::WORD               m_length;
       ByteSequence            m_data;
-	};
+    };
     std::ostream& operator<<(
       std::ostream&                  os,
-	  const UnknownObjectClassData&  unknownObjectClass);
+      const UnknownObjectClassData&  unknownObjectClass);
     namespace parse
-	{
+    {
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
       struct unknown_object_class_grammar : qi::grammar<Iterator, UnknownObjectClassData()>
       {
-    	unknown_object_class_grammar();
+        unknown_object_class_grammar();
 
-    	lmp::obj::parse::byte_sequence_grammar<Iterator>                       byte_sequence;
-    	qi::rule<Iterator, UnknownObjectClassData()>                           unknown_object_class_rule;
+        lmp::obj::parse::byte_sequence_grammar<Iterator>                       byte_sequence;
+        qi::rule<Iterator, UnknownObjectClassData()>                           unknown_object_class_rule;
       };
-	}
+    }
   } // namespace obj
 } // namespace lmp
 

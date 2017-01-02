@@ -21,36 +21,35 @@ namespace lmp
 {
   namespace obj
   {
-	namespace msgid
-	{
+    namespace msgid
+    {
       namespace parse
-	  {
+      {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
         namespace qi = boost::spirit::qi;
 
         template <typename Iterator>
         message_id_ctypes_grammar<Iterator>::message_id_ctypes_grammar()
-		: message_id_ctypes_grammar::base_type(message_id_ctypes_rule,
-				                                      "message_id_ctypes")
+        : message_id_ctypes_grammar::base_type(message_id_ctypes_rule,
+                                               "message_id_ctypes")
         {
-     	  using qi::big_word;
+          using qi::big_word;
           using qi::big_dword;
           using qi::_1;
           using phoenix::at_c;
           using namespace qi::labels;
 
           message_id_ctypes_rule %=
-        		local_msgid |
-    			remote_msgid |
-  				unknown_msgid_ctype
-				;
+              local_msgid |
+              remote_msgid |
+              unknown_msgid_ctype
+              ;
 
           message_id_ctypes_rule.name("message_id_ctypes");
         }
-
-	  } // namespace parse
-	} // namespace msgid
+      } // namespace parse
+    } // namespace msgid
   } // namespace obj
 } // namespace lmp
 

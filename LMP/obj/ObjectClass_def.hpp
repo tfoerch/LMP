@@ -68,99 +68,97 @@ namespace lmp
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
-	  template <typename Iterator, typename ClassType, ClassType ctype>
-	  object_class_grammar<Iterator, ClassType, ctype>::object_class_grammar()
-	  : object_class_grammar::base_type(object_class_rule, "object_class")
-	  {
-	    using qi::byte_;
+      template <typename Iterator, typename ClassType, ClassType ctype>
+      object_class_grammar<Iterator, ClassType, ctype>::object_class_grammar()
+      : object_class_grammar::base_type(object_class_rule, "object_class")
+      {
+        using qi::byte_;
      	using qi::big_word;
      	using qi::big_dword;
      	using qi::_1;
      	using phoenix::at_c;
      	using namespace qi::labels;
 
-		object_class_rule =
-		    ( byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype))                                        [ at_c<0>(_val) = false ] |
-		      byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype) + lmp::obj::c_negotiableMask) [ at_c<0>(_val) = true  ] ) // class type
-			>> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(ObjectClassTypeConst<ClassType>::obj_class))    // object class
-			>> big_word(c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) // length
-			>> object_body [ at_c<1>(_val) = _1 ]
-//			>> big_dword [ at_c<1>(_val) = _1 ]
-			;
+     	object_class_rule =
+     	    ( byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype))                              [ at_c<0>(_val) = false ] |
+     	      byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype) + lmp::obj::c_negotiableMask) [ at_c<0>(_val) = true  ] ) // class type
+     	    >> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(ObjectClassTypeConst<ClassType>::obj_class))    // object class
+     	    >> big_word(c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) // length
+     	    >> object_body [ at_c<1>(_val) = _1 ]
+     	    ;
 
-		object_class_rule.name("object_class");
-	  }
-	  template <typename Iterator, ObjectClass objClass>
-	  object_class_unknown_ctype_grammar<Iterator, objClass>::object_class_unknown_ctype_grammar()
-	  : object_class_unknown_ctype_grammar::base_type(object_class_unknown_ctype_rule, "object_class_unknown_ctype")
-	  {
-		using qi::byte_;
-		using qi::big_word;
+     	object_class_rule.name("object_class");
+      }
+      template <typename Iterator, ObjectClass objClass>
+      object_class_unknown_ctype_grammar<Iterator, objClass>::object_class_unknown_ctype_grammar()
+      : object_class_unknown_ctype_grammar::base_type(object_class_unknown_ctype_rule, "object_class_unknown_ctype")
+      {
+        using qi::byte_;
+        using qi::big_word;
         using qi::_1;
         using phoenix::at_c;
         using namespace qi::labels;
 
         object_class_unknown_ctype_rule =
             byte_ [at_c<0>(_val) = (_1 & lmp::obj::c_classTypeMask), at_c<1>(_val) = (_1 & lmp::obj::c_negotiableMask) ]  // class type
-      		>> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(objClass))    // object class
-      		>> big_word  [ at_c<2>(_val) = _1 ] // length
-		    >> byte_sequence( at_c<2>(_val) - 4 ) [ at_c<3>(_val) = _1 ]
-			;
+            >> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(objClass))    // object class
+            >> big_word  [ at_c<2>(_val) = _1 ] // length
+            >> byte_sequence( at_c<2>(_val) - 4 ) [ at_c<3>(_val) = _1 ]
+            ;
 
         object_class_unknown_ctype_rule.name("object_class_unknown_ctype");
 
-	  }
+      }
     }
-	namespace generate
-	{
+    namespace generate
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
       template <typename OutputIterator, typename ClassType, ClassType ctype>
       object_class_grammar<OutputIterator, ClassType, ctype>::object_class_grammar()
-	  : object_class_grammar::base_type(object_class_rule, "object_class")
+      : object_class_grammar::base_type(object_class_rule, "object_class")
       {
-    	using qi::byte_;
+        using qi::byte_;
         using qi::big_word;
-    	using qi::big_dword;
-    	using qi::eps;
-    	using phoenix::at_c;
-    	using namespace qi::labels;
+        using qi::big_dword;
+        using qi::eps;
+        using phoenix::at_c;
+        using namespace qi::labels;
 
-    	object_class_rule =
+        object_class_rule =
             (  eps(at_c<0>(_val)) << byte_ [ _1 = ( static_cast<typename std::underlying_type<ClassType>::type>(ctype) | lmp::obj::c_negotiableMask ) ] |
                byte_ [ _1 = static_cast<typename std::underlying_type<ClassType>::type>(ctype) ] ) // class type
-    		<< byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(ObjectClassTypeConst<ClassType>::obj_class) ] // object class
-			<< big_word [ _1 = (c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) ] // length
-		    << object_body [ _1 = at_c<1>(_val) ]
-//            << big_dword [ _1 = at_c<1>(_val) ]
-			;
+            << byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(ObjectClassTypeConst<ClassType>::obj_class) ] // object class
+            << big_word [ _1 = (c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) ] // length
+            << object_body [ _1 = at_c<1>(_val) ]
+            ;
 
-    	object_class_rule.name("object_class");
+        object_class_rule.name("object_class");
       }
       template <typename OutputIterator, ObjectClass objClass>
       object_class_unknown_ctype_grammar<OutputIterator, objClass>::object_class_unknown_ctype_grammar()
-	  : object_class_unknown_ctype_grammar::base_type(object_class_unknown_ctype_rule, "object_class_unknown_ctype")
+      : object_class_unknown_ctype_grammar::base_type(object_class_unknown_ctype_rule, "object_class_unknown_ctype")
       {
-    	using qi::byte_;
+        using qi::byte_;
         using qi::big_word;
-    	using qi::big_dword;
-    	using qi::eps;
-    	using phoenix::at_c;
-    	using namespace qi::labels;
+        using qi::big_dword;
+        using qi::eps;
+        using phoenix::at_c;
+        using namespace qi::labels;
 
-    	object_class_unknown_ctype_rule =
-            (  eps(at_c<1>(_val)) << byte_ [ _1 = ( at_c<0>(_val) | lmp::obj::c_negotiableMask ) ] |
-               byte_ [ _1 = at_c<0>(_val) ] ) // class type
-    		<< byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(objClass) ] // object class
-			<< big_word [ _1 = at_c<2>(_val) ] // length
-		    << byte_sequence [ _1 = at_c<3>(_val) ]
-			;
+        object_class_unknown_ctype_rule =
+            ( eps(at_c<1>(_val)) << byte_ [ _1 = ( at_c<0>(_val) | lmp::obj::c_negotiableMask ) ] |
+              byte_ [ _1 = at_c<0>(_val) ] ) // class type
+            << byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(objClass) ] // object class
+            << big_word [ _1 = at_c<2>(_val) ] // length
+            << byte_sequence [ _1 = at_c<3>(_val) ]
+            ;
 
-    	object_class_unknown_ctype_rule.name("object_class_unknown_ctype");
+        object_class_unknown_ctype_rule.name("object_class_unknown_ctype");
       }
-	}
+    }
   } // namespace obj
 } // namespace lmp
 

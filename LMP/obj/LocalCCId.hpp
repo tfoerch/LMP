@@ -28,15 +28,15 @@ namespace lmp
     };
     template <typename OutputIterator>
     struct ObjectClassTypeGenerateTraits<OutputIterator, ccid::ClassType, ccid::ClassType::LocalCCId>
-	{
+    {
       typedef ccid::generate::control_channel_id_body_grammar<OutputIterator>  grammar_type;
-	};
- 	namespace ccid
-	{
-	  typedef ObjectClassTypeData<ObjectClassTypeTraits<ccid::ClassType,
-			                                            ccid::ClassType::LocalCCId>>  LocalCCIdData;
-	  const lmp::WORD localCCIdLength = c_objHeaderLength + 4;
-	}
+    };
+    namespace ccid
+    {
+      typedef ObjectClassTypeData<ObjectClassTypeTraits<ccid::ClassType,
+                                                        ccid::ClassType::LocalCCId>>  LocalCCIdData;
+      const lmp::WORD localCCIdLength = c_objHeaderLength + 4;
+    }
   } // namespace obj
 } // namespace lmp
 

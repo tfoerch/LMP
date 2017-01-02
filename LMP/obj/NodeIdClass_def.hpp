@@ -28,32 +28,32 @@ namespace lmp
 {
   namespace obj
   {
-	namespace nodeid
-	{
-	  namespace parse
-	  {
-	    namespace fusion = boost::fusion;
-	    namespace phoenix = boost::phoenix;
-	    namespace qi = boost::spirit::qi;
+    namespace nodeid
+    {
+      namespace parse
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
 
-	    template <typename Iterator>
+        template <typename Iterator>
         node_id_body_grammar<Iterator>::node_id_body_grammar()
-		: node_id_body_grammar::base_type(node_id_body_rule,
-				                          "node_id")
+        : node_id_body_grammar::base_type(node_id_body_rule,
+                                          "node_id")
         {
-     	  using qi::big_dword;
+          using qi::big_dword;
           using qi::_1;
           using phoenix::at_c;
           using namespace qi::labels;
 
           node_id_body_rule =
-        		big_dword [ at_c<0>(_val) = _1 ]
-				;
+              big_dword [ at_c<0>(_val) = _1 ]
+              ;
 
           node_id_body_rule.name("node_id");
         }
-	  } // namespace parse
-	  namespace generate
+      } // namespace parse
+      namespace generate
       {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
@@ -71,7 +71,7 @@ namespace lmp
 
           node_id_body_rule =
                 big_dword [ _1 = at_c<0>(_val) ]
-				;
+		;
 
           node_id_body_rule.name("node_id_body");
         }

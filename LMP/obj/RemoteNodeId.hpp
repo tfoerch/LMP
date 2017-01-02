@@ -28,15 +28,15 @@ namespace lmp
     };
     template <typename OutputIterator>
     struct ObjectClassTypeGenerateTraits<OutputIterator, nodeid::ClassType, nodeid::ClassType::RemoteNodeId>
-	{
+    {
       typedef nodeid::generate::node_id_body_grammar<OutputIterator>  grammar_type;
-	};
-	namespace nodeid
-	{
-	  typedef ObjectClassTypeData<ObjectClassTypeTraits<nodeid::ClassType,
-			                                            nodeid::ClassType::RemoteNodeId>>  RemoteNodeIdData;
-	  const lmp::WORD remoteNodeIdLength = c_objHeaderLength + 4;
-	}
+    };
+    namespace nodeid
+    {
+      typedef ObjectClassTypeData<ObjectClassTypeTraits<nodeid::ClassType,
+                                                        nodeid::ClassType::RemoteNodeId>>  RemoteNodeIdData;
+      const lmp::WORD remoteNodeIdLength = c_objHeaderLength + 4;
+    }
   } // namespace obj
 } // namespace lmp
 

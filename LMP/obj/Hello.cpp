@@ -25,6 +25,6 @@ std::ostream& lmp::obj::hello::operator<<(
   const lmp::obj::hello::HelloBody&     hello)
 {
   os << hello.m_txSeqNum << ", "
-	 << hello.m_rcvSeqNum;
+     << hello.m_rcvSeqNum;
   return os;
 }

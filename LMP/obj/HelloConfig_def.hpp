@@ -29,33 +29,33 @@ namespace lmp
 {
   namespace obj
   {
-	namespace config
-	{
+    namespace config
+    {
       namespace parse
-	  {
+      {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
         namespace qi = boost::spirit::qi;
 
         template <typename Iterator>
         hello_config_body_grammar<Iterator>::hello_config_body_grammar()
-		: hello_config_body_grammar::base_type(hello_config_body_rule,
-				                          "hello_config")
+        : hello_config_body_grammar::base_type(hello_config_body_rule,
+                                               "hello_config")
         {
-     	  using qi::big_word;
+          using qi::big_word;
           using qi::_1;
           using phoenix::at_c;
           using namespace qi::labels;
 
           hello_config_body_rule =
-        		big_word [ at_c<0>(_val) = _1 ]
-				>> big_word [ at_c<1>(_val) = _1 ]
-				;
+              big_word [ at_c<0>(_val) = _1 ]
+              >> big_word [ at_c<1>(_val) = _1 ]
+              ;
 
           hello_config_body_rule.name("hello_config");
         }
-	  } // namespace parse
-	  namespace generate
+      } // namespace parse
+      namespace generate
       {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
@@ -63,7 +63,7 @@ namespace lmp
 
         template <typename OutputIterator>
         hello_config_body_grammar<OutputIterator>::hello_config_body_grammar()
-		: hello_config_body_grammar::base_type(hello_config_body_rule, "hello_config_body")
+        : hello_config_body_grammar::base_type(hello_config_body_rule, "hello_config_body")
         {
           using qi::byte_;
           using qi::big_word;
@@ -72,14 +72,14 @@ namespace lmp
           using namespace qi::labels;
 
           hello_config_body_rule =
-                big_word [ _1 = at_c<0>(_val) ]
-			    << big_word [ _1 = at_c<1>(_val) ]
-				;
+              big_word [ _1 = at_c<0>(_val) ]
+              << big_word [ _1 = at_c<1>(_val) ]
+              ;
 
           hello_config_body_rule.name("hello_config_body");
         }
       }
-	} // namespace config
+    } // namespace config
   } // namespace obj
 } // namespace lmp
 

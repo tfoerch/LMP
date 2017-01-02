@@ -29,33 +29,33 @@ namespace lmp
 {
   namespace obj
   {
-	namespace hello
-	{
+    namespace hello
+    {
       namespace parse
-	  {
+      {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
         namespace qi = boost::spirit::qi;
 
         template <typename Iterator>
         hello_body_grammar<Iterator>::hello_body_grammar()
-		: hello_body_grammar::base_type(hello_body_rule,
-				                   "hello_body")
+        : hello_body_grammar::base_type(hello_body_rule,
+                                        "hello_body")
         {
-     	  using qi::big_dword;
+          using qi::big_dword;
           using qi::_1;
           using phoenix::at_c;
           using namespace qi::labels;
 
           hello_body_rule =
-				big_dword [ at_c<0>(_val) = _1 ]
-				>> big_dword [ at_c<1>(_val) = _1 ]
-				;
+              big_dword [ at_c<0>(_val) = _1 ]
+              >> big_dword [ at_c<1>(_val) = _1 ]
+              ;
 
           hello_body_rule.name("hello_body");
         }
-	  } // namespace parse
-	  namespace generate
+      } // namespace parse
+      namespace generate
       {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
@@ -63,7 +63,7 @@ namespace lmp
 
         template <typename OutputIterator>
         hello_body_grammar<OutputIterator>::hello_body_grammar()
-		: hello_body_grammar::base_type(hello_body_rule, "hello_body")
+        : hello_body_grammar::base_type(hello_body_rule, "hello_body")
         {
           using qi::byte_;
           using qi::big_dword;
@@ -72,14 +72,14 @@ namespace lmp
           using namespace qi::labels;
 
           hello_body_rule =
-                big_dword [ _1 = at_c<0>(_val) ]
-			    << big_dword [ _1 = at_c<1>(_val) ]
-				;
+              big_dword [ _1 = at_c<0>(_val) ]
+              << big_dword [ _1 = at_c<1>(_val) ]
+              ;
 
           hello_body_rule.name("hello_body");
         }
       }
-	} // namespace hello
+    } // namespace hello
   } // namespace obj
 } // namespace lmp
 

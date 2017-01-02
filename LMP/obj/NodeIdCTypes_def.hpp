@@ -21,36 +21,35 @@ namespace lmp
 {
   namespace obj
   {
-	namespace nodeid
-	{
+    namespace nodeid
+    {
       namespace parse
-	  {
+      {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
         namespace qi = boost::spirit::qi;
 
         template <typename Iterator>
         node_id_ctypes_grammar<Iterator>::node_id_ctypes_grammar()
-		: node_id_ctypes_grammar::base_type(node_id_ctypes_rule,
-				                            "node_id_ctypes")
+        : node_id_ctypes_grammar::base_type(node_id_ctypes_rule,
+                                            "node_id_ctypes")
         {
-     	  using qi::big_word;
+          using qi::big_word;
           using qi::big_dword;
           using qi::_1;
           using phoenix::at_c;
           using namespace qi::labels;
 
           node_id_ctypes_rule %=
-        		local_nodeid |
-    			remote_nodeid |
-  				unknown_nodeid_ctype
-				;
+              local_nodeid |
+              remote_nodeid |
+              unknown_nodeid_ctype
+              ;
 
           node_id_ctypes_rule.name("node_id_ctypes");
         }
-
-	  } // namespace parse
-	} // namespace nodeid
+      } // namespace parse
+    } // namespace nodeid
   } // namespace obj
 } // namespace lmp
 

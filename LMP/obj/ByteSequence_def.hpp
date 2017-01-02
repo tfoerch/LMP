@@ -31,47 +31,47 @@ namespace lmp
       byte_sequence_grammar<Iterator>::byte_sequence_grammar()
 	  : byte_sequence_grammar::base_type(byte_sequence, "byte_sequence")
       {
-          using qi::byte_;
-          // using qi::repeat;
-          using qi::eps;
-          // using qi::lazy;
-          using qi::_a;
-          using qi::_1;
-          // using phoenix::at_c;
-          using phoenix::push_back;
-          using namespace qi::labels;
+        using qi::byte_;
+        // using qi::repeat;
+        using qi::eps;
+        // using qi::lazy;
+        using qi::_a;
+        using qi::_1;
+        // using phoenix::at_c;
+        using phoenix::push_back;
+        using namespace qi::labels;
 
-          byte_sequence =
-				( eps(_r1 > 1)
-				  >> byte_sequence(_r1 - 1) [ _val = _1 ]
-				  >> byte_ [ push_back(_val, _1) ] ) |
-				byte_ [ push_back(_val, _1) ];
+        byte_sequence =
+            ( eps(_r1 > 1)
+              >> byte_sequence(_r1 - 1) [ _val = _1 ]
+              >> byte_ [ push_back(_val, _1) ] ) |
+            byte_ [ push_back(_val, _1) ];
 
 
-          byte_sequence.name("byte_sequence");
+        byte_sequence.name("byte_sequence");
       }
     } // namespace parse
-	namespace generate
-	{
+    namespace generate
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
       template <typename OutputIterator>
       byte_sequence_grammar<OutputIterator>::byte_sequence_grammar()
-	  : byte_sequence_grammar::base_type(byte_sequence, "byte_sequence")
+      : byte_sequence_grammar::base_type(byte_sequence, "byte_sequence")
       {
-    	using qi::byte_;
-    	using phoenix::at_c;
-    	using namespace qi::labels;
+        using qi::byte_;
+        using phoenix::at_c;
+        using namespace qi::labels;
 
-    	byte_sequence =
+        byte_sequence =
             *byte_
-			;
+            ;
 
-    	byte_sequence.name("byte_sequence");
+        byte_sequence.name("byte_sequence");
       }
-	}
+    }
   } // namespace obj
 } // namespace lmp
 

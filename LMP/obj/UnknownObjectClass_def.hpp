@@ -31,33 +31,32 @@ namespace lmp
   namespace obj
   {
     namespace parse
-	{
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
       template <typename Iterator>
       unknown_object_class_grammar<Iterator>::unknown_object_class_grammar()
-	  : unknown_object_class_grammar::base_type(unknown_object_class_rule,
-			                                    "unknown_object_class")
+      : unknown_object_class_grammar::base_type(unknown_object_class_rule,
+                                                "unknown_object_class")
       {
         using qi::byte_;
-    	using qi::big_word;
-    	using qi::_1;
-    	using phoenix::at_c;
-    	using namespace qi::labels;
+        using qi::big_word;
+        using qi::_1;
+        using phoenix::at_c;
+        using namespace qi::labels;
 
-    	unknown_object_class_rule =
-    	    byte_ [at_c<1>(_val) = (_1 & lmp::obj::c_classTypeMask), at_c<2>(_val) = (_1 & lmp::obj::c_negotiableMask) ]  // class type
-    		>> byte_  [at_c<0>(_val) = _1 ] // object class
-    		>> big_word  [ at_c<3>(_val) = _1 ] // length
-			>> byte_sequence( at_c<3>(_val) - 4 ) [ at_c<4>(_val) = _1 ]
-			;
+        unknown_object_class_rule =
+            byte_ [at_c<1>(_val) = (_1 & lmp::obj::c_classTypeMask), at_c<2>(_val) = (_1 & lmp::obj::c_negotiableMask) ]  // class type
+            >> byte_  [at_c<0>(_val) = _1 ] // object class
+            >> big_word  [ at_c<3>(_val) = _1 ] // length
+            >> byte_sequence( at_c<3>(_val) - 4 ) [ at_c<4>(_val) = _1 ]
+            ;
 
-    	unknown_object_class_rule.name("unknown_object_class");
+        unknown_object_class_rule.name("unknown_object_class");
       }
-
-	} // namespace parse
+    } // namespace parse
   } // namespace obj
 } // namespace lmp
 

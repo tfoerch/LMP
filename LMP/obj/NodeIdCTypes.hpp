@@ -18,35 +18,34 @@ namespace lmp
 {
   namespace obj
   {
-	namespace nodeid
-	{
-	typedef
-	  boost::variant<lmp::obj::nodeid::LocalNodeIdData,
-	                 lmp::obj::nodeid::RemoteNodeIdData,
-					 lmp::obj::nodeid::UnknownNodeIdCTypeData>   NodeIdCTypes;
+    namespace nodeid
+    {
+      typedef boost::variant<lmp::obj::nodeid::LocalNodeIdData,
+                             lmp::obj::nodeid::RemoteNodeIdData,
+                             lmp::obj::nodeid::UnknownNodeIdCTypeData>   NodeIdCTypes;
       std::ostream& operator<<(
         std::ostream&                  os,
-  	    const NodeIdCTypes&            nodeIdCTypes);
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
-	    template <typename Iterator>
+        const NodeIdCTypes&            nodeIdCTypes);
+      namespace parse
+      {
+        namespace qi = boost::spirit::qi;
+        template <typename Iterator>
         struct node_id_ctypes_grammar : qi::grammar<Iterator, NodeIdCTypes()>
         {
-      	  node_id_ctypes_grammar();
+          node_id_ctypes_grammar();
 
           lmp::obj::parse::object_class_grammar<Iterator,
-		                                        lmp::obj::nodeid::ClassType,
-												lmp::obj::nodeid::ClassType::LocalNodeId>    local_nodeid;
+                                                lmp::obj::nodeid::ClassType,
+                                                lmp::obj::nodeid::ClassType::LocalNodeId>     local_nodeid;
           lmp::obj::parse::object_class_grammar<Iterator,
-		                                        lmp::obj::nodeid::ClassType,
-												lmp::obj::nodeid::ClassType::RemoteNodeId>    remote_nodeid;
+                                                lmp::obj::nodeid::ClassType,
+                                                lmp::obj::nodeid::ClassType::RemoteNodeId>    remote_nodeid;
           lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
-		                                                      lmp::obj::ObjectClass::NodeID>  unknown_nodeid_ctype;
-      	  qi::rule<Iterator, NodeIdCTypes()>                          node_id_ctypes_rule;
+                                                              lmp::obj::ObjectClass::NodeID>  unknown_nodeid_ctype;
+          qi::rule<Iterator, NodeIdCTypes()>                                                  node_id_ctypes_rule;
         };
-	  }
-	}
+      }
+    }
   } // namespace obj
 } // namespace lmp
 

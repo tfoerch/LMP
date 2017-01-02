@@ -16,25 +16,25 @@ namespace lmp
 {
   namespace obj
   {
-	struct ObjectSequence
-	{
-	  std::vector<lmp::obj::Objects>   m_objects;
-	};
-	std::ostream& operator<<(
-	  std::ostream&          os,
-	  const ObjectSequence&  objectSequence);
-	namespace parse
-	{
-	  namespace qi = boost::spirit::qi;
-	  template <typename Iterator>
-	  struct object_sequence_grammar : qi::grammar<Iterator, ObjectSequence(lmp::WORD)>
-	  {
-		object_sequence_grammar();
+    struct ObjectSequence
+    {
+      std::vector<lmp::obj::Objects>   m_objects;
+    };
+    std::ostream& operator<<(
+      std::ostream&          os,
+      const ObjectSequence&  objectSequence);
+    namespace parse
+    {
+      namespace qi = boost::spirit::qi;
+      template <typename Iterator>
+      struct object_sequence_grammar : qi::grammar<Iterator, ObjectSequence(lmp::WORD)>
+      {
+        object_sequence_grammar();
 
-		lmp::obj::parse::objects_grammar<Iterator>      objects;
-		qi::rule<Iterator, ObjectSequence(lmp::WORD)>   object_sequence;
-	  };
-	}
+        lmp::obj::parse::objects_grammar<Iterator>      objects;
+        qi::rule<Iterator, ObjectSequence(lmp::WORD)>   object_sequence;
+      };
+    }
   } // namespace obj
 } // namespace lmp
 

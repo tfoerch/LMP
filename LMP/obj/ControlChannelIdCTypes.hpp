@@ -18,35 +18,34 @@ namespace lmp
 {
   namespace obj
   {
-	namespace ccid
-	{
-	typedef
-	  boost::variant<lmp::obj::ccid::LocalCCIdData,
-	                 lmp::obj::ccid::RemoteCCIdData,
-					 lmp::obj::ccid::UnknownCCIdCTypeData>   ControlChannelIdCTypes;
+    namespace ccid
+    {
+      typedef boost::variant<lmp::obj::ccid::LocalCCIdData,
+                             lmp::obj::ccid::RemoteCCIdData,
+                             lmp::obj::ccid::UnknownCCIdCTypeData>   ControlChannelIdCTypes;
       std::ostream& operator<<(
         std::ostream&                  os,
-  	    const ControlChannelIdCTypes&  controlChannelIdCTypes);
-	  namespace parse
-	  {
-	    namespace qi = boost::spirit::qi;
-	    template <typename Iterator>
+        const ControlChannelIdCTypes&  controlChannelIdCTypes);
+      namespace parse
+      {
+        namespace qi = boost::spirit::qi;
+        template <typename Iterator>
         struct control_channel_id_ctypes_grammar : qi::grammar<Iterator, ControlChannelIdCTypes()>
         {
-      	  control_channel_id_ctypes_grammar();
+          control_channel_id_ctypes_grammar();
 
           lmp::obj::parse::object_class_grammar<Iterator,
-  		                                        lmp::obj::ccid::ClassType,
-  											    lmp::obj::ccid::ClassType::LocalCCId>    local_ccid;
+                                                lmp::obj::ccid::ClassType,
+                                                lmp::obj::ccid::ClassType::LocalCCId>                   local_ccid;
           lmp::obj::parse::object_class_grammar<Iterator,
-  		                                        lmp::obj::ccid::ClassType,
-  											    lmp::obj::ccid::ClassType::RemoteCCId>    remote_ccid;
+                                                lmp::obj::ccid::ClassType,
+                                                lmp::obj::ccid::ClassType::RemoteCCId>                  remote_ccid;
           lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
                                                               lmp::obj::ObjectClass::ControlChannelID>  unknown_ccid_ctype;
-      	  qi::rule<Iterator, ControlChannelIdCTypes()>                         control_channel_id_ctypes_rule;
+          qi::rule<Iterator, ControlChannelIdCTypes()>                                                  control_channel_id_ctypes_rule;
         };
-	  }
-	}
+      }
+    }
   } // namespace obj
 } // namespace lmp
 

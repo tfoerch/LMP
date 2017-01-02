@@ -13,10 +13,10 @@ namespace lmp
 {
   namespace obj
   {
-	namespace hello
-	{
-	  typedef ObjectClassUnknownCTypeData<ObjectClassTraits<ObjectClass::Hello>>  UnknownHelloCTypeData;
-	}
+    namespace hello
+    {
+      typedef ObjectClassUnknownCTypeData<ObjectClassTraits<ObjectClass::Hello>>  UnknownHelloCTypeData;
+    }
   } // namespace obj
 } // namespace lmp
 

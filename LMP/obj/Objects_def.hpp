@@ -21,35 +21,35 @@ namespace lmp
   namespace obj
   {
     namespace parse
-	{
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
       template <typename Iterator>
       objects_grammar<Iterator>::objects_grammar()
-	  : objects_grammar::base_type(objects,
-	    		                   "objects")
+      : objects_grammar::base_type(objects,
+                                   "objects")
       {
-    	using qi::big_word;
-    	using qi::big_dword;
-    	using qi::_1;
-    	using phoenix::at_c;
-    	using namespace qi::labels;
+        using qi::big_word;
+        using qi::big_dword;
+        using qi::_1;
+        using phoenix::at_c;
+        using namespace qi::labels;
 
-    	objects %=
-    		control_channel_id_ctypes |
-			message_id_ctypes |
-			node_id_ctypes |
-			config_ctypes |
-			hello_ctypes |
-			unknown_object_class
-			;
+        objects %=
+            control_channel_id_ctypes |
+            message_id_ctypes |
+            node_id_ctypes |
+            config_ctypes |
+            hello_ctypes |
+            unknown_object_class
+            ;
 
-    	objects.name("objects");
+        objects.name("objects");
       }
 
-	} // namespace parse
+    } // namespace parse
   } // namespace obj
 } // namespace lmp
 

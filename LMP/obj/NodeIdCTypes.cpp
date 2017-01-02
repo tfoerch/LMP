@@ -22,23 +22,22 @@ namespace
     {}
     std::ostream& operator()(const lmp::obj::nodeid::LocalNodeIdData& nodeId) const
     {
-	  m_os << nodeId;
-	  return m_os;
+      m_os << nodeId;
+      return m_os;
     }
     std::ostream& operator()(const lmp::obj::nodeid::RemoteNodeIdData& nodeId) const
     {
-	  m_os << nodeId;
-	  return m_os;
+      m_os << nodeId;
+      return m_os;
     }
     std::ostream& operator()(const lmp::obj::nodeid::UnknownNodeIdCTypeData& unknownNodeId) const
     {
-	  m_os << unknownNodeId;
-	  return m_os;
+      m_os << unknownNodeId;
+      return m_os;
     }
     std::ostream&   m_os;
   };
 }
-
 
 std::ostream& lmp::obj::nodeid::operator<<(
   std::ostream&                                  os,

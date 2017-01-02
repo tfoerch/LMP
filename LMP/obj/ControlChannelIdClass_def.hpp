@@ -28,32 +28,32 @@ namespace lmp
 {
   namespace obj
   {
-	namespace ccid
-	{
-	  namespace parse
-	  {
-	    namespace fusion = boost::fusion;
-	    namespace phoenix = boost::phoenix;
-	    namespace qi = boost::spirit::qi;
+    namespace ccid
+    {
+      namespace parse
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
 
-	    template <typename Iterator>
+        template <typename Iterator>
         control_channel_id_body_grammar<Iterator>::control_channel_id_body_grammar()
-		: control_channel_id_body_grammar::base_type(control_channel_id_body_rule,
-				                          "control_channel_id")
+        : control_channel_id_body_grammar::base_type(control_channel_id_body_rule,
+                                                     "control_channel_id")
         {
-     	  using qi::big_dword;
+          using qi::big_dword;
           using qi::_1;
           using phoenix::at_c;
           using namespace qi::labels;
 
           control_channel_id_body_rule =
-        		big_dword [ at_c<0>(_val) = _1 ]
-				;
+              big_dword [ at_c<0>(_val) = _1 ]
+              ;
 
           control_channel_id_body_rule.name("control_channel_id");
         }
-	  } // namespace parse
-	  namespace generate
+      } // namespace parse
+      namespace generate
       {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
@@ -70,8 +70,8 @@ namespace lmp
           using namespace qi::labels;
 
           control_channel_id_body_rule =
-                big_dword [ _1 = at_c<0>(_val) ]
-				;
+              big_dword [ _1 = at_c<0>(_val) ]
+	      ;
 
           control_channel_id_body_rule.name("control_channel_id_body");
         }
