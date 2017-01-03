@@ -53,7 +53,7 @@ namespace lmp
     struct ObjectClassTypeGenerateTraits
     {
     };
-    // instantiate following with ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>::>data_type
+    // instantiate following with ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>
     template <typename   ObjCTypeTraits>
     class ObjectClassTypeData
     {
