@@ -30,6 +30,22 @@ std::ostream& lmp::obj::ccid::operator<<(
   }
   return os;
 }
+
+bool lmp::obj::ccid::IsEqualFtor::operator()(
+  const  ControlChannelIdBody& first,
+  const  ControlChannelIdBody& second) const
+{
+  return ( first.m_CCId == second.m_CCId );
+}
+
+const lmp::WORD lmp::obj::ccid::GetLengthFtor::c_length = 4;
+
+lmp::WORD lmp::obj::ccid::GetLengthFtor::operator()(
+  const ControlChannelIdBody& controlChannelIdBody) const
+{
+  return c_length;
+}
+
 std::ostream& lmp::obj::ccid::operator<<(
   std::ostream&                                  os,
   const lmp::obj::ccid::ControlChannelIdBody&  controlChannelIdBody)

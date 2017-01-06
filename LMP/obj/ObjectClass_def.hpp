@@ -48,6 +48,23 @@ namespace lmp
          << objClassCTypeData.m_data;
       return os;
     }
+    template <typename   ObjCTypeTraits>
+    bool operator==(
+       const ObjectClassTypeData<ObjCTypeTraits>&  first,
+       const ObjectClassTypeData<ObjCTypeTraits>&  second)
+    {
+      return
+        ( first.m_negotiable == second.m_negotiable &&
+          typename ObjCTypeTraits::equal_ftor_type()(first.m_data, second.m_data) );
+    }
+    template <typename   ObjCTypeTraits>
+    lmp::DWORD getLength(
+      const ObjectClassTypeData<ObjCTypeTraits>&  objClassCTypeData)
+    {
+      return
+        ( c_objHeaderLength +
+          typename ObjCTypeTraits::get_length_ftor_type()(objClassCTypeData.m_data) );
+    }
     template <typename   ObjClassTraits>
     std::ostream& operator<<(
       std::ostream&                                       os,
@@ -131,7 +148,8 @@ namespace lmp
             (  eps(at_c<0>(_val)) << byte_ [ _1 = ( static_cast<typename std::underlying_type<ClassType>::type>(ctype) | lmp::obj::c_negotiableMask ) ] |
                byte_ [ _1 = static_cast<typename std::underlying_type<ClassType>::type>(ctype) ] ) // class type
             << byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(ObjectClassTypeConst<ClassType>::obj_class) ] // object class
-            << big_word [ _1 = (c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) ] // length
+            << big_word [ _1 = phx_getLength(_val) ] // length
+//            << big_word [ _1 = (c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) ] // length
             << object_body [ _1 = at_c<1>(_val) ]
             ;
 

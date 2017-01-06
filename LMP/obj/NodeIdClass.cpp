@@ -30,6 +30,22 @@ std::ostream& lmp::obj::nodeid::operator<<(
   }
   return os;
 }
+
+bool lmp::obj::nodeid::IsEqualFtor::operator()(
+  const  NodeIdBody& first,
+  const  NodeIdBody& second) const
+{
+  return ( first.m_nodeId == second.m_nodeId );
+}
+
+const lmp::WORD lmp::obj::nodeid::GetLengthFtor::c_length = 4;
+
+lmp::WORD lmp::obj::nodeid::GetLengthFtor::operator()(
+  const NodeIdBody& nodeIdBody) const
+{
+  return c_length;
+}
+
 std::ostream& lmp::obj::nodeid::operator<<(
   std::ostream&                        os,
   const lmp::obj::nodeid::NodeIdBody&  nodeIdBody)

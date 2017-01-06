@@ -17,9 +17,11 @@ namespace lmp
     template <>
     struct ObjectClassTypeTraits<ccid::ClassType, ccid::ClassType::RemoteCCId>
     {
-      typedef ccid::ClassType             ctype_type;
-      static const ctype_type             ctype = ccid::ClassType::RemoteCCId;
-      typedef ccid::ControlChannelIdBody  data_type;
+      typedef typename ccid::ClassType             ctype_type;
+      typedef typename ccid::ControlChannelIdBody  data_type;
+      typedef typename ccid::IsEqualFtor           equal_ftor_type;
+      typedef typename ccid::GetLengthFtor         get_length_ftor_type;
+      static const ctype_type                      ctype = ccid::ClassType::RemoteCCId;
     };
     template <typename Iterator>
     struct ObjectClassTypeParseTraits<Iterator, ccid::ClassType, ccid::ClassType::RemoteCCId>

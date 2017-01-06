@@ -34,6 +34,18 @@ namespace lmp
       std::ostream& operator<<(
         std::ostream&      os,
         const NodeIdBody&  nodeIdBody);
+      struct IsEqualFtor
+      {
+        bool operator()(
+          const NodeIdBody& first,
+          const NodeIdBody& second) const;
+      };
+      struct GetLengthFtor
+      {
+        lmp::WORD operator()(
+          const NodeIdBody&  nodeIdBody) const;
+        static const lmp::WORD c_length;
+      };
       namespace parse
       {
         namespace qi = boost::spirit::qi;

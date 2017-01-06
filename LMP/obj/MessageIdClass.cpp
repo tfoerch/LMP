@@ -30,6 +30,22 @@ std::ostream& lmp::obj::msgid::operator<<(
   }
   return os;
 }
+
+bool lmp::obj::msgid::IsEqualFtor::operator()(
+  const  MessageIdBody& first,
+  const  MessageIdBody& second) const
+{
+  return ( first.m_messageId == second.m_messageId );
+}
+
+const lmp::WORD lmp::obj::msgid::GetLengthFtor::c_length = 4;
+
+lmp::WORD lmp::obj::msgid::GetLengthFtor::operator()(
+  const MessageIdBody& messageIdBody) const
+{
+  return c_length;
+}
+
 std::ostream& lmp::obj::msgid::operator<<(
   std::ostream&                          os,
   const lmp::obj::msgid::MessageIdBody&  messageIdBody)

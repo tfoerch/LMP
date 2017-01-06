@@ -67,6 +67,13 @@ namespace lmp
     std::ostream& operator<<(
       std::ostream&                               os,
       const ObjectClassTypeData<ObjCTypeTraits>&  objClassCTypeData);
+    template <typename   ObjCTypeTraits>
+    bool operator==(
+       const ObjectClassTypeData<ObjCTypeTraits>&  first,
+       const ObjectClassTypeData<ObjCTypeTraits>&  second);
+    template <typename   ObjCTypeTraits>
+    lmp::DWORD getLength(
+      const ObjectClassTypeData<ObjCTypeTraits>&  objClassCTypeData);
     template <typename  ObjClassTraits>
     class ObjectClassUnknownCTypeData
     {
@@ -82,13 +89,15 @@ namespace lmp
     std::ostream& operator<<(
       std::ostream&                                       os,
       const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData);
+    template <typename   ObjClassTraits>
+    lmp::DWORD getLength(
+      const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData);
     const lmp::WORD  c_objHeaderLength = 4;
     const lmp::BYTE  c_negotiableMask = 0x80;
     const lmp::BYTE  c_classTypeMask = 0x7f;
     namespace parse
     {
       namespace qi = boost::spirit::qi;
-
       template <typename Iterator, typename ClassType, ClassType ctype>
       struct object_class_grammar : qi::grammar<Iterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>
       {
@@ -108,12 +117,24 @@ namespace lmp
     }
     namespace generate
     {
+      namespace qi = boost::spirit::qi;
+      template<typename ObjCTypeTraits>
+      struct GetLength
+      {
+        template<typename> struct result { typedef lmp::WORD type; };
+        lmp::WORD operator()(
+          const ObjectClassTypeData<ObjCTypeTraits>& objClassCTypeData) const
+        {
+          return getLength(objClassCTypeData);
+        }
+      };
       namespace karma = boost::spirit::karma;
       template <typename OutputIterator, typename ClassType, ClassType ctype>
       struct object_class_grammar : karma::grammar<OutputIterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>
       {
         object_class_grammar();
 
+        boost::phoenix::function<GetLength<ObjectClassTypeTraits<ClassType, ctype>>>                 phx_getLength;
         typename ObjectClassTypeGenerateTraits<OutputIterator, ClassType, ctype>::grammar_type       object_body;
         karma::rule<OutputIterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>  object_class_rule;
       };

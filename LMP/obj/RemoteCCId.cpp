@@ -18,3 +18,8 @@ template struct lmp::obj::generate::object_class_grammar<BufOutIterType, lmp::ob
 template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>(
   std::ostream&,
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>&);
+template bool lmp::obj::operator== <lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>(
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>&,
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>&);
+template lmp::DWORD lmp::obj::getLength<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>(
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>&);

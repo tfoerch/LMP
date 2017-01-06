@@ -20,6 +20,23 @@ template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp
   std::ostream&,
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::config::ClassType, lmp::obj::config::ClassType::HelloConfig>>&);
 
+bool lmp::obj::config::IsEqualFtor::operator()(
+  const  HelloConfigBody& first,
+  const  HelloConfigBody& second) const
+{
+  return
+    ( first.m_helloIntv == second.m_helloIntv &&
+      first.m_helloDeadIntv == second.m_helloDeadIntv );
+}
+
+const lmp::WORD lmp::obj::config::GetLengthFtor::c_length = 4;
+
+lmp::WORD lmp::obj::config::GetLengthFtor::operator()(
+  const HelloConfigBody& helloConfig) const
+{
+  return c_length;
+}
+
 std::ostream& lmp::obj::config::operator<<(
   std::ostream&                             os,
   const lmp::obj::config::HelloConfigBody&  helloConfig)

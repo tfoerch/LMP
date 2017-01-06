@@ -32,8 +32,20 @@ namespace lmp
         lmp::DWORD  m_messageId;
       };
       std::ostream& operator<<(
-        std::ostream&                os,
-        const MessageIdBody&  controlChannelIdBody);
+        std::ostream&         os,
+        const MessageIdBody&  messageIdBody);
+      struct IsEqualFtor
+      {
+        bool operator()(
+          const MessageIdBody& first,
+          const MessageIdBody& second) const;
+      };
+      struct GetLengthFtor
+      {
+        lmp::WORD operator()(
+          const MessageIdBody&  messageIdBody) const;
+        static const lmp::WORD c_length;
+      };
       namespace parse
       {
         namespace qi = boost::spirit::qi;

@@ -29,6 +29,18 @@ namespace lmp
       std::ostream& operator<<(
         std::ostream&      os,
         const HelloBody&   hello);
+      struct IsEqualFtor
+      {
+        bool operator()(
+          const HelloBody& first,
+          const HelloBody& second) const;
+      };
+      struct GetLengthFtor
+      {
+        lmp::WORD operator()(
+          const HelloBody&  hello) const;
+        static const lmp::WORD c_length;
+      };
       namespace parse
       {
         namespace qi = boost::spirit::qi;
@@ -55,9 +67,11 @@ namespace lmp
     template <>
     struct ObjectClassTypeTraits<hello::ClassType, hello::ClassType::Hello>
     {
-      typedef hello::ClassType        ctype_type;
-      static const ctype_type          ctype = hello::ClassType::Hello;
-      typedef hello::HelloBody  data_type;
+      typedef typename hello::ClassType      ctype_type;
+      typedef typename hello::HelloBody      data_type;
+      typedef typename hello::IsEqualFtor    equal_ftor_type;
+      typedef typename hello::GetLengthFtor  get_length_ftor_type;
+      static const ctype_type                ctype = hello::ClassType::Hello;
     };
     template <typename Iterator>
     struct ObjectClassTypeParseTraits<Iterator, hello::ClassType, hello::ClassType::Hello>

@@ -20,6 +20,23 @@ template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp
   std::ostream&,
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::hello::ClassType, lmp::obj::hello::ClassType::Hello>>&);
 
+bool lmp::obj::hello::IsEqualFtor::operator()(
+  const  HelloBody& first,
+  const  HelloBody& second) const
+{
+  return
+    ( first.m_txSeqNum == second.m_txSeqNum &&
+      first.m_rcvSeqNum == second.m_rcvSeqNum );
+}
+
+const lmp::WORD lmp::obj::hello::GetLengthFtor::c_length = 4;
+
+lmp::WORD lmp::obj::hello::GetLengthFtor::operator()(
+  const HelloBody& hello) const
+{
+  return c_length;
+}
+
 std::ostream& lmp::obj::hello::operator<<(
   std::ostream&                         os,
   const lmp::obj::hello::HelloBody&     hello)

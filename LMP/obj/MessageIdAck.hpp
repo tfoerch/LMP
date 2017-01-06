@@ -16,9 +16,11 @@ namespace lmp
     template <>
     struct ObjectClassTypeTraits<msgid::ClassType, msgid::ClassType::MessageIdAck>
     {
-      typedef msgid::ClassType      ctype_type;
-      static const ctype_type       ctype = msgid::ClassType::MessageIdAck;
-      typedef msgid::MessageIdBody  data_type;
+      typedef typename msgid::ClassType      ctype_type;
+      typedef typename msgid::MessageIdBody  data_type;
+      typedef typename msgid::IsEqualFtor    equal_ftor_type;
+      typedef typename msgid::GetLengthFtor  get_length_ftor_type;
+      static const ctype_type                ctype = msgid::ClassType::MessageIdAck;
     };
     template <typename Iterator>
     struct ObjectClassTypeParseTraits<Iterator, msgid::ClassType, msgid::ClassType::MessageIdAck>

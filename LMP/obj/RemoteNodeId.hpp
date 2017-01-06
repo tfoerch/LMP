@@ -17,9 +17,11 @@ namespace lmp
     template <>
     struct ObjectClassTypeTraits<nodeid::ClassType, nodeid::ClassType::RemoteNodeId>
     {
-      typedef nodeid::ClassType   ctype_type;
-      static const ctype_type     ctype = nodeid::ClassType::RemoteNodeId;
-      typedef nodeid::NodeIdBody  data_type;
+      typedef typename nodeid::ClassType      ctype_type;
+      typedef typename nodeid::NodeIdBody     data_type;
+      typedef typename nodeid::IsEqualFtor    equal_ftor_type;
+      typedef typename nodeid::GetLengthFtor  get_length_ftor_type;
+      static const ctype_type                 ctype = nodeid::ClassType::RemoteNodeId;
     };
     template <typename Iterator>
     struct ObjectClassTypeParseTraits<Iterator, nodeid::ClassType, nodeid::ClassType::RemoteNodeId>

@@ -28,6 +28,18 @@ namespace lmp
       std::ostream& operator<<(
         std::ostream&            os,
         const HelloConfigBody&   helloConfig);
+      struct IsEqualFtor
+      {
+        bool operator()(
+          const HelloConfigBody& first,
+          const HelloConfigBody& second) const;
+      };
+      struct GetLengthFtor
+      {
+        lmp::WORD operator()(
+          const HelloConfigBody&  helloConfig) const;
+        static const lmp::WORD c_length;
+      };
       namespace parse
       {
         namespace qi = boost::spirit::qi;
@@ -54,9 +66,11 @@ namespace lmp
     template <>
     struct ObjectClassTypeTraits<config::ClassType, config::ClassType::HelloConfig>
     {
-      typedef config::ClassType        ctype_type;
-      static const ctype_type          ctype = config::ClassType::HelloConfig;
-      typedef config::HelloConfigBody  data_type;
+      typedef typename config::ClassType        ctype_type;
+      typedef typename config::HelloConfigBody  data_type;
+      typedef typename config::IsEqualFtor      equal_ftor_type;
+      typedef typename config::GetLengthFtor    get_length_ftor_type;
+      static const ctype_type                   ctype = config::ClassType::HelloConfig;
     };
     template <typename Iterator>
     struct ObjectClassTypeParseTraits<Iterator, config::ClassType, config::ClassType::HelloConfig>
