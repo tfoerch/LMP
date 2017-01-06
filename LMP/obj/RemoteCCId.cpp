@@ -21,5 +21,3 @@ template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp
 template bool lmp::obj::operator== <lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>(
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>&,
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>&);
-template lmp::DWORD lmp::obj::getLength<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>(
-  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType, lmp::obj::ccid::ClassType::RemoteCCId>>&);

@@ -18,3 +18,6 @@ template struct lmp::obj::generate::object_class_grammar<BufOutIterType, lmp::ob
 template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp::obj::msgid::ClassType, lmp::obj::msgid::ClassType::MessageId>>(
   std::ostream&,
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::msgid::ClassType, lmp::obj::msgid::ClassType::MessageId>>&);
+template bool lmp::obj::operator== <lmp::obj::ObjectClassTypeTraits<lmp::obj::msgid::ClassType, lmp::obj::msgid::ClassType::MessageId>>(
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::msgid::ClassType, lmp::obj::msgid::ClassType::MessageId>>&,
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::msgid::ClassType, lmp::obj::msgid::ClassType::MessageId>>&);

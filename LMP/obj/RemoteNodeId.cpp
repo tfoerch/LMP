@@ -18,4 +18,7 @@ template struct lmp::obj::generate::object_class_grammar<BufOutIterType, lmp::ob
 template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp::obj::nodeid::ClassType, lmp::obj::nodeid::ClassType::RemoteNodeId>>(
   std::ostream&,
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::nodeid::ClassType, lmp::obj::nodeid::ClassType::RemoteNodeId>>&);
+template bool lmp::obj::operator== <lmp::obj::ObjectClassTypeTraits<lmp::obj::nodeid::ClassType, lmp::obj::nodeid::ClassType::RemoteNodeId>>(
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::nodeid::ClassType, lmp::obj::nodeid::ClassType::RemoteNodeId>>&,
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::nodeid::ClassType, lmp::obj::nodeid::ClassType::RemoteNodeId>>&);
 

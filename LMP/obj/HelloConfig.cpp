@@ -19,6 +19,9 @@ template struct lmp::obj::generate::object_class_grammar<BufOutIterType, lmp::ob
 template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp::obj::config::ClassType, lmp::obj::config::ClassType::HelloConfig>>(
   std::ostream&,
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::config::ClassType, lmp::obj::config::ClassType::HelloConfig>>&);
+template bool lmp::obj::operator== <lmp::obj::ObjectClassTypeTraits<lmp::obj::config::ClassType, lmp::obj::config::ClassType::HelloConfig>>(
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::config::ClassType, lmp::obj::config::ClassType::HelloConfig>>&,
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::config::ClassType, lmp::obj::config::ClassType::HelloConfig>>&);
 
 bool lmp::obj::config::IsEqualFtor::operator()(
   const  HelloConfigBody& first,

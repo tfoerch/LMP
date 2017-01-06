@@ -19,6 +19,9 @@ template struct lmp::obj::generate::object_class_grammar<BufOutIterType, lmp::ob
 template std::ostream& lmp::obj::operator<< <lmp::obj::ObjectClassTypeTraits<lmp::obj::hello::ClassType, lmp::obj::hello::ClassType::Hello>>(
   std::ostream&,
   const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::hello::ClassType, lmp::obj::hello::ClassType::Hello>>&);
+template bool lmp::obj::operator== <lmp::obj::ObjectClassTypeTraits<lmp::obj::hello::ClassType, lmp::obj::hello::ClassType::Hello>>(
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::hello::ClassType, lmp::obj::hello::ClassType::Hello>>&,
+  const lmp::obj::ObjectClassTypeData<lmp::obj::ObjectClassTypeTraits<lmp::obj::hello::ClassType, lmp::obj::hello::ClassType::Hello>>&);
 
 bool lmp::obj::hello::IsEqualFtor::operator()(
   const  HelloBody& first,
@@ -29,7 +32,7 @@ bool lmp::obj::hello::IsEqualFtor::operator()(
       first.m_rcvSeqNum == second.m_rcvSeqNum );
 }
 
-const lmp::WORD lmp::obj::hello::GetLengthFtor::c_length = 4;
+const lmp::WORD lmp::obj::hello::GetLengthFtor::c_length = 4 + 4;
 
 lmp::WORD lmp::obj::hello::GetLengthFtor::operator()(
   const HelloBody& hello) const
