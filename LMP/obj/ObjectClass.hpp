@@ -74,6 +74,16 @@ namespace lmp
     template <typename   ObjCTypeTraits>
     lmp::DWORD getLength(
       const ObjectClassTypeData<ObjCTypeTraits>&  objClassCTypeData);
+    template<typename ObjCTypeTraits>
+    struct GetLength
+    {
+      template<typename> struct result { typedef lmp::WORD type; };
+      lmp::WORD operator()(
+        const ObjectClassTypeData<ObjCTypeTraits>& objClassCTypeData) const
+      {
+        return getLength(objClassCTypeData);
+      }
+    };
     template <typename  ObjClassTraits>
     class ObjectClassUnknownCTypeData
     {
@@ -82,7 +92,6 @@ namespace lmp
       static const  obj_class_type                     obj_class;
       lmp::BYTE                                        m_class_type;
       bool                                             m_negotiable;
-      lmp::WORD                                        m_length;
       ByteSequence                                     m_data;
     };
     template <typename   ObjClassTraits>
@@ -90,44 +99,56 @@ namespace lmp
       std::ostream&                                       os,
       const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData);
     template <typename   ObjClassTraits>
+    bool operator==(
+      const ObjectClassUnknownCTypeData<ObjClassTraits>&  first,
+      const ObjectClassUnknownCTypeData<ObjClassTraits>&  second);
+    template <typename   ObjClassTraits>
     lmp::DWORD getLength(
       const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData);
-    const lmp::WORD  c_objHeaderLength = 4;
+    template<typename ObjClassTraits>
+    struct GetLengthUnknownCTypeData
+    {
+      template<typename> struct result { typedef lmp::WORD type; };
+      lmp::WORD operator()(
+        const ObjectClassUnknownCTypeData<ObjClassTraits>& objClassUnknownCTypeData) const
+      {
+        return getLength(objClassUnknownCTypeData);
+      }
+    };
+   const lmp::WORD  c_objHeaderLength = 4;
     const lmp::BYTE  c_negotiableMask = 0x80;
     const lmp::BYTE  c_classTypeMask = 0x7f;
     namespace parse
     {
       namespace qi = boost::spirit::qi;
       template <typename Iterator, typename ClassType, ClassType ctype>
-      struct object_class_grammar : qi::grammar<Iterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>
+      struct object_class_grammar : qi::grammar<Iterator,
+                                                ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>(),
+                                                qi::locals<lmp::WORD>>
       {
         object_class_grammar();
 
         typename ObjectClassTypeParseTraits<Iterator, ClassType, ctype>::grammar_type       object_body;
-        qi::rule<Iterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>  object_class_rule;
+        qi::rule<Iterator,
+                 ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>(),
+                 qi::locals<lmp::WORD>>                                                     object_class_rule;
       };
       template <typename Iterator, ObjectClass objClass>
-      struct object_class_unknown_ctype_grammar : qi::grammar<Iterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>
+      struct object_class_unknown_ctype_grammar : qi::grammar<Iterator,
+                                                              ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>(),
+                                                              qi::locals<lmp::WORD>>
       {
         object_class_unknown_ctype_grammar();
 
-        byte_sequence_grammar<Iterator>                                                 byte_sequence;
-        qi::rule<Iterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>  object_class_unknown_ctype_rule;
+        byte_sequence_grammar<Iterator>                                         byte_sequence;
+        qi::rule<Iterator,
+                 ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>(),
+                 qi::locals<lmp::WORD>>                                         object_class_unknown_ctype_rule;
       };
     }
     namespace generate
     {
       namespace qi = boost::spirit::qi;
-      template<typename ObjCTypeTraits>
-      struct GetLength
-      {
-        template<typename> struct result { typedef lmp::WORD type; };
-        lmp::WORD operator()(
-          const ObjectClassTypeData<ObjCTypeTraits>& objClassCTypeData) const
-        {
-          return getLength(objClassCTypeData);
-        }
-      };
       namespace karma = boost::spirit::karma;
       template <typename OutputIterator, typename ClassType, ClassType ctype>
       struct object_class_grammar : karma::grammar<OutputIterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>
@@ -143,6 +164,7 @@ namespace lmp
       {
         object_class_unknown_ctype_grammar();
 
+        boost::phoenix::function<GetLengthUnknownCTypeData<ObjectClassTraits<objClass>>>         phx_getLength;
         byte_sequence_grammar<OutputIterator>                                                    byte_sequence;
         karma::rule<OutputIterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>  object_class_unknown_ctype_rule;
       };

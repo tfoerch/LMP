@@ -50,11 +50,11 @@ namespace lmp
       {
         namespace qi = boost::spirit::qi;
         template <typename Iterator>
-        struct control_channel_id_body_grammar : qi::grammar<Iterator, ControlChannelIdBody()>
+        struct control_channel_id_body_grammar : qi::grammar<Iterator, ControlChannelIdBody(lmp::WORD)>
         {
           control_channel_id_body_grammar();
 
-          qi::rule<Iterator, ControlChannelIdBody()>  control_channel_id_body_rule;
+          qi::rule<Iterator, ControlChannelIdBody(lmp::WORD)>  control_channel_id_body_rule;
         };
       }
       namespace generate

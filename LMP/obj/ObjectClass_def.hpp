@@ -31,7 +31,6 @@ BOOST_FUSION_ADAPT_TPL_STRUCT(
   (lmp::obj::ObjectClassUnknownCTypeData)(ObjClassTraits),
   (lmp::BYTE,               m_class_type)
   (bool,                    m_negotiable)
-  (lmp::WORD,               m_length)
   (lmp::obj::ByteSequence,  m_data)
 )
 
@@ -71,13 +70,30 @@ namespace lmp
       const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData)
     {
       os << static_cast<lmp::WORD>(objClassUnknownCTypeData.m_class_type) << ", "
-    	 << (objClassUnknownCTypeData.m_negotiable ? "negotiable" : "not negotiable") << ", "
-         << objClassUnknownCTypeData.m_length << ", ";
+    	 << (objClassUnknownCTypeData.m_negotiable ? "negotiable" : "not negotiable") << ", ";
       {
     	using namespace hex_stream;
     	os << objClassUnknownCTypeData.m_data;
       }
       return os;
+    }
+    template <typename   ObjClassTraits>
+    bool operator==(
+      const ObjectClassUnknownCTypeData<ObjClassTraits>&  first,
+      const ObjectClassUnknownCTypeData<ObjClassTraits>&  second)
+    {
+      return
+        ( first.m_class_type == second.m_class_type &&
+          first.m_negotiable == second.m_negotiable &&
+          first.m_data == second.m_data  );
+    }
+    template <typename   ObjClassTraits>
+    lmp::DWORD getLength(
+      const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData)
+    {
+      return
+        ( c_objHeaderLength +
+          objClassUnknownCTypeData.m_data.size() );
     }
     namespace parse
     {
@@ -100,8 +116,8 @@ namespace lmp
      	    ( byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype))                              [ at_c<0>(_val) = false ] |
      	      byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype) + lmp::obj::c_negotiableMask) [ at_c<0>(_val) = true  ] ) // class type
      	    >> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(ObjectClassTypeConst<ClassType>::obj_class))    // object class
-     	    >> big_word(c_objHeaderLength + sizeof(typename ObjectClassTypeTraits<ClassType, ctype>::data_type)) // length
-     	    >> object_body [ at_c<1>(_val) = _1 ]
+     	    >> big_word [_a = _1] // length
+     	    >> object_body(_a) [ at_c<1>(_val) = _1 ]
      	    ;
 
      	object_class_rule.name("object_class");
@@ -119,8 +135,8 @@ namespace lmp
         object_class_unknown_ctype_rule =
             byte_ [at_c<0>(_val) = (_1 & lmp::obj::c_classTypeMask), at_c<1>(_val) = (_1 & lmp::obj::c_negotiableMask) ]  // class type
             >> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(objClass))    // object class
-            >> big_word  [ at_c<2>(_val) = _1 ] // length
-            >> byte_sequence( at_c<2>(_val) - 4 ) [ at_c<3>(_val) = _1 ]
+            >> big_word [_a = _1] // length
+            >> byte_sequence(_a - lmp::obj::c_objHeaderLength) [ at_c<2>(_val) = _1 ]
             ;
 
         object_class_unknown_ctype_rule.name("object_class_unknown_ctype");
@@ -170,8 +186,9 @@ namespace lmp
             ( eps(at_c<1>(_val)) << byte_ [ _1 = ( at_c<0>(_val) | lmp::obj::c_negotiableMask ) ] |
               byte_ [ _1 = at_c<0>(_val) ] ) // class type
             << byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(objClass) ] // object class
-            << big_word [ _1 = at_c<2>(_val) ] // length
-            << byte_sequence [ _1 = at_c<3>(_val) ]
+            << big_word [ _1 = phx_getLength(_val) ] // length
+//            << big_word [ _1 = at_c<2>(_val) ] // length
+            << byte_sequence [ _1 = at_c<2>(_val) ]
             ;
 
         object_class_unknown_ctype_rule.name("object_class_unknown_ctype");

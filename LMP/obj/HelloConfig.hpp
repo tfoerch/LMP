@@ -44,11 +44,11 @@ namespace lmp
       {
         namespace qi = boost::spirit::qi;
         template <typename Iterator>
-        struct hello_config_body_grammar : qi::grammar<Iterator, HelloConfigBody()>
+        struct hello_config_body_grammar : qi::grammar<Iterator, HelloConfigBody(lmp::WORD)>
         {
           hello_config_body_grammar();
 
-          qi::rule<Iterator, HelloConfigBody()>                         hello_config_body_rule;
+          qi::rule<Iterator, HelloConfigBody(lmp::WORD)>           hello_config_body_rule;
         };
       }
       namespace generate

@@ -20,8 +20,8 @@ namespace lmp
     namespace hex_stream
     {
       std::ostream& operator<<(
-          std::ostream&        os,
-          const ByteSequence&  byteSequence);
+        std::ostream&        os,
+        const ByteSequence&  byteSequence);
     }
     namespace parse
     {
