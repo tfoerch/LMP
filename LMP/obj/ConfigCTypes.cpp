@@ -15,6 +15,17 @@ template struct lmp::obj::config::parse::config_ctypes_grammar<BufIterType>;
 
 namespace
 {
+  struct ConfigCTypes_GetLengthVisitor : boost::static_visitor<lmp::DWORD>
+  {
+    lmp::DWORD operator()(const lmp::obj::config::HelloConfigData& helloConfig) const
+    {
+      return lmp::obj::getLength(helloConfig);
+    }
+    lmp::DWORD operator()(const lmp::obj::config::UnknownConfigCTypeData& unknownConfig) const
+    {
+      return lmp::obj::getLength(unknownConfig);
+    }
+  };
   struct ConfigCTypes_Printer : boost::static_visitor<std::ostream&>
   {
     ConfigCTypes_Printer(std::ostream& os)
@@ -34,10 +45,16 @@ namespace
   };
 }
 
+lmp::DWORD lmp::obj::config::getLength(
+  const lmp::obj::config::ConfigCTypes&  configCType)
+{
+  return boost::apply_visitor(ConfigCTypes_GetLengthVisitor(), configCType);
+}
+
 std::ostream& lmp::obj::config::operator<<(
   std::ostream&                                  os,
-  const lmp::obj::config::ConfigCTypes&          configCTypes)
+  const lmp::obj::config::ConfigCTypes&          configCType)
 {
-  boost::apply_visitor(ConfigCTypes_Printer(os), configCTypes);
+  boost::apply_visitor(ConfigCTypes_Printer(os), configCType);
   return os;
 }

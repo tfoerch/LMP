@@ -22,8 +22,20 @@ namespace lmp
       typedef boost::variant<lmp::obj::config::HelloConfigData,
                              lmp::obj::config::UnknownConfigCTypeData>   ConfigCTypes;
       std::ostream& operator<<(
-        std::ostream&                  os,
-        const ConfigCTypes&            configCTypes);
+        std::ostream&        os,
+        const ConfigCTypes&  configCType);
+      lmp::DWORD getLength(
+        const ConfigCTypes&  configCType);
+      struct GetLength
+      {
+        template<typename> struct result { typedef lmp::WORD type; };
+        template<typename ConfigCTypes>
+        lmp::WORD operator()(
+          const ConfigCTypes& configCType) const
+        {
+          return getLength(configCType);
+        }
+       };
       namespace parse
       {
         namespace qi = boost::spirit::qi;

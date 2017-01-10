@@ -87,45 +87,16 @@ namespace lmp
 	};
     namespace parse
     {
-//      struct CommonHeaderInput
-//	  {
-//    	CommonHeaderInput(
-//    	  lmp::BYTE               version,
-//		  lmp::BYTE               msg_type);
-//	    lmp::BYTE               m_version;
-//	    lmp::BYTE               m_msg_type;
-//	  };
-//      struct CommonHeaderOutput
-//	  {
-//        CommonHeaderOutput(
-//    	  lmp::BYTE               flags,
-//		  lmp::WORD               length);
-//	    lmp::BYTE               m_flags;
-//	    lmp::WORD               m_length;
-//	  };
-//      struct CommonHeaderUnknownMessageInput
-//	  {
-//    	CommonHeaderUnknownMessageInput(
-//    	  lmp::BYTE               version);
-//	    lmp::BYTE               m_version;
-//	  };
       struct CommonHeaderOutput
-	  {
-	    lmp::BYTE               m_flags;
-	    lmp::BYTE               m_msg_type;
-	    lmp::WORD               m_length;
-	  };
+      {
+        lmp::BYTE               m_flags;
+        lmp::BYTE               m_msg_type;
+        lmp::WORD               m_length;
+      };
       std::ostream& operator<<(
         std::ostream&              os,
-  	    const CommonHeaderOutput&  commonHeader);
+        const CommonHeaderOutput&  commonHeader);
       namespace qi = boost::spirit::qi;
-//      template <typename Iterator>
-//      struct common_header_grammar : qi::grammar<Iterator, CommonHeaderOutput(CommonHeaderInput)>
-//      {
-//    	common_header_grammar();
-//
-//        qi::rule<Iterator, CommonHeaderOutput(CommonHeaderInput)>                               common_header_rule;
-//      };
       template <typename Iterator>
       struct common_header_grammar : qi::grammar<Iterator, CommonHeaderOutput(lmp::BYTE)>
       {

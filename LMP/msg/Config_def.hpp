@@ -22,11 +22,11 @@
 
 BOOST_FUSION_ADAPT_STRUCT(
   lmp::msg::ConfigMsg,
-  (lmp::BYTE,                          m_flags)
-  (lmp::obj::ccid::LocalCCIdData,      m_localCCId)
-  (lmp::obj::msgid::MessageIdData,     m_messageId)
-  (lmp::obj::nodeid::LocalNodeIdData,  m_localNodeId)
-  (lmp::obj::config::HelloConfigData,  m_helloConfig)
+  (lmp::BYTE,                               m_flags)
+  (lmp::obj::ccid::LocalCCIdData,           m_localCCId)
+  (lmp::obj::msgid::MessageIdData,          m_messageId)
+  (lmp::obj::nodeid::LocalNodeIdData,       m_localNodeId)
+  (lmp::obj::config::ConfigObjectSequence,  m_configObjects)
 )
 
 namespace lmp
@@ -34,15 +34,15 @@ namespace lmp
   namespace msg
   {
     namespace parse
-	{
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
       template <typename Iterator>
       config_grammar<Iterator>::config_grammar()
-	  : config_grammar<Iterator>::base_type(config_rule, "config")
-	  {
+      : config_grammar<Iterator>::base_type(config_rule, "config")
+      {
         using qi::byte_;
         using qi::big_word;
         using qi::_a;
@@ -52,16 +52,16 @@ namespace lmp
         using namespace qi::labels;
 
         config_rule %=
-        		attr(at_c<0>(_r1))
- 	    		>> local_ccid
-				>> message_id
-				>> local_node_id
-				>> hello_config
-				;
+            attr(at_c<0>(_r1))
+            >> local_ccid
+            >> message_id
+            >> local_node_id
+            >> config_object_sequence(at_c<2>(_r1) - phx_getCCIdLength(at_c<1>(_val)))
+            ;
 
         config_rule.name("config");
-	  }
-	} // namespace parse
+      }
+    } // namespace parse
   } // namespace msg
 } // namespace lmp
 

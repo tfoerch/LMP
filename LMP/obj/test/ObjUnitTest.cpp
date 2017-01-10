@@ -20,6 +20,7 @@
 #include "obj/Hello.hpp"
 #include "obj/UnknownHelloCType.hpp"
 #include "obj/UnknownObjectClass.hpp"
+#include "obj/ConfigObjectSequence.hpp"
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 #include <iostream>
@@ -489,7 +490,7 @@ BOOST_AUTO_TEST_CASE( unknown_config_decode_spirit )
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
    typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
    unsigned char message[] =
-     { 0x07, 0x06, 0x00, 0x08,
+     { 0x87, 0x06, 0x00, 0x08,
        0x01, 0x13, 0x0a, 0x03 };
    const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
    boost::asio::const_buffers_1 messageBuffer(message, msgLength);
@@ -498,7 +499,7 @@ BOOST_AUTO_TEST_CASE( unknown_config_decode_spirit )
    lmp::obj::parse::object_class_unknown_ctype_grammar<BufIterType,
                                                        lmp::obj::ObjectClass::Config>  unknownConfigGrammar;
    lmp::obj::config::UnknownConfigCTypeData  unknownConfig;
-   lmp::obj::config::UnknownConfigCTypeData  expectedUnknownConfig = { 0x07, false, { 0x01, 0x13, 0x0a, 0x03 } };
+   lmp::obj::config::UnknownConfigCTypeData  expectedUnknownConfig = { 0x07, true, { 0x01, 0x13, 0x0a, 0x03 } };
    BOOST_CHECK(parse(begin,
                      last,
                      unknownConfigGrammar,
@@ -623,6 +624,38 @@ BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
    BOOST_CHECK_EQUAL(unknownObjectClass.m_length, 12);
    BOOST_CHECK_EQUAL(unknownObjectClass.m_negotiable, false);
    // std::cout << msgData << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( config_object_sequence_decode_spirit )
+{
+  using boost::spirit::qi::parse;
+  using boost::spirit::karma::generate;
+
+  typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+  typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+  unsigned char message[] =
+     { 0x81, 0x06, 0x00, 0x08,
+       0x00, 0x9A, 0x01, 0xCF,
+       0x87, 0x06, 0x00, 0x08,
+       0x01, 0x13, 0x0a, 0x03 };
+  const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
+  boost::asio::const_buffers_1 messageBuffer(message, msgLength);
+   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+   BufIterType last = boost::asio::buffers_end(messageBuffer);
+   lmp::obj::config::parse::config_object_sequence_grammar<BufIterType>  configObjectSequenceGrammar;
+   lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+   lmp::obj::config::ConfigObjectSequence  expectedConfigObjectSequence;
+   {
+     lmp::obj::config::HelloConfigData  expectedHelloConfig = { true, { 0x009A, 0x01CF } };
+     expectedConfigObjectSequence.push_back(lmp::obj::config::ConfigCTypes(expectedHelloConfig));
+     lmp::obj::config::UnknownConfigCTypeData  expectedUnknownConfig = { 0x07, true, { 0x01, 0x13, 0x0a, 0x03 } };
+     expectedConfigObjectSequence.push_back(lmp::obj::config::ConfigCTypes(expectedUnknownConfig));
+   }
+   BOOST_CHECK(parse(begin,
+                     last,
+                     configObjectSequenceGrammar(msgLength),
+                     configObjectSequence));
+   BOOST_CHECK_EQUAL(configObjectSequence, expectedConfigObjectSequence);
 }
 
 #if 0

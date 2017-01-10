@@ -19,14 +19,14 @@ namespace lmp
   {
     std::ostream& operator<<(
       std::ostream&     os,
-	  const ConfigMsg&  config)
+      const ConfigMsg&  config)
     {
       std::cout << "ConfigMsg(" << static_cast<lmp::WORD>(config.m_flags)
-			    << ", " << config.m_localCCId
-				<< ", " << config.m_messageId
-				<< ", " << config.m_localNodeId
-				<< ", " << config.m_helloConfig
-				<< ")";
+		<< ", " << config.m_localCCId
+		<< ", " << config.m_messageId
+		<< ", " << config.m_localNodeId
+		<< ", " << config.m_configObjects
+		<< ")";
       return os;
     }
   } // namespace msg

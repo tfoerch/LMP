@@ -19,6 +19,22 @@
 #include <limits>
 #include <ostream>
 
+namespace
+{
+  struct ConfigCTypes_IsAcceptableVisitor : boost::static_visitor<bool>
+  {
+    bool operator()(const lmp::obj::config::HelloConfigData& helloConfig) const
+    {
+      return
+        ( (3 * helloConfig.m_data.m_helloIntv ) < helloConfig.m_data.m_helloDeadIntv );
+    }
+    bool operator()(const lmp::obj::config::UnknownConfigCTypeData& unknownConfig) const
+    {
+      return false;
+    }
+  };
+}
+
 namespace lmp
 {
   namespace cc
@@ -122,8 +138,15 @@ namespace lmp
   	  const msg::ConfigMsg&  configMsg) const
     {
       // remoteNodeId, remoeCCId valid; HelloConfig in acceptable range
-      return
-        ( ( 3 * configMsg.m_helloConfig.m_data.m_helloIntv ) < configMsg.m_helloConfig.m_data.m_helloDeadIntv);
+      bool isAcceptable = true;
+      const lmp::obj::config::ConfigObjectSequence&  configObjectSequence = configMsg.m_configObjects;
+      for (std::vector<lmp::obj::config::ConfigCTypes>::const_iterator iter = configObjectSequence.begin();
+           iter != configObjectSequence.end() && isAcceptable;
+           ++iter)
+      {
+        isAcceptable = boost::apply_visitor(ConfigCTypes_IsAcceptableVisitor(), *iter);
+      }
+      return isAcceptable;
     }
     void IpccImpl::do_reportTransition(
       const appl::State&   sourceState,

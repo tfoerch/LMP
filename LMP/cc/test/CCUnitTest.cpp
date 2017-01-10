@@ -242,12 +242,17 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
 	  BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
     }
   }
+  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+  {
+    lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
+    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+  }
   lmp::msg::ConfigMsg  configMsg =
     { 0x00,
       { false, { 2 } },      // localCCId
-	  { false, { 34 } },     // messageId
-	  { false, { 115 } },    // localNodeId
-	  { true, { 100, 450 } } // helloConfig
+      { false, { 34 } },     // messageId
+      { false, { 115 } },    // localNodeId
+      configObjectSequence // configObjects
     };
 
   activeIPCC.processReceivedMessage(configMsg);
@@ -355,12 +360,17 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
 	  BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
     }
   }
+  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+  {
+    lmp::obj::config::HelloConfigData  helloConfig = { true, { 450, 450 } };// helloConfig
+    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+  }
   lmp::msg::ConfigMsg  configMsg =
     { 0x00,
       { false, { 2 } },      // localCCId
-	  { false, { 34 } },     // messageId
-	  { false, { 128 } },    // localNodeId
-	  { true, { 450, 450 } } // helloConfig
+      { false, { 34 } },     // messageId
+      { false, { 128 } },    // localNodeId
+      configObjectSequence   // configObjectss
     };
   activeIPCC.processReceivedMessage(configMsg);
   // BOOST_TEST_MESSAGE("getActiveState");
@@ -561,12 +571,17 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
 	  BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
     }
   }
+  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+  {
+    lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
+    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+  }
   lmp::msg::ConfigMsg  configMsg =
     { 0x00,
       { false, { 2 } },      // localCCId
-	  { false, { 32 } },     // messageId
-	  { false, { 128 } },    // localNodeId
-	  { true, { 100, 450 } } // helloConfig
+      { false, { 32 } },     // messageId
+      { false, { 128 } },    // localNodeId
+      configObjectSequence   // configObjectss
     };
   activeIPCC.processReceivedMessage(configMsg);
   // BOOST_TEST_MESSAGE("getActiveState");
@@ -616,12 +631,17 @@ BOOST_AUTO_TEST_CASE( passiveIPCC )
 	  BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfRcv());
     }
   }
+  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+  {
+    lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
+    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+  }
   lmp::msg::ConfigMsg  configMsg =
     { 0x00,
       { false, { 2 } },      // localCCId
-	  { false, { 38 } },     // messageId
-	  { false, { 128 } },    // localNodeId
-	  { true, { 100, 450 } } // helloConfig
+      { false, { 38 } },     // messageId
+      { false, { 128 } },    // localNodeId
+      configObjectSequence   // configObjectss
     };
   passiveIPCC.processReceivedMessage(configMsg);
   {

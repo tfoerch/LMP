@@ -32,7 +32,8 @@ namespace lmp
       {
     	byte_sequence_grammar();
 
-        qi::rule<Iterator, ByteSequence(lmp::WORD)>  byte_sequence;
+        qi::rule<Iterator, ByteSequence(lmp::WORD)>         byte_sequence;
+        qi::rule<Iterator, void(ByteSequence&, lmp::WORD)>  recursive_byte_seq;
       };
     } // namespace parse
     namespace generate

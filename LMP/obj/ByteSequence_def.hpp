@@ -42,11 +42,18 @@ namespace lmp
         using namespace qi::labels;
 
         byte_sequence =
-            ( eps(_r1 > 1)
-              >> byte_sequence(_r1 - 1) [ _val = _1 ]
-              >> byte_ [ push_back(_val, _1) ] ) |
-            byte_ [ push_back(_val, _1) ];
+            byte_ [ push_back(_val, _1) ]
+            >> ( eps(_r1 > 1)
+                 >> recursive_byte_seq(_val, _r1 - 1) ) |
+                 eps(true)
+            ;
 
+        recursive_byte_seq =
+            byte_ [ push_back(_r1, _1) ]
+            >> ( eps(_r2 > 1)
+                 >> recursive_byte_seq(_r1, _r2 - 1) ) |
+               eps(true)
+            ;
 
         byte_sequence.name("byte_sequence");
       }
