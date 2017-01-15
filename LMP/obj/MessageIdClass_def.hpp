@@ -61,7 +61,7 @@ namespace lmp
 
         template <typename OutputIterator>
         message_id_body_grammar<OutputIterator>::message_id_body_grammar()
-		: message_id_body_grammar::base_type(message_id_body_rule, "message_id_body")
+        : message_id_body_grammar::base_type(message_id_body_rule, "message_id_body")
         {
           using qi::byte_;
           using qi::big_dword;
@@ -71,7 +71,7 @@ namespace lmp
 
           message_id_body_rule =
                 big_dword [ _1 = at_c<0>(_val) ]
-				;
+                ;
 
           message_id_body_rule.name("message_id_body");
         }

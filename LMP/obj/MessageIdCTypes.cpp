@@ -15,6 +15,21 @@ template struct lmp::obj::msgid::parse::message_id_ctypes_grammar<BufIterType>;
 
 namespace
 {
+  struct MessageIdCTypes_GetLengthVisitor : boost::static_visitor<lmp::DWORD>
+  {
+    lmp::DWORD operator()(const lmp::obj::msgid::MessageIdData& messageId) const
+    {
+      return lmp::obj::getLength(messageId);
+    }
+    lmp::DWORD operator()(const lmp::obj::msgid::MessageIdAckData& messageAckId) const
+    {
+      return lmp::obj::getLength(messageAckId);
+    }
+    lmp::DWORD operator()(const lmp::obj::msgid::UnknownMessageIdCTypeData& unknownMessageId) const
+    {
+      return lmp::obj::getLength(unknownMessageId);
+    }
+  };
   struct MessageIdCTypes_Printer : boost::static_visitor<std::ostream&>
   {
     MessageIdCTypes_Printer(std::ostream& os)
@@ -37,6 +52,12 @@ namespace
     }
     std::ostream&   m_os;
   };
+}
+
+lmp::DWORD lmp::obj::msgid::getLength(
+  const lmp::obj::msgid::MessageIdCTypes&  messageIdCTypes)
+{
+  return boost::apply_visitor(MessageIdCTypes_GetLengthVisitor(), messageIdCTypes);
 }
 
 std::ostream& lmp::obj::msgid::operator<<(

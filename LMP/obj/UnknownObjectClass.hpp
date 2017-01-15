@@ -24,6 +24,11 @@ namespace lmp
       lmp::WORD               m_length;
       ByteSequence            m_data;
     };
+    bool operator==(
+      const UnknownObjectClassData&  first,
+      const UnknownObjectClassData&  second);
+    lmp::DWORD getLength(
+      const UnknownObjectClassData&  unknownObjectClass);
     std::ostream& operator<<(
       std::ostream&                  os,
       const UnknownObjectClassData&  unknownObjectClass);

@@ -115,7 +115,7 @@ namespace lmp
         return getLength(objClassUnknownCTypeData);
       }
     };
-   const lmp::WORD  c_objHeaderLength = 4;
+    const lmp::WORD  c_objHeaderLength = 4;
     const lmp::BYTE  c_negotiableMask = 0x80;
     const lmp::BYTE  c_classTypeMask = 0x7f;
     namespace parse

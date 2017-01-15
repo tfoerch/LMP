@@ -15,6 +15,33 @@ template struct lmp::obj::parse::objects_grammar<BufIterType>;
 
 namespace
 {
+  struct ObjTypes_GetLengthVisitor : boost::static_visitor<lmp::DWORD>
+  {
+    lmp::DWORD operator()(const lmp::obj::ccid::ControlChannelIdCTypes& controlChannelId) const
+    {
+      return lmp::obj::ccid::getLength(controlChannelId);
+    }
+    lmp::DWORD operator()(const lmp::obj::msgid::MessageIdCTypes& messageId) const
+    {
+      return lmp::obj::msgid::getLength(messageId);
+    }
+    lmp::DWORD operator()(const lmp::obj::nodeid::NodeIdCTypes& nodeId) const
+    {
+      return lmp::obj::nodeid::getLength(nodeId);
+    }
+    lmp::DWORD operator()(const lmp::obj::config::ConfigCTypes& config) const
+    {
+      return lmp::obj::config::getLength(config);
+    }
+    lmp::DWORD operator()(const lmp::obj::hello::HelloCTypes& hello) const
+    {
+      return lmp::obj::hello::getLength(hello);
+    }
+    lmp::DWORD operator()(const lmp::obj::UnknownObjectClassData& unknownObject) const
+    {
+      return lmp::obj::getLength(unknownObject);
+    }
+  };
   struct Objects_Printer : boost::static_visitor<std::ostream&>
   {
     Objects_Printer(std::ostream& os)
@@ -52,6 +79,12 @@ namespace
     }
     std::ostream&   m_os;
   };
+}
+
+lmp::DWORD lmp::obj::getLength(
+  const lmp::obj::Objects&  objects)
+{
+  return boost::apply_visitor(ObjTypes_GetLengthVisitor(), objects);
 }
 
 std::ostream& lmp::obj::operator<<(

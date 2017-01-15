@@ -7,14 +7,14 @@
  *      Author: tom
  */
 
-#include "msg/LMPMessageIF.hpp"
+//#include "msg/LMPMessageIF.hpp"
 #include "obj/LocalCCId.hpp"
 #include "obj/MessageId.hpp"
 #include "obj/LocalNodeId.hpp"
 #include "obj/ConfigObjectSequence.hpp"
 #include "CommonHeader.hpp"
-#include "base/ProtocolTypes.hpp"
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -29,13 +29,26 @@ namespace lmp
       lmp::obj::config::ConfigObjectSequence  m_configObjects;
     };
     std::ostream& operator<<(
-      std::ostream&         os,
-      const ConfigMsg&      config);
+      std::ostream&     os,
+      const ConfigMsg&  config);
+    bool operator==(
+      const ConfigMsg&  first,
+      const ConfigMsg&  second);
+    lmp::DWORD getLength(
+      const ConfigMsg&  config);
+    struct GetLength
+    {
+      template<typename> struct result { typedef lmp::DWORD type; };
+      template<typename ConfigMsg>
+      lmp::DWORD operator()(
+        const ConfigMsg& config) const
+      { return lmp::msg::getLength(config); }
+    };
     namespace parse
     {
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
-      struct config_grammar : qi::grammar<Iterator, ConfigMsg(CommonHeaderOutput)>
+      struct config_grammar : qi::grammar<Iterator, ConfigMsg(CommonHeader)>
       {
     	config_grammar();
 
@@ -51,7 +64,30 @@ namespace lmp
                                               lmp::obj::msgid::ClassType,
                                               lmp::obj::msgid::ClassType::MessageId>     message_id;
         lmp::obj::config::parse::config_object_sequence_grammar<Iterator>                config_object_sequence;
-    	qi::rule<Iterator, ConfigMsg(CommonHeaderOutput)>                                config_rule;
+    	qi::rule<Iterator, ConfigMsg(CommonHeader)>                                      config_rule;
+      };
+    }
+    namespace generate
+    {
+      namespace karma = boost::spirit::karma;
+      template <typename OutputIterator>
+      struct config_grammar : karma::grammar<OutputIterator, ConfigMsg()>
+      {
+        config_grammar();
+
+        boost::phoenix::function<lmp::msg::GetLength>                                       phx_getLength;
+        lmp::obj::generate::object_class_grammar<OutputIterator,
+                                                 lmp::obj::ccid::ClassType,
+                                                 lmp::obj::ccid::ClassType::LocalCCId>      local_ccid;
+        lmp::obj::generate::object_class_grammar<OutputIterator,
+                                                 lmp::obj::nodeid::ClassType,
+                                                 lmp::obj::nodeid::ClassType::LocalNodeId>  local_node_id;
+        lmp::obj::generate::object_class_grammar<OutputIterator,
+                                                 lmp::obj::msgid::ClassType,
+                                                 lmp::obj::msgid::ClassType::MessageId>     message_id;
+        lmp::obj::config::generate::config_object_sequence_grammar<OutputIterator>          config_object_sequence;
+        karma::rule<OutputIterator, ConfigMsg&()>                                           common_header;
+        karma::rule<OutputIterator, ConfigMsg()>                                            config_rule;
       };
     }
   } // namespace msg

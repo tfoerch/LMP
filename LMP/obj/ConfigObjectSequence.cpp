@@ -12,6 +12,21 @@
 
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
 template struct lmp::obj::config::parse::config_object_sequence_grammar<BufIterType>;
+typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+template struct lmp::obj::config::generate::config_object_sequence_grammar<BufOutIterType>;
+
+lmp::DWORD lmp::obj::config::getLength(
+  const lmp::obj::config::ConfigObjectSequence&  configObjectSequence)
+{
+  lmp::DWORD length = 0;
+  for (std::vector<lmp::obj::config::ConfigCTypes>::const_iterator iter = configObjectSequence.begin();
+       iter != configObjectSequence.end();
+       ++iter)
+  {
+    length += lmp::obj::config::getLength(*iter);
+  }
+  return length;
+}
 
 std::ostream& lmp::obj::config::operator<<(
   std::ostream&                                  os,

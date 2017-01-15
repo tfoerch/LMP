@@ -62,6 +62,53 @@ namespace lmp
         config_rule.name("config");
       }
     } // namespace parse
+    namespace generate
+    {
+      namespace fusion = boost::fusion;
+      namespace phoenix = boost::phoenix;
+      namespace qi = boost::spirit::qi;
+
+      template <typename OutputIterator>
+      config_grammar<OutputIterator>::config_grammar()
+      : config_grammar::base_type(config_rule, "config")
+      {
+        using phoenix::at_c;
+        using qi::byte_;
+        using qi::big_word;
+        using qi::attr;
+        using namespace qi::labels;
+
+        config_rule %=
+            common_header [ _1 = _val  ]
+            << local_ccid
+            << message_id
+            << local_node_id
+            << config_object_sequence
+            ;
+
+        common_header =
+            byte_       [ _1 = (c_supportedVersion << 4) ]  // version
+            << byte_    [ _1 = at_c<0>(_val) ]              // flags
+            << byte_    [ _1 = 0 ]                          // reserved
+            << byte_    [ _1 = static_cast<std::underlying_type<MsgType>::type>(MsgType::Config) ]              // msg type
+            << big_word [ _1 = phx_getLength(_val) ]        // length
+            << big_word [ _1 = 0 ]                          // reserved
+            ;
+
+/*        config_rule =
+            [ at_c<0>(_a) = at_c<0>(_val),
+              at_c<1>(_a) = static_cast<std::underlying_type<MsgType>::type>(MsgType::Config),
+              at_c<2>(_a) = 25 ]
+            common_header [ _1 = _a ]
+            << local_ccid
+            << message_id
+            << local_node_id
+            << config_object_sequence
+            ;*/
+
+        config_rule.name("config");
+      }
+    } // namespace generate
   } // namespace msg
 } // namespace lmp
 

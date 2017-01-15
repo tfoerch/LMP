@@ -16,24 +16,29 @@ namespace lmp
 {
   namespace msg
   {
+    struct UnknownMessage
+    {
+      lmp::msg::CommonHeader     m_header;
+      lmp::obj::ObjectSequence   m_objects;
+    };
+    std::ostream& operator<<(
+      std::ostream&          os,
+      const UnknownMessage&  unknownMessage);
+    bool operator==(
+      const UnknownMessage&  first,
+      const UnknownMessage&  second);
+    lmp::DWORD getLength(
+      const UnknownMessage&  unknownMessage);
     namespace parse
     {
-      struct UnknownMessage
-	  {
-    	lmp::msg::parse::CommonHeaderOutput  m_header;
-    	lmp::obj::ObjectSequence             m_objects;
-	  };
-      std::ostream& operator<<(
-        std::ostream&          os,
-	    const UnknownMessage&  unknownMessage);
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
-      struct unknown_message_grammar : qi::grammar<Iterator, UnknownMessage(CommonHeaderOutput)>
+      struct unknown_message_grammar : qi::grammar<Iterator, UnknownMessage(CommonHeader)>
       {
     	unknown_message_grammar();
 
-        lmp::obj::parse::object_sequence_grammar<Iterator>            object_sequence;
-    	qi::rule<Iterator, UnknownMessage(CommonHeaderOutput)>        unknown_message_rule;
+        lmp::obj::parse::object_sequence_grammar<Iterator>      object_sequence;
+    	qi::rule<Iterator, UnknownMessage(CommonHeader)>        unknown_message_rule;
       };
     }
   } // namespace msg

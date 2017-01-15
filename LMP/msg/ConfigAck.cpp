@@ -17,17 +17,41 @@ namespace lmp
 {
   namespace msg
   {
+    lmp::DWORD getLength(
+      const ConfigAckMsg& configAck)
+    {
+      lmp::DWORD length =
+        ( lmp::msg::c_headerLength +
+          lmp::obj::getLength(configAck.m_localCCId) +
+          lmp::obj::getLength(configAck.m_localNodeId) +
+          lmp::obj::getLength(configAck.m_remoteCCId) +
+          lmp::obj::getLength(configAck.m_messageId) +
+          lmp::obj::getLength(configAck.m_remoteNodeId) );
+      return length;
+    }
+    bool operator==(
+      const ConfigAckMsg&  first,
+      const ConfigAckMsg&  second)
+    {
+      return
+        ( first.m_flags == second.m_flags &&
+          first.m_localCCId == second.m_localCCId &&
+          first.m_localNodeId == second.m_localNodeId &&
+          first.m_remoteCCId == second.m_remoteCCId &&
+          first.m_messageId == second.m_messageId &&
+          first.m_remoteNodeId == second.m_remoteNodeId );
+    }
     std::ostream& operator<<(
       std::ostream&             os,
-	  const ConfigAckMsg& configAck)
+      const ConfigAckMsg& configAck)
     {
       std::cout << "ConfigAckMsg(" << static_cast<lmp::WORD>(configAck.m_flags)
-	            << ", " << configAck.m_localCCId
-				<< ", " << configAck.m_localNodeId
-				<< ", " << configAck.m_remoteCCId
-				<< ", " << configAck.m_messageId
-				<< ", " << configAck.m_remoteNodeId
-				<< ")";
+	        << ", " << configAck.m_localCCId
+	        << ", " << configAck.m_localNodeId
+	        << ", " << configAck.m_remoteCCId
+	        << ", " << configAck.m_messageId
+	        << ", " << configAck.m_remoteNodeId
+	        << ")";
       return os;
     }
   } // namespace msg

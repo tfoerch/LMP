@@ -7,7 +7,6 @@
  *      Author: tom
  */
 
-#include "msg/LMPMessageIF.hpp"
 #include "obj/LocalCCId.hpp"
 #include "obj/LocalNodeId.hpp"
 #include "obj/RemoteCCId.hpp"
@@ -23,7 +22,7 @@ namespace lmp
   namespace msg
   {
     struct ConfigNackMsg
-	{
+    {
       lmp::BYTE                           m_flags;
       lmp::obj::ccid::LocalCCIdData       m_localCCId;
       lmp::obj::nodeid::LocalNodeIdData   m_localNodeId;
@@ -31,37 +30,42 @@ namespace lmp
       lmp::obj::msgid::MessageIdAckData   m_messageId;
       lmp::obj::nodeid::RemoteNodeIdData  m_remoteNodeId;
       lmp::obj::config::HelloConfigData   m_helloConfig;
-	};
+    };
     std::ostream& operator<<(
-      std::ostream&          os,
-	  const ConfigNackMsg& configNack);
+      std::ostream&         os,
+      const ConfigNackMsg&  configNack);
+    bool operator==(
+      const ConfigNackMsg&  first,
+      const ConfigNackMsg&  second);
+    lmp::DWORD getLength(
+      const ConfigNackMsg&  configNack);
     namespace parse
     {
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
-      struct config_nack_grammar : qi::grammar<Iterator, ConfigNackMsg(CommonHeaderOutput)>
+      struct config_nack_grammar : qi::grammar<Iterator, ConfigNackMsg(CommonHeader)>
       {
     	config_nack_grammar();
 
         lmp::obj::parse::object_class_grammar<Iterator,
-		                                      lmp::obj::ccid::ClassType,
-											  lmp::obj::ccid::ClassType::LocalCCId>    local_ccid;
+		                              lmp::obj::ccid::ClassType,
+		                              lmp::obj::ccid::ClassType::LocalCCId>    local_ccid;
         lmp::obj::parse::object_class_grammar<Iterator,
-		                                      lmp::obj::ccid::ClassType,
-											  lmp::obj::ccid::ClassType::RemoteCCId>    remote_ccid;
+		                              lmp::obj::ccid::ClassType,
+		                              lmp::obj::ccid::ClassType::RemoteCCId>    remote_ccid;
         lmp::obj::parse::object_class_grammar<Iterator,
-		                                      lmp::obj::nodeid::ClassType,
-											  lmp::obj::nodeid::ClassType::LocalNodeId>    local_node_id;
+		                              lmp::obj::nodeid::ClassType,
+		                              lmp::obj::nodeid::ClassType::LocalNodeId>    local_node_id;
         lmp::obj::parse::object_class_grammar<Iterator,
-           		                              lmp::obj::nodeid::ClassType,
-											  lmp::obj::nodeid::ClassType::RemoteNodeId>   remote_node_id;
+           		                      lmp::obj::nodeid::ClassType,
+           		                      lmp::obj::nodeid::ClassType::RemoteNodeId>   remote_node_id;
         lmp::obj::parse::object_class_grammar<Iterator,
                                               lmp::obj::msgid::ClassType,
-											  lmp::obj::msgid::ClassType::MessageIdAck>    message_id_ack;
+                                              lmp::obj::msgid::ClassType::MessageIdAck>    message_id_ack;
         lmp::obj::parse::object_class_grammar<Iterator,
-		                                      lmp::obj::config::ClassType,
-											  lmp::obj::config::ClassType::HelloConfig>     hello_config;
-    	qi::rule<Iterator, ConfigNackMsg(CommonHeaderOutput)>            config_nack_rule;
+                                              lmp::obj::config::ClassType,
+                                              lmp::obj::config::ClassType::HelloConfig>    hello_config;
+    	qi::rule<Iterator, ConfigNackMsg(CommonHeader)>                                    config_nack_rule;
       };
     }
   } // namespace msg

@@ -15,6 +15,21 @@ template struct lmp::obj::ccid::parse::control_channel_id_ctypes_grammar<BufIter
 
 namespace
 {
+  struct ControlChannelIdCTypes_GetLengthVisitor : boost::static_visitor<lmp::DWORD>
+  {
+    lmp::DWORD operator()(const lmp::obj::ccid::LocalCCIdData& localCCId) const
+    {
+      return lmp::obj::getLength(localCCId);
+    }
+    lmp::DWORD operator()(const lmp::obj::ccid::RemoteCCIdData& remoteCCId) const
+    {
+      return lmp::obj::getLength(remoteCCId);
+    }
+    lmp::DWORD operator()(const lmp::obj::ccid::UnknownCCIdCTypeData& unknownCCId) const
+    {
+      return lmp::obj::getLength(unknownCCId);
+    }
+  };
   struct ControlChannelIdCTypes_Printer : boost::static_visitor<std::ostream&>
   {
     ControlChannelIdCTypes_Printer(std::ostream& os)
@@ -37,6 +52,12 @@ namespace
     }
     std::ostream&   m_os;
   };
+}
+
+lmp::DWORD lmp::obj::ccid::getLength(
+  const lmp::obj::ccid::ControlChannelIdCTypes&  controlChannelIdCTypes)
+{
+  return boost::apply_visitor(ControlChannelIdCTypes_GetLengthVisitor(), controlChannelIdCTypes);
 }
 
 std::ostream& lmp::obj::ccid::operator<<(

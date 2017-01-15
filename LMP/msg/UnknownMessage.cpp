@@ -17,17 +17,30 @@ namespace lmp
 {
   namespace msg
   {
-    namespace parse
+    lmp::DWORD getLength(
+      const UnknownMessage&  unknownMessage)
     {
-	  std::ostream& operator<<(
-	    std::ostream&          os,
-		const UnknownMessage&  unknownMessage)
-	  {
-	    std::cout << "UnknownMessage(" << unknownMessage.m_header
-				  << ", " << unknownMessage.m_objects
-				  << ")";
-	    return os;
-	  }
+      lmp::DWORD length =
+        ( lmp::msg::c_headerLength +
+          lmp::obj::getLength(unknownMessage.m_objects) );
+      return length;
+    }
+    bool operator==(
+      const UnknownMessage&  first,
+      const UnknownMessage&  second)
+    {
+      return
+        ( first.m_header == second.m_header &&
+          first.m_objects == second.m_objects );
+    }
+    std::ostream& operator<<(
+      std::ostream&          os,
+      const UnknownMessage&  unknownMessage)
+    {
+      std::cout << "UnknownMessage(" << unknownMessage.m_header
+                << ", " << unknownMessage.m_objects
+                << ")";
+      return os;
     }
   } // namespace msg
 } // namespace lmp

@@ -23,6 +23,8 @@ namespace lmp
       typedef boost::variant<lmp::obj::ccid::LocalCCIdData,
                              lmp::obj::ccid::RemoteCCIdData,
                              lmp::obj::ccid::UnknownCCIdCTypeData>   ControlChannelIdCTypes;
+      lmp::DWORD getLength(
+        const ControlChannelIdCTypes&  controlChannelIdCTypes);
       std::ostream& operator<<(
         std::ostream&                  os,
         const ControlChannelIdCTypes&  controlChannelIdCTypes);

@@ -48,6 +48,27 @@ namespace lmp
           config_ctypes_rule.name("config_ctypes");
         }
       } // namespace parse
+      namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
+
+        template <typename OutputIterator>
+        config_ctypes_grammar<OutputIterator>::config_ctypes_grammar()
+        : config_ctypes_grammar::base_type(config_ctypes_rule, "config_ctypes")
+        {
+          using phoenix::at_c;
+          using namespace qi::labels;
+
+          config_ctypes_rule %=
+              hello_config |
+              unknown_config_ctype
+              ;
+
+          config_ctypes_rule.name("config_ctypes");
+        }
+      } // namespace generate
     } // namespace config
   } // namespace obj
 } // namespace lmp

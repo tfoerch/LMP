@@ -36,7 +36,7 @@
 //)
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::msg::parse::CommonHeaderOutput,
+  lmp::msg::CommonHeader,
   (lmp::BYTE,       m_flags)
   (lmp::BYTE,       m_msg_type)
   (lmp::WORD,       m_length)
@@ -48,7 +48,7 @@ namespace lmp
   namespace msg
   {
     namespace parse
-	{
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
@@ -75,8 +75,8 @@ namespace lmp
 //	  }
       template <typename Iterator>
       common_header_grammar<Iterator>::common_header_grammar()
-	  : common_header_grammar<Iterator>::base_type(common_header_rule, "common_header")
-	  {
+      : common_header_grammar<Iterator>::base_type(common_header_rule, "common_header")
+      {
         using qi::byte_;
         using qi::big_word;
         using qi::_a;
@@ -85,17 +85,45 @@ namespace lmp
         using namespace qi::labels;
 
         common_header_rule =
-                byte_(_r1)                           // version
-    		    >> byte_    [ at_c<0>(_val) = _1 ]  // flags
-				>> byte_	                        // reserved
-    		    >> byte_    [ at_c<1>(_val) = _1 ]  // msg type
-    		    >> big_word [ at_c<2>(_val) = _1 ]  // length
-    		    >> big_word                         // reserved
-    		    ;
+            byte_(c_supportedVersion << 4)                // version
+            >> byte_    [ at_c<0>(_val) = _1 ]            // flags
+            >> byte_	                                  // reserved
+            >> byte_    [ at_c<1>(_val) = _1 ]            // msg type
+            >> big_word [ at_c<2>(_val) = _1 ]            // length
+            >> big_word                                   // reserved
+            ;
 
         common_header_rule.name("common_header");
-	  }
-	} // namespace parse
+      }
+    } // namespace parse
+    namespace generate
+    {
+      namespace fusion = boost::fusion;
+      namespace phoenix = boost::phoenix;
+      namespace qi = boost::spirit::qi;
+
+      template <typename OutputIterator>
+      common_header_grammar<OutputIterator>::common_header_grammar()
+      : common_header_grammar::base_type(common_header_rule, "common_header")
+      {
+        using phoenix::at_c;
+        using qi::byte_;
+        using qi::big_word;
+        using qi::attr;
+        using namespace qi::labels;
+
+        common_header_rule =
+            byte_       [ _1 = (c_supportedVersion << 4) ]  // version
+            << byte_    [ _1 = at_c<0>(_val) ]              // flags
+            << byte_    [ _1 = 0 ]                          // reserved
+            << byte_    [ _1 = at_c<1>(_val) ]              // msg type
+            << big_word [ _1 = at_c<2>(_val) ]              // length
+            << big_word [ _1 = 0 ]                          // reserved
+            ;
+
+        common_header_rule.name("common_header");
+      }
+    } // namespace generate
   } // namespace msg
 } // namespace lmp
 

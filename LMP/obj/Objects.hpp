@@ -27,6 +27,8 @@ namespace lmp
                            lmp::obj::config::ConfigCTypes,
                            lmp::obj::hello::HelloCTypes,
                            lmp::obj::UnknownObjectClassData>   Objects;
+    lmp::DWORD getLength(
+      const Objects&  objects);
     std::ostream& operator<<(
       std::ostream&   os,
       const Objects&  objects);

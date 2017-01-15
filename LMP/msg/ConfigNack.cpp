@@ -17,6 +17,32 @@ namespace lmp
 {
   namespace msg
   {
+    lmp::DWORD getLength(
+      const ConfigNackMsg&  configNack)
+    {
+      lmp::DWORD length =
+        ( lmp::msg::c_headerLength +
+          lmp::obj::getLength(configNack.m_localCCId) +
+          lmp::obj::getLength(configNack.m_localNodeId) +
+          lmp::obj::getLength(configNack.m_remoteCCId) +
+          lmp::obj::getLength(configNack.m_messageId) +
+          lmp::obj::getLength(configNack.m_remoteNodeId) +
+          lmp::obj::getLength(configNack.m_helloConfig) );
+      return length;
+    }
+    bool operator==(
+      const ConfigNackMsg&  first,
+      const ConfigNackMsg&  second)
+    {
+      return
+        ( first.m_flags == second.m_flags &&
+          first.m_localCCId == second.m_localCCId &&
+          first.m_localNodeId == second.m_localNodeId &&
+          first.m_remoteCCId == second.m_remoteCCId &&
+          first.m_messageId == second.m_messageId &&
+          first.m_remoteNodeId == second.m_remoteNodeId &&
+          first.m_helloConfig == second.m_helloConfig );
+    }
     std::ostream& operator<<(
 	  std::ostream&          os,
 	  const ConfigNackMsg& configNack)

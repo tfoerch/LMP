@@ -13,15 +13,28 @@
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
 template struct lmp::obj::parse::object_sequence_grammar<BufIterType>;
 
+lmp::DWORD lmp::obj::getLength(
+  const lmp::obj::ObjectSequence&  objectSequence)
+{
+  lmp::DWORD length = 0;
+  for (std::vector<lmp::obj::Objects>::const_iterator iter = objectSequence.begin();
+       iter != objectSequence.end();
+       ++iter)
+  {
+    length += lmp::obj::getLength(*iter);
+  }
+  return length;
+}
+
 std::ostream& lmp::obj::operator<<(
   std::ostream&             os,
   const lmp::obj::ObjectSequence&  objectSequence)
 {
-  for (std::vector<lmp::obj::Objects>::const_iterator iter = objectSequence.m_objects.begin();
-       iter != objectSequence.m_objects.end();
+  for (std::vector<lmp::obj::Objects>::const_iterator iter = objectSequence.begin();
+       iter != objectSequence.end();
        ++iter)
   {
-    if (iter != objectSequence.m_objects.begin())
+    if (iter != objectSequence.begin())
     {
       os << ", ";
     }

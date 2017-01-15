@@ -656,6 +656,17 @@ BOOST_AUTO_TEST_CASE( config_object_sequence_decode_spirit )
                      configObjectSequenceGrammar(msgLength),
                      configObjectSequence));
    BOOST_CHECK_EQUAL(configObjectSequence, expectedConfigObjectSequence);
+   BOOST_CHECK_EQUAL(lmp::obj::config::getLength(configObjectSequence), msgLength);
+   unsigned char emptySpace[msgLength];
+   boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
+   BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
+   BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
+   lmp::obj::config::generate::config_object_sequence_grammar<BufOutIterType>  configObjectSequenceGenerateGrammar;
+   BOOST_CHECK(generate(gen_begin,
+                        configObjectSequenceGenerateGrammar,
+                        configObjectSequence));
+   BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
+                                 emptySpace, emptySpace + msgLength);
 }
 
 #if 0

@@ -17,13 +17,29 @@ namespace lmp
 {
   namespace msg
   {
+    lmp::DWORD getLength(
+      const HelloMsg&  hello)
+    {
+      lmp::DWORD length =
+        ( lmp::msg::c_headerLength +
+          lmp::obj::getLength(hello.m_hello) );
+      return length;
+    }
+    bool operator==(
+      const HelloMsg&  first,
+      const HelloMsg&  second)
+    {
+      return
+        ( first.m_flags == second.m_flags &&
+          first. m_hello== second.m_hello  );
+    }
     std::ostream& operator<<(
-      std::ostream&     os,
-	  const HelloMsg&  hello)
+      std::ostream&    os,
+      const HelloMsg&  hello)
     {
       std::cout << "HelloMsg(" << static_cast<lmp::WORD>(hello.m_flags)
-			    << ", " << hello.m_hello
-				<< ")";
+	        << ", " << hello.m_hello
+	        << ")";
       return os;
     }
   } // namespace msg

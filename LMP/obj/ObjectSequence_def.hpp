@@ -15,11 +15,6 @@
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/phoenix/object/static_cast.hpp>
 
-BOOST_FUSION_ADAPT_STRUCT(
-  lmp::obj::ObjectSequence,
-  (std::vector<lmp::obj::Objects>,  m_objects)
-)
-
 namespace lmp
 {
   namespace obj
@@ -41,7 +36,7 @@ namespace lmp
         using namespace qi::labels;
 
         object_sequence =
-            +objects [push_back(at_c<0>(_val), _1)]
+            +objects [push_back(_val, _1)]
             ;
 
         object_sequence.name("object_sequence");

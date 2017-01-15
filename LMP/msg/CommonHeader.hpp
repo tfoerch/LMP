@@ -11,98 +11,51 @@
 #include "msg/MsgType.hpp"
 
 #include <boost/spirit/include/qi.hpp>
-
-#include <boost/optional/optional.hpp>     // for optional
-
-#include <utility>
-
-namespace boost
-{
-  namespace asio
-  {
-    class const_buffer;
-    class mutable_buffer;
-  }
-}
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
   namespace msg
   {
-    class CommonHeader
-	{
-	public:
-      typedef boost::optional<CommonHeader>      OptHeader;
-      enum decoding_error
-	  {
-    	not_supported_msgType,
-		invalid_length,
-		not_supported_version,
-		not_supported_flag,
-		unspecified_decoding_error
-	  };
-      enum encoding_error
-	  {
-    	insufficient_buffer_length
-	  };
-      typedef boost::optional<decoding_error>    OptDecError;
-      typedef std::pair<OptHeader, OptDecError>  DecodingResult;
-      typedef boost::optional<encoding_error>    OptEncError;
-      typedef boost::optional<mtype::MsgType>    OptMsgType;
-      inline CommonHeader(
-        lmp::BYTE                    version,
-		bool                         controlChannelDown,
-		bool                         lmpRestart,
-		mtype::MsgType               msgType,
-		lmp::WORD                    lmpLength)
-      : m_version(version),
-		m_controlChannelDown(controlChannelDown),
-		m_lmpRestart(lmpRestart),
-		m_msgType(msgType),
-		m_lmpLength(lmpLength)
-      {}
-      inline lmp::BYTE getVersion() const { return m_version; }
-      inline bool isControlChannelDown() const { return m_controlChannelDown; }
-      inline bool isLmpRestart() const { return m_lmpRestart; }
-      inline const mtype::MsgType getMsgType() const { return m_msgType; }
-      inline lmp::WORD getLmpLength() const { return m_lmpLength; }
-      OptEncError encode(
-        boost::asio::mutable_buffer&  buffer) const;
-      static DecodingResult decode(
-    	boost::asio::const_buffer&    buffer);
-      static OptMsgType msgType_cast(
-    	lmp::BYTE                     msgTypeByte);
-	private:
-      lmp::BYTE                    m_version;
-      bool                         m_controlChannelDown;
-      bool                         m_lmpRestart;
-      mtype::MsgType               m_msgType;
-	  lmp::WORD                    m_lmpLength;
-	public:
-	  static const lmp::WORD       c_headerLength;
-	  static const lmp::BYTE       c_versionMask;
-	  static const lmp::BYTE       c_supportedVersion;
-	  static const lmp::BYTE       c_controlChannelDownMask;
-	  static const lmp::BYTE       c_lmpRestartMask;
-	};
+    struct CommonHeader
+    {
+      lmp::BYTE               m_flags;
+      lmp::BYTE               m_msg_type;
+      lmp::WORD               m_length;
+    };
+    const lmp::WORD  c_headerLength = 8;
+    const lmp::BYTE  c_versionMask = 0xf0;
+    const lmp::BYTE  c_supportedVersion = 1;
+    const lmp::BYTE  c_controlChannelDownMask = 0x01;
+    const lmp::BYTE  c_lmpRestartMask = 0x02;
+
+    bool operator==(
+      const CommonHeader&  first,
+      const CommonHeader&  second);
+    lmp::DWORD getLength(
+      const CommonHeader&  commonHeader);
+    std::ostream& operator<<(
+      std::ostream&        os,
+      const CommonHeader&  commonHeader);
     namespace parse
     {
-      struct CommonHeaderOutput
-      {
-        lmp::BYTE               m_flags;
-        lmp::BYTE               m_msg_type;
-        lmp::WORD               m_length;
-      };
-      std::ostream& operator<<(
-        std::ostream&              os,
-        const CommonHeaderOutput&  commonHeader);
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
-      struct common_header_grammar : qi::grammar<Iterator, CommonHeaderOutput(lmp::BYTE)>
+      struct common_header_grammar : qi::grammar<Iterator, CommonHeader()>
       {
     	common_header_grammar();
 
-        qi::rule<Iterator, CommonHeaderOutput(lmp::BYTE)>   common_header_rule;
+        qi::rule<Iterator, CommonHeader()>   common_header_rule;
+      };
+    }
+    namespace generate
+    {
+      namespace karma = boost::spirit::karma;
+      template <typename OutputIterator>
+      struct common_header_grammar : karma::grammar<OutputIterator, CommonHeader()>
+      {
+        common_header_grammar();
+        karma::rule<OutputIterator, CommonHeader()>      common_header_rule;
       };
     }
   } // namespace msg

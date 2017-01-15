@@ -24,15 +24,15 @@ namespace lmp
   namespace msg
   {
     namespace parse
-	{
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
       template <typename Iterator>
       message_grammar<Iterator>::message_grammar()
-	  : message_grammar<Iterator>::base_type(message_rule, "message")
-	  {
+      : message_grammar<Iterator>::base_type(message_rule, "message")
+      {
         using qi::byte_;
         using qi::big_word;
         using qi::eps;
@@ -42,21 +42,21 @@ namespace lmp
         using namespace qi::labels;
 
         message_rule =
-        		common_header(CommonHeader::c_supportedVersion << 4) [ _a = _1 ]
-				>> ( ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::Config) )
-				       >> config_msg(_a) ) |
-				     ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigAck) )
-					   >> config_ack_msg(_a) ) |
-				     ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigNack) )
-					   >>  config_nack_msg(_a) ) |
-					 ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::Hello) )
-					   >>  hello_msg(_a) ) |
-				     unknown_msg(_a) ) [ _val = _1 ]
-				;
+            common_header [ _a = _1 ]
+            >> ( ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::Config) )
+                 >> config_msg(_a) ) |
+                 ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigAck) )
+                 >> config_ack_msg(_a) ) |
+                 ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigNack) )
+                 >>  config_nack_msg(_a) ) |
+                 ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::Hello) )
+                 >>  hello_msg(_a) ) |
+                 unknown_msg(_a) ) [ _val = _1 ]
+            ;
 
         message_rule.name("message");
-	  }
-	} // namespace parse
+      }
+    } // namespace parse
   } // namespace msg
 } // namespace lmp
 

@@ -13,6 +13,25 @@
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
 template struct lmp::obj::parse::unknown_object_class_grammar<BufIterType>;
 
+bool lmp::obj::operator==(
+  const lmp::obj::UnknownObjectClassData&  first,
+  const lmp::obj::UnknownObjectClassData&  second)
+{
+  return
+    ( first.m_object_class == second.m_object_class &&
+      first.m_class_type == second.m_class_type &&
+      first.m_negotiable == second.m_negotiable &&
+      first.m_data == second.m_data );
+}
+
+lmp::DWORD lmp::obj::getLength(
+  const lmp::obj::UnknownObjectClassData&  unknownObjectClass)
+{
+  return
+    ( c_objHeaderLength +
+      unknownObjectClass.m_data.size() );
+}
+
 std::ostream& lmp::obj::operator<<(
   std::ostream&                            os,
   const lmp::obj::UnknownObjectClassData&  unknownObjectClass)

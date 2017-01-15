@@ -23,9 +23,11 @@ namespace lmp
       typedef boost::variant<lmp::obj::nodeid::LocalNodeIdData,
                              lmp::obj::nodeid::RemoteNodeIdData,
                              lmp::obj::nodeid::UnknownNodeIdCTypeData>   NodeIdCTypes;
+      lmp::DWORD getLength(
+        const NodeIdCTypes&  nodeIdCTypes);
       std::ostream& operator<<(
-        std::ostream&                  os,
-        const NodeIdCTypes&            nodeIdCTypes);
+        std::ostream&        os,
+        const NodeIdCTypes&  nodeIdCTypes);
       namespace parse
       {
         namespace qi = boost::spirit::qi;

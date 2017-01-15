@@ -12,6 +12,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -35,7 +36,7 @@ namespace lmp
         {
           return getLength(configCType);
         }
-       };
+      };
       namespace parse
       {
         namespace qi = boost::spirit::qi;
@@ -50,6 +51,22 @@ namespace lmp
           lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
                                                               lmp::obj::ObjectClass::Config>  unknown_config_ctype;
           qi::rule<Iterator, ConfigCTypes()>                                                  config_ctypes_rule;
+        };
+      }
+      namespace generate
+      {
+        namespace karma = boost::spirit::karma;
+        template <typename OutputIterator>
+        struct config_ctypes_grammar : karma::grammar<OutputIterator, ConfigCTypes()>
+        {
+          config_ctypes_grammar();
+
+          lmp::obj::generate::object_class_grammar<OutputIterator,
+                                                   lmp::obj::config::ClassType,
+                                                   lmp::obj::config::ClassType::HelloConfig>     hello_config;
+          lmp::obj::generate::object_class_unknown_ctype_grammar<OutputIterator,
+                                                                 lmp::obj::ObjectClass::Config>  unknown_config_ctype;
+          karma::rule<OutputIterator, ConfigCTypes()>                                            config_ctypes_rule;
         };
       }
     }

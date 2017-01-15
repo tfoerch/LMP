@@ -21,9 +21,11 @@ namespace lmp
     {
       typedef boost::variant<lmp::obj::hello::HelloData,
                              lmp::obj::hello::UnknownHelloCTypeData>   HelloCTypes;
+      lmp::DWORD getLength(
+        const HelloCTypes&  helloCTypes);
       std::ostream& operator<<(
-        std::ostream&                  os,
-        const HelloCTypes&             helloCTypes);
+        std::ostream&       os,
+        const HelloCTypes&  helloCTypes);
       namespace parse
       {
         namespace qi = boost::spirit::qi;

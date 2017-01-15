@@ -16,10 +16,12 @@ namespace lmp
 {
   namespace obj
   {
-    struct ObjectSequence
-    {
-      std::vector<lmp::obj::Objects>   m_objects;
-    };
+    typedef  std::vector<lmp::obj::Objects>   ObjectSequence;
+//    bool operator==(
+//      const ObjectSequence&  first,
+//      const ObjectSequence&  second);
+    lmp::DWORD getLength(
+      const ObjectSequence&  objectSequence);
     std::ostream& operator<<(
       std::ostream&          os,
       const ObjectSequence&  objectSequence);

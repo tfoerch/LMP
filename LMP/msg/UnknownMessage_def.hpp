@@ -21,9 +21,9 @@
 
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::msg::parse::UnknownMessage,
-  (lmp::msg::parse::CommonHeaderOutput,  m_header)
-  (lmp::obj::ObjectSequence,             m_objects)
+  lmp::msg::UnknownMessage,
+  (lmp::msg::CommonHeader,    m_header)
+  (lmp::obj::ObjectSequence,  m_objects)
 )
 
 namespace lmp
@@ -31,15 +31,15 @@ namespace lmp
   namespace msg
   {
     namespace parse
-	{
+    {
       namespace fusion = boost::fusion;
       namespace phoenix = boost::phoenix;
       namespace qi = boost::spirit::qi;
 
       template <typename Iterator>
       unknown_message_grammar<Iterator>::unknown_message_grammar()
-	  : unknown_message_grammar<Iterator>::base_type(unknown_message_rule, "unknown_message")
-	  {
+      : unknown_message_grammar<Iterator>::base_type(unknown_message_rule, "unknown_message")
+      {
         using qi::byte_;
         using qi::big_word;
         using qi::_a;
@@ -49,13 +49,13 @@ namespace lmp
         using namespace qi::labels;
 
         unknown_message_rule %=
-        		attr(_r1)
-				>> object_sequence(at_c<2>(_r1))
-				;
+            attr(_r1)
+            >> object_sequence(at_c<2>(_r1))
+            ;
 
         unknown_message_rule.name("unknown_message");
-	  }
-	} // namespace parse
+      }
+    } // namespace parse
   } // namespace msg
 } // namespace lmp
 

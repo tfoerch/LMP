@@ -55,8 +55,28 @@ namespace lmp
 
           config_object_sequence.name("config_object_sequence");
         }
-      }
-    } // namespace parse
+      } // namespace parse
+      namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
+
+        template <typename OutputIterator>
+        config_object_sequence_grammar<OutputIterator>::config_object_sequence_grammar()
+        : config_object_sequence_grammar::base_type(config_object_sequence, "config_object_sequence")
+        {
+          using phoenix::at_c;
+          using namespace qi::labels;
+
+          config_object_sequence %=
+              +config_object
+              ;
+
+          config_object_sequence.name("config_object_sequence");
+        }
+      } // namespace generate
+    } // namespace config
   } // namespace obj
 } // namespace lmp
 
