@@ -56,7 +56,11 @@ namespace lmp
             >> local_ccid
             >> message_id
             >> local_node_id
-            >> config_object_sequence(at_c<2>(_r1) - phx_getCCIdLength(at_c<1>(_val)))
+            >> config_object_sequence(at_c<2>(_r1) -
+                                      c_headerLength -
+                                      phx_getCCIdLength(at_c<1>(_val)) -
+                                      phx_getMessageIdLength(at_c<2>(_val)) -
+                                      phx_getNodeIdLength(at_c<3>(_val)))
             ;
 
         config_rule.name("config");
@@ -94,17 +98,6 @@ namespace lmp
             << big_word [ _1 = phx_getLength(_val) ]        // length
             << big_word [ _1 = 0 ]                          // reserved
             ;
-
-/*        config_rule =
-            [ at_c<0>(_a) = at_c<0>(_val),
-              at_c<1>(_a) = static_cast<std::underlying_type<MsgType>::type>(MsgType::Config),
-              at_c<2>(_a) = 25 ]
-            common_header [ _1 = _a ]
-            << local_ccid
-            << message_id
-            << local_node_id
-            << config_object_sequence
-            ;*/
 
         config_rule.name("config");
       }

@@ -36,7 +36,7 @@ namespace lmp
       const ConfigMsg&  second);
     lmp::DWORD getLength(
       const ConfigMsg&  config);
-    struct GetLength
+    struct GetConfigLength
     {
       template<typename> struct result { typedef lmp::DWORD type; };
       template<typename ConfigMsg>
@@ -53,7 +53,11 @@ namespace lmp
     	config_grammar();
 
         boost::phoenix::function<lmp::obj::GetLength<lmp::obj::ObjectClassTypeTraits<lmp::obj::ccid::ClassType,
-                                                                                     lmp::obj::ccid::ClassType::LocalCCId>>>  phx_getCCIdLength;
+                                                                                     lmp::obj::ccid::ClassType::LocalCCId>>>      phx_getCCIdLength;
+        boost::phoenix::function<lmp::obj::GetLength<lmp::obj::ObjectClassTypeTraits<lmp::obj::nodeid::ClassType,
+                                                                                     lmp::obj::nodeid::ClassType::LocalNodeId>>>  phx_getNodeIdLength;
+        boost::phoenix::function<lmp::obj::GetLength<lmp::obj::ObjectClassTypeTraits<lmp::obj::msgid::ClassType,
+                                                                                     lmp::obj::msgid::ClassType::MessageId>>>     phx_getMessageIdLength;
         lmp::obj::parse::object_class_grammar<Iterator,
                                               lmp::obj::ccid::ClassType,
                                               lmp::obj::ccid::ClassType::LocalCCId>      local_ccid;
@@ -75,7 +79,7 @@ namespace lmp
       {
         config_grammar();
 
-        boost::phoenix::function<lmp::msg::GetLength>                                       phx_getLength;
+        boost::phoenix::function<lmp::msg::GetConfigLength>                                 phx_getLength;
         lmp::obj::generate::object_class_grammar<OutputIterator,
                                                  lmp::obj::ccid::ClassType,
                                                  lmp::obj::ccid::ClassType::LocalCCId>      local_ccid;
