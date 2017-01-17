@@ -8,7 +8,7 @@
  */
 
 #include "base/ProtocolTypes.hpp"                  // for DWORD
-#include "msg/MsgType.hpp"
+#include "MessageType.hpp"
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
@@ -23,12 +23,6 @@ namespace lmp
       lmp::BYTE               m_msg_type;
       lmp::WORD               m_length;
     };
-    const lmp::WORD  c_headerLength = 8;
-    const lmp::BYTE  c_versionMask = 0xf0;
-    const lmp::BYTE  c_supportedVersion = 1;
-    const lmp::BYTE  c_controlChannelDownMask = 0x01;
-    const lmp::BYTE  c_lmpRestartMask = 0x02;
-
     bool operator==(
       const CommonHeader&  first,
       const CommonHeader&  second);

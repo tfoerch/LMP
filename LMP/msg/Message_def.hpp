@@ -44,7 +44,7 @@ namespace lmp
         message_rule =
             common_header [ _a = _1 ]
             >> ( ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::Config) )
-                 >> config_msg(_a) ) |
+                 >> config_msg((at_c<0>(_a) & c_controlChannelDownMask), (at_c<0>(_a) & c_lmpRestartMask), at_c<0>(_a)) ) |
                  ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigAck) )
                  >> config_ack_msg(_a) ) |
                  ( eps(at_c<1>(_a) == static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigNack) )

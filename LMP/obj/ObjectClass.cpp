@@ -6,8 +6,6 @@
  */
 
 #include "obj/ObjectClass_def.hpp"
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/buffers_iterator.hpp>
 
 std::ostream& lmp::obj::operator<<(
   std::ostream&                 os,

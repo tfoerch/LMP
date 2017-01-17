@@ -139,7 +139,7 @@ namespace lmp
     {
       // remoteNodeId, remoeCCId valid; HelloConfig in acceptable range
       bool isAcceptable = true;
-      const lmp::obj::config::ConfigObjectSequence&  configObjectSequence = configMsg.m_configObjects;
+      const lmp::obj::config::ConfigObjectSequence&  configObjectSequence = configMsg.m_data.m_configObjects;
       for (std::vector<lmp::obj::config::ConfigCTypes>::const_iterator iter = configObjectSequence.begin();
            iter != configObjectSequence.end() && isAcceptable;
            ++iter)
@@ -242,7 +242,7 @@ namespace lmp
     bool IpccImpl::isConntentionWinning(
   	  const msg::ConfigMsg&  configMsg) const
     {
-      return do_isConntentionWinning(configMsg.m_localNodeId.m_data.m_nodeId);
+      return do_isConntentionWinning(configMsg.m_data.m_localNodeId.m_data.m_nodeId);
     }
     namespace appl
     {

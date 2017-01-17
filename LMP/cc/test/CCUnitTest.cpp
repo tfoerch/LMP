@@ -248,11 +248,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
     configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
   }
   lmp::msg::ConfigMsg  configMsg =
-    { 0x00,
-      { false, { 2 } },      // localCCId
-      { false, { 34 } },     // messageId
-      { false, { 115 } },    // localNodeId
-      configObjectSequence // configObjects
+    { false,
+      false,
+      { { false, { 2 } },      // localCCId
+        { false, { 34 } },     // messageId
+        { false, { 115 } },    // localNodeId
+        configObjectSequence } // configObjects
     };
 
   activeIPCC.processReceivedMessage(configMsg);
@@ -366,11 +367,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
     configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
   }
   lmp::msg::ConfigMsg  configMsg =
-    { 0x00,
-      { false, { 2 } },      // localCCId
-      { false, { 34 } },     // messageId
-      { false, { 128 } },    // localNodeId
-      configObjectSequence   // configObjectss
+    { false,
+      false,
+      { { false, { 2 } },      // localCCId
+        { false, { 34 } },     // messageId
+        { false, { 128 } },    // localNodeId
+        configObjectSequence } // configObjectss
     };
   activeIPCC.processReceivedMessage(configMsg);
   // BOOST_TEST_MESSAGE("getActiveState");
@@ -577,11 +579,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
     configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
   }
   lmp::msg::ConfigMsg  configMsg =
-    { 0x00,
-      { false, { 2 } },      // localCCId
-      { false, { 32 } },     // messageId
-      { false, { 128 } },    // localNodeId
-      configObjectSequence   // configObjectss
+    { false,
+      false,
+      { { false, { 2 } },      // localCCId
+        { false, { 32 } },     // messageId
+        { false, { 128 } },    // localNodeId
+        configObjectSequence } // configObjectss
     };
   activeIPCC.processReceivedMessage(configMsg);
   // BOOST_TEST_MESSAGE("getActiveState");
@@ -637,11 +640,12 @@ BOOST_AUTO_TEST_CASE( passiveIPCC )
     configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
   }
   lmp::msg::ConfigMsg  configMsg =
-    { 0x00,
-      { false, { 2 } },      // localCCId
-      { false, { 38 } },     // messageId
-      { false, { 128 } },    // localNodeId
-      configObjectSequence   // configObjectss
+    { false,
+      false,
+      { { false, { 2 } },      // localCCId
+        { false, { 38 } },     // messageId
+        { false, { 128 } },    // localNodeId
+        configObjectSequence } // configObjectss
     };
   passiveIPCC.processReceivedMessage(configMsg);
   {

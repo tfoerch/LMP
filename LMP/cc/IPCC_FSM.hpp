@@ -8,16 +8,13 @@
  */
 
 #include "cc/IPCC_ObserverIF.hpp"
+#include "msg/Config.hpp"
 
 #include <boost/optional/optional.hpp>     // for optional
 #include <boost/smart_ptr/shared_ptr.hpp>  // for shared_ptr
 
 namespace lmp
 {
-  namespace msg
-  {
-    class ConfigMsg;
-  }
   namespace cc
   {
     class IpccFsmInvokeIF;

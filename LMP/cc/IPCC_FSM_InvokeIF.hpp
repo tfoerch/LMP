@@ -8,20 +8,17 @@
  */
 
 #include "base/ProtocolTypes.hpp"                  // for WORD
+#include "msg/Config.hpp"
 
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp
 {
-  namespace msg
-  {
-  	class ConfigMsg;
-  }
   namespace cc
   {
     namespace appl
     {
-	  class State;
-	  class Event;
+      class State;
+      class Event;
     }
     class IpccFsmInvokeIF
     {

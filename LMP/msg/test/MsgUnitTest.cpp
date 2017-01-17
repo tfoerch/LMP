@@ -418,11 +418,12 @@ BOOST_AUTO_TEST_CASE( config_message_spirit )
       expectedConfigObjectSequence.push_back(lmp::obj::config::ConfigCTypes(expectedHelloConfig));
     }
     lmp::msg::ConfigMsg  expectedConfigMsg =
-      { 0x00,
-        { false, { 0x1020008 } },      // localCCId
-        { false, { 0x1020508 } },     // messageId
-        { false, { 0x8600420 } },    // localNodeId
-        expectedConfigObjectSequence   // configObjectss
+      { false,
+        false,
+        { { false, { 0x1020008 } },      // localCCId
+          { false, { 0x1020508 } },      // messageId
+          { false, { 0x8600420 } },      // localNodeId
+          expectedConfigObjectSequence } // configObjectss
       };
     lmp::msg::Message expectedMessage = expectedConfigMsg;
     BOOST_CHECK(parse(begin,
@@ -436,7 +437,8 @@ BOOST_AUTO_TEST_CASE( config_message_spirit )
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::config_grammar<BufOutIterType>  configMsgGenerateGrammar;
+    lmp::msg::generate::message_type_grammar<BufOutIterType,
+                                             lmp::msg::MsgType::Config>  configMsgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
                          configMsgGenerateGrammar,
                          expectedConfigMsg));

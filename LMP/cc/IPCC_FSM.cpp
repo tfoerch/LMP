@@ -5,13 +5,14 @@
  *      Author: tom
  */
 
-#include "IPCC_FSM.hpp"
-#include "IPCC_ObserverIF.hpp"                            // for Action, etc
-#include "IPCC_FSM_InvokeIF.hpp"
 
 #define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
 #define BOOST_MPL_LIMIT_VECTOR_SIZE 40
 #define BOOST_MPL_LIMIT_MAP_SIZE 40
+
+#include "IPCC_FSM.hpp"
+#include "IPCC_ObserverIF.hpp"                            // for Action, etc
+#include "IPCC_FSM_InvokeIF.hpp"
 
 #include <boost/core/ref.hpp>
 #include <boost/mpl/aux_/adl_barrier.hpp>                 // for mpl
