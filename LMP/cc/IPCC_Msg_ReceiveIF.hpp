@@ -9,15 +9,12 @@
 
 #include "msg/Config.hpp"
 #include "msg/ConfigAck.hpp"
+#include "msg/ConfigNack.hpp"
+#include "msg/Hello.hpp"
 
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp
 {
-  namespace msg
-  {
-    class ConfigNackMsg;
-    class HelloMsg;
-  }
   namespace cc
   {
     class IpccMsgReceiveIF

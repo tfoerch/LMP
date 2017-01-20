@@ -217,10 +217,10 @@ namespace lmp
     {
 //      std::cout << "processReceivedMessage helloMsg.theRcvSeqNum = " << helloMsg.theRcvSeqNum
 //    	        << ", theTxSeqNum = " << theTxSeqNum << std::endl;
-      if (helloMsg.m_hello.m_data.m_rcvSeqNum == theTxSeqNum)
+      if (helloMsg.m_data.m_hello.m_data.m_rcvSeqNum == theTxSeqNum)
       {
         theFSM.process_event(EvHelloRcvd());
-        theRcvSeqNum = helloMsg.m_hello.m_data.m_txSeqNum;
+        theRcvSeqNum = helloMsg.m_data.m_hello.m_data.m_txSeqNum;
       }
       else
       {

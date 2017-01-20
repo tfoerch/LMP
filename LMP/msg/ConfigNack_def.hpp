@@ -20,8 +20,7 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(
-  lmp::msg::ConfigNackMsg,
-  (lmp::BYTE,                           m_flags)
+  lmp::msg::config_nack::ConfigNackBody,
   (lmp::obj::ccid::LocalCCIdData,       m_localCCId)
   (lmp::obj::nodeid::LocalNodeIdData,   m_localNodeId)
   (lmp::obj::ccid::RemoteCCIdData,      m_remoteCCId)
@@ -34,37 +33,67 @@ namespace lmp
 {
   namespace msg
   {
-    namespace parse
-	{
-      namespace fusion = boost::fusion;
-      namespace phoenix = boost::phoenix;
-      namespace qi = boost::spirit::qi;
+    namespace config_nack
+    {
+      namespace parse
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
 
-      template <typename Iterator>
-      config_nack_grammar<Iterator>::config_nack_grammar()
-	  : config_nack_grammar<Iterator>::base_type(config_nack_rule, "config_nack")
-	  {
-        using qi::byte_;
-        using qi::big_word;
-        using qi::_a;
-        using qi::_1;
-        using qi::attr;
-        using phoenix::at_c;
-        using namespace qi::labels;
+        template <typename Iterator>
+        config_nack_body_grammar<Iterator>::config_nack_body_grammar()
+        : config_nack_body_grammar<Iterator>::base_type(config_nack_body_rule, "config_nack_body")
+        {
+          using qi::byte_;
+          using qi::big_word;
+          using qi::_a;
+          using qi::_1;
+          using qi::attr;
+          using phoenix::at_c;
+          using namespace qi::labels;
 
-        config_nack_rule %=
-        		attr(at_c<0>(_r1))
- 	    		>> local_ccid
-  				>> local_node_id
-  				>> remote_ccid
-      			>> message_id_ack
-  				>> remote_node_id
-  				>> hello_config
-				;
+          config_nack_body_rule %=
+              local_ccid
+              >> local_node_id
+              >> remote_ccid
+              >> message_id_ack
+              >> remote_node_id
+              >> hello_config
+              ;
 
-        config_nack_rule.name("config_nack");
-	  }
-	} // namespace parse
+          config_nack_body_rule.name("config_nack_body");
+        }
+      } // namespace parse
+      namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
+
+        template <typename OutputIterator>
+        config_nack_body_grammar<OutputIterator>::config_nack_body_grammar()
+        : config_nack_body_grammar::base_type(config_nack_body_rule, "config_nack_body")
+        {
+          using phoenix::at_c;
+          using qi::byte_;
+          using qi::big_word;
+          using qi::attr;
+          using namespace qi::labels;
+
+          config_nack_body_rule %=
+              local_ccid
+              << local_node_id
+              << remote_ccid
+              << message_id_ack
+              << remote_node_id
+              << hello_config
+              ;
+
+          config_nack_body_rule.name("config_nack_body");
+        }
+      } // namespace generate
+    }
   } // namespace msg
 } // namespace lmp
 

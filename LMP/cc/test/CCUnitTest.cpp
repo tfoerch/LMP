@@ -194,13 +194,14 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
 	}
   }
   lmp::msg::ConfigNackMsg configNackMsg =
-    { 0x00,
-      { false, { 2 } },      // localCCId
-	  { false, { 115 } },    // localNodeId
-      { false, { 7 } },      // remoteCCId
-	  { false, { 34 } },     // messageId
-	  { false, { 117 } },    // remoteNodeId
-	  { true, { 100, 450 } } // helloConfig
+    { false,
+      false,
+      { { false, { 2 } },        // localCCId
+	{ false, { 115 } },      // localNodeId
+        { false, { 7 } },        // remoteCCId
+        { false, { 34 } },       // messageId
+        { false, { 117 } },      // remoteNodeId
+        { true, { 100, 450 } } } // helloConfig
     };
   activeIPCC.processReceivedMessage(configNackMsg);
   {
@@ -446,8 +447,9 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
   }
   {
     lmp::msg::HelloMsg  helloMsg =
-      { 0x00,
-  	    { false, { 1, 0 } }     // hello
+      { false,
+        false,
+        { { false, { 1, 0 } } }    // hello
       };
     activeIPCC.processReceivedMessage(helloMsg);
     {
@@ -468,8 +470,9 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
   }
   {
     lmp::msg::HelloMsg  helloMsg =
-      { 0x00,
-  	    { false, { 1, 1 } }     // hello
+      { false,
+        false,
+        { { false, { 1, 1 } } }     // hello
       };
     activeIPCC.processReceivedMessage(helloMsg);
     {
@@ -506,8 +509,9 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
   }
   {
     lmp::msg::HelloMsg  helloMsg =
-      { 0x00,
-  	    { false, { 2, 2 } }     // hello
+      { false,
+        false,
+        { { false, { 2, 2 } } }   // hello
       };
     activeIPCC.processReceivedMessage(helloMsg);
     {
