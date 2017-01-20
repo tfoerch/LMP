@@ -416,12 +416,13 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
 	}
   }
   lmp::msg::ConfigAckMsg configAckMsg =
-    { 0x00,
-      { false, { 2 } },      // localCCId
-	  { false, { 115 } },    // localNodeId
-      { false, { 7 } },      // remoteCCId
-	  { false, { 34 } },     // messageId
-	  { false, { 117 } }     // remoteNodeId
+    { false,
+      false,
+      { { false, { 2 } },      // localCCId
+        { false, { 115 } },    // localNodeId
+        { false, { 7 } },      // remoteCCId
+        { false, { 34 } },     // messageId
+        { false, { 117 } } }   // remoteNodeId
     };
   activeIPCC.processReceivedMessage(configAckMsg);
   {

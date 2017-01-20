@@ -49,7 +49,9 @@ namespace lmp
         lmp::msg::parse::message_type_grammar<Iterator,
                                               lmp::msg::MsgType::Config>   config_msg;
 //        lmp::msg::parse::config_grammar<Iterator>                          config_msg;
-        lmp::msg::parse::config_ack_grammar<Iterator>                      config_ack_msg;
+        lmp::msg::parse::message_type_grammar<Iterator,
+                                              lmp::msg::MsgType::ConfigAck>  config_ack_msg;
+//        lmp::msg::parse::config_ack_grammar<Iterator>                      config_ack_msg;
         lmp::msg::parse::config_nack_grammar<Iterator>                     config_nack_msg;
         lmp::msg::parse::hello_grammar<Iterator>                           hello_msg;
         lmp::msg::parse::unknown_message_grammar<Iterator>                 unknown_msg;

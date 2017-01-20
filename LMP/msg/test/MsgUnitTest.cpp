@@ -475,12 +475,13 @@ BOOST_AUTO_TEST_CASE( config_ack_message_spirit )
     lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
     lmp::msg::Message parsedMessage;
     lmp::msg::ConfigAckMsg  expectedConfigAckMsg =
-      { 0x00,
-        { false, { 0x1020008 } },    // localCCId
-        { false, { 0x8600420 } },    // localNodeId
-        { false, { 0x1130a03 } },    // remoteCCId
-        { false, { 0x1020508 } },    // messageId
-        { false, { 0x1130a05 } }     // remoteNodeId
+      { false,
+        false,
+        { { false, { 0x1020008 } },    // localCCId
+          { false, { 0x8600420 } },    // localNodeId
+          { false, { 0x1130a03 } },    // remoteCCId
+          { false, { 0x1020508 } },    // messageId
+          { false, { 0x1130a05 } } }   // remoteNodeId
       };
     lmp::msg::Message expectedMessage = expectedConfigAckMsg;
     BOOST_CHECK(parse(begin,
@@ -494,7 +495,8 @@ BOOST_AUTO_TEST_CASE( config_ack_message_spirit )
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::config_ack_grammar<BufOutIterType>  configAckMsgGenerateGrammar;
+    lmp::msg::generate::message_type_grammar<BufOutIterType,
+                                             lmp::msg::MsgType::ConfigAck>  configAckMsgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
                          configAckMsgGenerateGrammar,
                          expectedConfigAckMsg));
