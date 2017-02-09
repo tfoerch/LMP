@@ -11,89 +11,93 @@ namespace lmp
 {
   namespace cc
   {
-	void TestIpccMsgReceiver::reset()
-	{
-	  m_ConfigMessageReceivedFtor.reset();
-	  m_ConfigAckMessageReceivedFtor.reset();
-	  m_ConfigNackMessageReceivedFtor.reset();
-	  m_HelloMessageReceivedFtor.reset();
-	}
-	const lmp::base::CheckFtorIF& TestIpccMsgReceiver::getConfigMessageReceivedFtor() const
-	{
-	  return m_ConfigMessageReceivedFtor;
-	}
+    void TestIpccMsgReceiver::reset()
+    {
+      m_ConfigMessageReceivedFtor.reset();
+      m_ConfigAckMessageReceivedFtor.reset();
+      m_ConfigNackMessageReceivedFtor.reset();
+      m_HelloMessageReceivedFtor.reset();
+    }
+    const lmp::base::CheckFtorIF& TestIpccMsgReceiver::getConfigMessageReceivedFtor() const
+    {
+      return m_ConfigMessageReceivedFtor;
+    }
 
-	const lmp::base::CheckFtorIF& TestIpccMsgReceiver::getConfigAckMessageReceivedFtor() const
-	{
-	  return m_ConfigAckMessageReceivedFtor;
-	}
+    const lmp::base::CheckFtorIF& TestIpccMsgReceiver::getConfigAckMessageReceivedFtor() const
+    {
+      return m_ConfigAckMessageReceivedFtor;
+    }
 
-	const lmp::base::CheckFtorIF& TestIpccMsgReceiver::getConfigNackMessageReceivedFtor() const
-	{
-	  return m_ConfigNackMessageReceivedFtor;
-	}
+    const lmp::base::CheckFtorIF& TestIpccMsgReceiver::getConfigNackMessageReceivedFtor() const
+    {
+      return m_ConfigNackMessageReceivedFtor;
+    }
 
-	const lmp::base::CheckFtorIF& TestIpccMsgReceiver::getHelloMessageReceivedFtor() const
-	{
-	  return m_HelloMessageReceivedFtor;
-	}
+    const lmp::base::CheckFtorIF& TestIpccMsgReceiver::getHelloMessageReceivedFtor() const
+    {
+      return m_HelloMessageReceivedFtor;
+    }
 
-	void TestIpccMsgReceiver::do_processReceivedMessage(
-	  const msg::ConfigMsg&      configMsg)
-	{
-	  m_ConfigMessageReceivedFtor.set();
-	}
+    void TestIpccMsgReceiver::do_processReceivedMessage(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::ConfigMsg&      configMsg)
+    {
+      m_ConfigMessageReceivedFtor.set();
+    }
 
-	void TestIpccMsgReceiver::do_processReceivedMessage(
-	  const msg::ConfigAckMsg&   configAckMsg)
-	{
-	  m_ConfigAckMessageReceivedFtor.set();
-	}
+    void TestIpccMsgReceiver::do_processReceivedMessage(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::ConfigAckMsg&   configAckMsg)
+    {
+      m_ConfigAckMessageReceivedFtor.set();
+    }
 
-	void TestIpccMsgReceiver::do_processReceivedMessage(
-	  const msg::ConfigNackMsg&  configNackMsg)
-	{
-	  m_ConfigNackMessageReceivedFtor.set();
-	}
+    void TestIpccMsgReceiver::do_processReceivedMessage(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::ConfigNackMsg&  configNackMsg)
+    {
+      m_ConfigNackMessageReceivedFtor.set();
+    }
 
-	void TestIpccMsgReceiver::do_processReceivedMessage(
-	  const msg::HelloMsg&       helloMsg)
-	{
-	  m_HelloMessageReceivedFtor.set();
-	}
+    void TestIpccMsgReceiver::do_processReceivedMessage(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::HelloMsg&       helloMsg)
+    {
+      m_HelloMessageReceivedFtor.set();
+    }
 
-	TestIpccMsgReceiver::MsgReceivedFtor::MsgReceivedFtor()
+    TestIpccMsgReceiver::MsgReceivedFtor::MsgReceivedFtor()
     : CheckFtorIF(),
-	  m_check_flag(false)
-	{
-	}
+      m_check_flag(false)
+    {
+    }
 
-	TestIpccMsgReceiver::MsgReceivedFtor::MsgReceivedFtor(
-	  const MsgReceivedFtor&  other)
+    TestIpccMsgReceiver::MsgReceivedFtor::MsgReceivedFtor(
+        const MsgReceivedFtor&  other)
     : CheckFtorIF(),
-	  m_check_flag(other.m_check_flag)
-	{
-	}
+      m_check_flag(other.m_check_flag)
+    {
+    }
 
-	void TestIpccMsgReceiver::MsgReceivedFtor::reset()
-	{
-	  m_check_flag = false;
-	}
+    void TestIpccMsgReceiver::MsgReceivedFtor::reset()
+    {
+      m_check_flag = false;
+    }
 
-	void TestIpccMsgReceiver::MsgReceivedFtor::set()
-	{
-	  m_check_flag = true;
-	}
+    void TestIpccMsgReceiver::MsgReceivedFtor::set()
+    {
+      m_check_flag = true;
+    }
 
-	bool TestIpccMsgReceiver::MsgReceivedFtor::do_check() const
-	{
-	  return m_check_flag;
-	}
+    bool TestIpccMsgReceiver::MsgReceivedFtor::do_check() const
+    {
+      return m_check_flag;
+    }
 
-	lmp::base::CheckFtorIF* TestIpccMsgReceiver::MsgReceivedFtor::do_clone() const
-	{
-	  return new MsgReceivedFtor(*this);
-	}
+    lmp::base::CheckFtorIF* TestIpccMsgReceiver::MsgReceivedFtor::do_clone() const
+    {
+      return new MsgReceivedFtor(*this);
+    }
 
   } // namespace cc
 } // namespace lmp

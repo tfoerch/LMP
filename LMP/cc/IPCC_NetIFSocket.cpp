@@ -6,6 +6,7 @@
  */
 
 #include "IPCC_NetIFSocket.hpp"
+#include "UDP_Msg_ReceiveIF.hpp"
 #include <boost/asio/ip/multicast.hpp>
 #include <boost/asio/placeholders.hpp>
 #include <boost/bind.hpp>
@@ -26,21 +27,23 @@ namespace lmp
 
     NetworkIFSocket::NetworkIFSocket(
       boost::asio::io_service&  io_service,
-	  lmp::WORD                 port,
-	  const std::string&        ifName,
-	  IpccMsgReceiveIF&         ipccMsgHandler)
-      : m_listen_endpoint(c_multicast_address, port),
+      lmp::DWORD                localCCId,
+      const std::string&        ifName,
+      lmp::WORD                 port,
+      UDPMsgReceiveIF&          udpMsgHandler)
+      : m_localCCId(localCCId),
+        m_udpMsgHandler(udpMsgHandler),
+        m_listen_endpoint(c_multicast_address, port),
         m_socket(io_service, m_listen_endpoint),
-		m_sender_endpoint(),
-		m_ipccMsgHandler(ipccMsgHandler)
+        m_sender_endpoint()
     {
-    	OptAddresses optAddr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
-    	boost::asio::ip::address if_address =
-    	  ( optAddr.first ?
-    		*optAddr.first :
-			( optAddr.second ?
-			  *optAddr.second :
-              boost::asio::ip::address::from_string("127.0.0.1") ) );
+      OptAddresses optAddr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+      boost::asio::ip::address if_address =
+        ( optAddr.first ?
+          *optAddr.first :
+          ( optAddr.second ?
+            *optAddr.second :
+            boost::asio::ip::address::from_string("127.0.0.1") ) );
       // SO_BINDTODEVICE
       if ((::setsockopt(m_socket.native(), SOL_SOCKET, SO_BINDTODEVICE,
     	  ifName.c_str(), ifName.size() + 1) == -1))
@@ -61,23 +64,25 @@ namespace lmp
 
       // set mcast group - join group
       m_socket.set_option(boost::asio::ip::multicast::join_group(c_multicast_address.to_v4(),
-    					   	   	   	   	   	   	   	   	         if_address.to_v4()));
+                                                                 if_address.to_v4()));
       m_socket.async_receive_from(boost::asio::buffer(m_buffer, max_buffer_length),
-    		                      m_sender_endpoint,
-								  boost::bind(&NetworkIFSocket::handle_received_msg,
-										      this,
-											  boost::asio::placeholders::error,
-											  boost::asio::placeholders::bytes_transferred));
+                                  m_sender_endpoint,
+                                  boost::bind(&NetworkIFSocket::handle_received_msg,
+                                              this,
+                                              boost::asio::placeholders::error,
+                                              boost::asio::placeholders::bytes_transferred));
     }
 
     NetworkIFSocket::NetworkIFSocket(
-  	  boost::asio::io_service&          io_service,
-	  boost::asio::ip::udp::endpoint&   listen_endpoint,
-	  IpccMsgReceiveIF&                 ipccMsgHandler)
-    : m_listen_endpoint(listen_endpoint),
+      boost::asio::io_service&          io_service,
+      lmp::DWORD                        localCCId,
+      boost::asio::ip::udp::endpoint&   listen_endpoint,
+      UDPMsgReceiveIF&                  udpMsgHandler)
+    : m_localCCId(localCCId),
+      m_udpMsgHandler(udpMsgHandler),
+      m_listen_endpoint(listen_endpoint),
       m_socket(io_service, m_listen_endpoint),
-	  m_sender_endpoint(),
-	  m_ipccMsgHandler(ipccMsgHandler)
+      m_sender_endpoint()
     {
       // bind
       m_socket.set_option(boost::asio::ip::udp::socket::reuse_address(true));
@@ -88,28 +93,29 @@ namespace lmp
       m_socket.set_option(boost::asio::ip::multicast::enable_loopback(false));
 
       m_socket.async_receive_from(boost::asio::buffer(m_buffer, max_buffer_length),
-    		                      m_sender_endpoint,
-								  boost::bind(&NetworkIFSocket::handle_received_msg,
-										      this,
-											  boost::asio::placeholders::error,
-											  boost::asio::placeholders::bytes_transferred));
+                                  m_sender_endpoint,
+                                  boost::bind(&NetworkIFSocket::handle_received_msg,
+                                              this,
+                                              boost::asio::placeholders::error,
+                                              boost::asio::placeholders::bytes_transferred));
     }
-
     NetworkIFSocket::~NetworkIFSocket()
     {
     }
-
-    void NetworkIFSocket::send(
-      const char                             message[],
-	  lmp::WORD                              length,
-	  const boost::asio::ip::udp::endpoint&  destination_endpoint)
+    lmp::DWORD NetworkIFSocket::do_getLocalCCId() const
     {
-      m_socket.async_send_to(boost::asio::buffer(message, length),
-    			             destination_endpoint,
-							 boost::bind(&NetworkIFSocket::handle_send_msg,
-							             this,
-										 boost::asio::placeholders::error,
-										 boost::asio::placeholders::bytes_transferred));
+      return m_localCCId;
+    }
+    void NetworkIFSocket::do_send(
+      const boost::asio::ip::udp::endpoint&  destination_endpoint,
+      boost::asio::mutable_buffers_1&        messageBuffer)
+    {
+      m_socket.async_send_to(messageBuffer,
+                             destination_endpoint,
+                             boost::bind(&NetworkIFSocket::handle_send_msg,
+                                         this,
+                                         boost::asio::placeholders::error,
+                                         boost::asio::placeholders::bytes_transferred));
     }
     NetworkIFSocket::OptAddresses NetworkIFSocket::getIfAddress(
       const std::string&        ifName)
@@ -123,14 +129,13 @@ namespace lmp
       else
       {
     	for (struct ifaddrs* ifa = myaddrs;
-    		 ifa != 0 &&
-    		 ( !result.first || !result.second);
-    		 ifa = ifa->ifa_next)
+    	     ifa != 0 && ( !result.first || !result.second);
+    	     ifa = ifa->ifa_next)
     	{
     	  // std::cout << ifa->ifa_name << std::endl;
     	  if (ifName.compare(ifa->ifa_name) == 0 &&
-    		  ifa->ifa_addr &&
-			  (ifa->ifa_flags & IFF_UP))
+    	      ifa->ifa_addr &&
+    	      (ifa->ifa_flags & IFF_UP))
           {
             // std::cout << ifa->ifa_name << " found" << std::endl;
             switch (ifa->ifa_addr->sa_family)
@@ -160,12 +165,12 @@ namespace lmp
                   const std::array<unsigned char, 16ul> ipv6 =
                     { v6addr.__in6_u.__u6_addr8[0], v6addr.__in6_u.__u6_addr8[1],
                       v6addr.__in6_u.__u6_addr8[2], v6addr.__in6_u.__u6_addr8[3],
-					  v6addr.__in6_u.__u6_addr8[4], v6addr.__in6_u.__u6_addr8[5],
-					  v6addr.__in6_u.__u6_addr8[6], v6addr.__in6_u.__u6_addr8[7],
-					  v6addr.__in6_u.__u6_addr8[8], v6addr.__in6_u.__u6_addr8[9],
-					  v6addr.__in6_u.__u6_addr8[10], v6addr.__in6_u.__u6_addr8[11],
-					  v6addr.__in6_u.__u6_addr8[12], v6addr.__in6_u.__u6_addr8[13],
-					  v6addr.__in6_u.__u6_addr8[14], v6addr.__in6_u.__u6_addr8[15] };
+                      v6addr.__in6_u.__u6_addr8[4], v6addr.__in6_u.__u6_addr8[5],
+                      v6addr.__in6_u.__u6_addr8[6], v6addr.__in6_u.__u6_addr8[7],
+                      v6addr.__in6_u.__u6_addr8[8], v6addr.__in6_u.__u6_addr8[9],
+                      v6addr.__in6_u.__u6_addr8[10], v6addr.__in6_u.__u6_addr8[11],
+                      v6addr.__in6_u.__u6_addr8[12], v6addr.__in6_u.__u6_addr8[13],
+                      v6addr.__in6_u.__u6_addr8[14], v6addr.__in6_u.__u6_addr8[15] };
                   result.second = boost::asio::ip::address_v6(ipv6, s6->sin6_scope_id);
                 }
                 break;
@@ -185,6 +190,10 @@ namespace lmp
       const boost::system::error_code&  error,
       size_t                            bytes_recvd)
     {
+      boost::asio::const_buffers_1  messageBuffer(m_buffer, bytes_recvd);
+      m_udpMsgHandler.processReceivedMessage(m_localCCId,
+                                             m_sender_endpoint,
+                                             messageBuffer);
       std::cout << "NetworkIFSocket::handle_received_msg(" << bytes_recvd << ")" << std::endl;
     }
     void NetworkIFSocket::handle_send_msg(

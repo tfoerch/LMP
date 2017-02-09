@@ -177,7 +177,8 @@ namespace lmp
       // create an send Hello message and schedule Hello retransmit timer
     }
     void IpccImpl::do_processReceivedMessage(
-  	  const msg::ConfigMsg&  configMsg)
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::ConfigMsg&                  configMsg)
     {
       if (canAcceptNewConfig())
       {
@@ -203,17 +204,20 @@ namespace lmp
       }
     }
     void IpccImpl::do_processReceivedMessage(
-  	  const msg::ConfigAckMsg&   configAckMsg)
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::ConfigAckMsg&               configAckMsg)
     {
         theFSM.process_event(EvConfDone());
     }
     void IpccImpl::do_processReceivedMessage(
-      const msg::ConfigNackMsg&  configNackMsg)
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::ConfigNackMsg&              configNackMsg)
     {
       theFSM.process_event(EvConfErr());
     }
     void IpccImpl::do_processReceivedMessage(
-  	  const msg::HelloMsg&       helloMsg)
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::HelloMsg&                   helloMsg)
     {
 //      std::cout << "processReceivedMessage helloMsg.theRcvSeqNum = " << helloMsg.theRcvSeqNum
 //    	        << ", theTxSeqNum = " << theTxSeqNum << std::endl;

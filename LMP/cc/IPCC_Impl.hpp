@@ -21,12 +21,12 @@ namespace lmp
   namespace cc
   {
     namespace appl
-	{
+    {
       class Action;
       class Event;
       class IpccObserverProxyIF;
       class State;
-	}
+    }
     class IpccImpl : public IpccFsmInvokeIF,
                      public IpccMsgReceiveIF
     {
@@ -66,13 +66,17 @@ namespace lmp
       virtual void do_sendHelloMsg();
       // implement IpccMsgReceiveIF
       virtual void do_processReceivedMessage(
-    	const msg::ConfigMsg&   configMsg);
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigMsg&                  configMsg);
       virtual void do_processReceivedMessage(
-    	const msg::ConfigAckMsg&   configAckMsg);
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigAckMsg&               configAckMsg);
       virtual void do_processReceivedMessage(
-    	const msg::ConfigNackMsg&  configNackMsg);
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigNackMsg&              configNackMsg);
       virtual void do_processReceivedMessage(
-    	const msg::HelloMsg&       helloMsg);
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::HelloMsg&                   helloMsg);
       // internal
       bool canAcceptNewConfig() const;
       bool isConntentionWinning(

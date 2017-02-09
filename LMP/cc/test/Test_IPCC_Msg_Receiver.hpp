@@ -20,15 +20,15 @@ namespace lmp
 	  class MsgReceivedFtor : public lmp::base::CheckFtorIF
 	  {
 	  public:
-		MsgReceivedFtor();
-		MsgReceivedFtor(
-		  const MsgReceivedFtor&  other);
-		void reset();
-		void set();
+	    MsgReceivedFtor();
+	    MsgReceivedFtor(
+	      const MsgReceivedFtor&  other);
+	    void reset();
+	    void set();
 	  private:
 	    virtual bool do_check() const;
 	    virtual CheckFtorIF* do_clone() const;
-		bool m_check_flag;
+	    bool m_check_flag;
 	  };
 	  void reset();
 	  const lmp::base::CheckFtorIF& getConfigMessageReceivedFtor() const;
@@ -37,13 +37,17 @@ namespace lmp
 	  const lmp::base::CheckFtorIF& getHelloMessageReceivedFtor() const;
 	private:
 	  virtual void do_processReceivedMessage(
-	    const msg::ConfigMsg&      configMsg);
+	    const boost::asio::ip::udp::endpoint&  sender_endpoint,
+	    const msg::ConfigMsg&                  configMsg);
 	  virtual void do_processReceivedMessage(
-		const msg::ConfigAckMsg&   configAckMsg);
+	    const boost::asio::ip::udp::endpoint&  sender_endpoint,
+	    const msg::ConfigAckMsg&               configAckMsg);
 	  virtual void do_processReceivedMessage(
-	    const msg::ConfigNackMsg&  configNackMsg);
+	    const boost::asio::ip::udp::endpoint&  sender_endpoint,
+	    const msg::ConfigNackMsg&              configNackMsg);
 	  virtual void do_processReceivedMessage(
-		const msg::HelloMsg&       helloMsg);
+	    const boost::asio::ip::udp::endpoint&  sender_endpoint,
+	    const msg::HelloMsg&                   helloMsg);
 	  MsgReceivedFtor  m_ConfigMessageReceivedFtor;
 	  MsgReceivedFtor  m_ConfigAckMessageReceivedFtor;
 	  MsgReceivedFtor  m_ConfigNackMessageReceivedFtor;

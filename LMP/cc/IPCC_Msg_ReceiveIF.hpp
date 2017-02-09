@@ -12,6 +12,8 @@
 #include "msg/ConfigNack.hpp"
 #include "msg/Hello.hpp"
 
+#include <boost/asio/ip/udp.hpp>
+
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp
 {
@@ -21,23 +23,35 @@ namespace lmp
     {
     public:
       inline void processReceivedMessage(
-    	const msg::ConfigMsg&   configMsg) { do_processReceivedMessage(configMsg); }
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigMsg&                  configMsg)
+      { do_processReceivedMessage(sender_endpoint, configMsg); }
       inline void processReceivedMessage(
-    	const msg::ConfigAckMsg&   configAckMsg) { do_processReceivedMessage(configAckMsg); }
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigAckMsg&               configAckMsg)
+      { do_processReceivedMessage(sender_endpoint, configAckMsg); }
       inline void processReceivedMessage(
-    	const msg::ConfigNackMsg&  configNackMsg) { do_processReceivedMessage(configNackMsg); }
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigNackMsg&              configNackMsg)
+      { do_processReceivedMessage(sender_endpoint, configNackMsg); }
       inline void processReceivedMessage(
-    	const msg::HelloMsg&       helloMsg) { do_processReceivedMessage(helloMsg); }
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::HelloMsg&                   helloMsg)
+      { do_processReceivedMessage(sender_endpoint, helloMsg); }
       virtual ~IpccMsgReceiveIF(){}
     private:
       virtual void do_processReceivedMessage(
-    	const msg::ConfigMsg&   configMsg) = 0;
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigMsg&                  configMsg) = 0;
       virtual void do_processReceivedMessage(
-    	const msg::ConfigAckMsg&   configAckMsg) = 0;
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigAckMsg&               configAckMsg) = 0;
       virtual void do_processReceivedMessage(
-    	const msg::ConfigNackMsg&  configNackMsg) = 0;
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::ConfigNackMsg&              configNackMsg) = 0;
       virtual void do_processReceivedMessage(
-    	const msg::HelloMsg&       helloMsg) = 0;
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    	const msg::HelloMsg&                   helloMsg) = 0;
     };
   } // namespace cc
 } // namespace lmp
