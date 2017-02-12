@@ -12,6 +12,8 @@
 
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
 template struct lmp::obj::parse::unknown_object_class_grammar<BufIterType>;
+typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+template struct lmp::obj::generate::unknown_object_class_grammar<BufOutIterType>;
 
 bool lmp::obj::operator==(
   const lmp::obj::UnknownObjectClassData&  first,

@@ -11,6 +11,8 @@
 
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
 template struct lmp::msg::parse::message_grammar<BufIterType>;
+typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+template struct lmp::msg::generate::message_grammar<BufOutIterType>;
 
 namespace
 {

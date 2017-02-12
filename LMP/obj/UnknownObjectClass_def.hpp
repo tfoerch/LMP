@@ -57,6 +57,33 @@ namespace lmp
         unknown_object_class_rule.name("unknown_object_class");
       }
     } // namespace parse
+    namespace generate
+    {
+      namespace fusion = boost::fusion;
+      namespace phoenix = boost::phoenix;
+      namespace qi = boost::spirit::qi;
+
+      template <typename OutputIterator>
+      unknown_object_class_grammar<OutputIterator>::unknown_object_class_grammar()
+      : unknown_object_class_grammar::base_type(unknown_object_class_rule, "unknown_object_class")
+      {
+        using qi::byte_;
+        using qi::big_word;
+        using qi::eps;
+        using phoenix::at_c;
+        using namespace qi::labels;
+
+        unknown_object_class_rule =
+            ( eps(at_c<2>(_val)) << byte_ [ _1 = ( at_c<1>(_val) | lmp::obj::c_negotiableMask ) ] |
+              byte_ [ _1 = at_c<1>(_val) ] ) // class type
+            << byte_ [ _1 = at_c<0>(_val) ] // object class
+            << big_word [ _1 = at_c<3>(_val) ] // length
+            << byte_sequence [ _1 = at_c<4>(_val) ]
+            ;
+
+        unknown_object_class_rule.name("unknown_object_class");
+      }
+    }
   } // namespace obj
 } // namespace lmp
 

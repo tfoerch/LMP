@@ -42,6 +42,26 @@ namespace lmp
         object_sequence.name("object_sequence");
       }
     } // namespace parse
+    namespace generate
+    {
+      namespace fusion = boost::fusion;
+      namespace phoenix = boost::phoenix;
+      namespace qi = boost::spirit::qi;
+
+      template <typename OutputIterator>
+      object_sequence_grammar<OutputIterator>::object_sequence_grammar()
+      : object_sequence_grammar::base_type(object_sequence, "object_sequence")
+      {
+        using phoenix::at_c;
+        using namespace qi::labels;
+
+        object_sequence %=
+            +objects
+            ;
+
+        object_sequence.name("object_sequence");
+      }
+    } // namespace generate
   } // namespace obj
 } // namespace lmp
 

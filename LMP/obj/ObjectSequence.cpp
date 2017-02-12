@@ -12,6 +12,8 @@
 
 typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
 template struct lmp::obj::parse::object_sequence_grammar<BufIterType>;
+typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+template struct lmp::obj::generate::object_sequence_grammar<BufOutIterType>;
 
 lmp::DWORD lmp::obj::getLength(
   const lmp::obj::ObjectSequence&  objectSequence)

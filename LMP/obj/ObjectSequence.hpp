@@ -11,6 +11,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -35,6 +36,18 @@ namespace lmp
 
         lmp::obj::parse::objects_grammar<Iterator>      objects;
         qi::rule<Iterator, ObjectSequence(lmp::WORD)>   object_sequence;
+      };
+    }
+    namespace generate
+    {
+      namespace karma = boost::spirit::karma;
+      template <typename OutputIterator>
+      struct object_sequence_grammar : karma::grammar<OutputIterator, ObjectSequence()>
+      {
+        object_sequence_grammar();
+
+        lmp::obj::generate::objects_grammar<OutputIterator>   objects;
+        karma::rule<OutputIterator, ObjectSequence()>         object_sequence;
       };
     }
   } // namespace obj

@@ -13,6 +13,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -45,6 +46,25 @@ namespace lmp
           lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
                                                               lmp::obj::ObjectClass::ControlChannelID>  unknown_ccid_ctype;
           qi::rule<Iterator, ControlChannelIdCTypes()>                                                  control_channel_id_ctypes_rule;
+        };
+      }
+      namespace generate
+      {
+        namespace karma = boost::spirit::karma;
+        template <typename OutputIterator>
+        struct control_channel_id_ctypes_grammar : karma::grammar<OutputIterator, ControlChannelIdCTypes()>
+        {
+          control_channel_id_ctypes_grammar();
+
+          lmp::obj::generate::object_class_grammar<OutputIterator,
+                                                   lmp::obj::ccid::ClassType,
+                                                   lmp::obj::ccid::ClassType::LocalCCId>     local_ccid;
+          lmp::obj::generate::object_class_grammar<OutputIterator,
+                                                   lmp::obj::ccid::ClassType,
+                                                   lmp::obj::ccid::ClassType::RemoteCCId>    remote_ccid;
+          lmp::obj::generate::object_class_unknown_ctype_grammar<OutputIterator,
+                                                                 lmp::obj::ObjectClass::ControlChannelID>  unknown_ccid_ctype;
+          karma::rule<OutputIterator, ControlChannelIdCTypes()>                                            control_channel_id_ctypes_rule;
         };
       }
     }

@@ -12,6 +12,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -40,6 +41,22 @@ namespace lmp
           lmp::obj::parse::object_class_unknown_ctype_grammar<Iterator,
                                                               lmp::obj::ObjectClass::Hello>  unknown_hello_ctype;
           qi::rule<Iterator, HelloCTypes()>                                                  hello_ctypes_rule;
+        };
+      }
+      namespace generate
+      {
+        namespace karma = boost::spirit::karma;
+        template <typename OutputIterator>
+        struct hello_ctypes_grammar : karma::grammar<OutputIterator, HelloCTypes()>
+        {
+          hello_ctypes_grammar();
+
+          lmp::obj::generate::object_class_grammar<OutputIterator,
+                                                   lmp::obj::hello::ClassType,
+                                                   lmp::obj::hello::ClassType::Hello>     hello;
+          lmp::obj::generate::object_class_unknown_ctype_grammar<OutputIterator,
+                                                                 lmp::obj::ObjectClass::Hello>  unknown_hello_ctype;
+          karma::rule<OutputIterator, HelloCTypes()>                                            hello_ctypes_rule;
         };
       }
     }

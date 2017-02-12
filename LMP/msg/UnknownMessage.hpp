@@ -11,6 +11,7 @@
 #include "CommonHeader.hpp"
 #include "base/ProtocolTypes.hpp"
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -39,6 +40,19 @@ namespace lmp
 
         lmp::obj::parse::object_sequence_grammar<Iterator>      object_sequence;
     	qi::rule<Iterator, UnknownMessage(CommonHeader)>        unknown_message_rule;
+      };
+    }
+    namespace generate
+    {
+      namespace karma = boost::spirit::karma;
+      template <typename OutputIterator>
+      struct unknown_message_grammar : karma::grammar<OutputIterator, UnknownMessage()>
+      {
+        unknown_message_grammar();
+
+        lmp::msg::generate::common_header_grammar<OutputIterator>    common_header;
+        lmp::obj::generate::object_sequence_grammar<OutputIterator>  object_sequence;
+        karma::rule<OutputIterator, UnknownMessage()>                unknown_message_rule;
       };
     }
   } // namespace msg

@@ -56,6 +56,30 @@ namespace lmp
         unknown_message_rule.name("unknown_message");
       }
     } // namespace parse
+    namespace generate
+    {
+      namespace fusion = boost::fusion;
+      namespace phoenix = boost::phoenix;
+      namespace qi = boost::spirit::qi;
+
+      template <typename OutputIterator>
+      unknown_message_grammar<OutputIterator>::unknown_message_grammar()
+      : unknown_message_grammar::base_type(unknown_message_rule, "unknown_message")
+      {
+        using phoenix::at_c;
+        using qi::byte_;
+        using qi::big_word;
+        using qi::attr;
+        using namespace qi::labels;
+
+        unknown_message_rule %=
+            common_header
+            << object_sequence
+            ;
+
+        unknown_message_rule.name("unknown_message");
+      }
+    } // namespace generate
   } // namespace msg
 } // namespace lmp
 

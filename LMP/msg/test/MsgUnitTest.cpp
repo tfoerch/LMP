@@ -46,18 +46,18 @@ size_t parseDocument(ConstBuffers const& buffers, int &data)
   using boost::spirit::qi::parse;
   using boost::phoenix::ref;
   return
-	( parse(first,
-			last,
-			//  Begin grammar
-			(
-			     byte_[ref(versByte) = _1]
-	          >> byte_[ref(msgTypeByte) = _1]
-              >> big_word[ref(msgLength) = _1]
-			),
-			//  End grammar
-			data) ?
+    ( parse(first,
+            last,
+            //  Begin grammar
+            (
+                byte_[ref(versByte) = _1]
+             >> byte_[ref(msgTypeByte) = _1]
+             >> big_word[ref(msgLength) = _1]
+            ),
+            //  End grammar
+            data) ?
       (first - begin) :
-	  0 ); // only optionally consume
+      0 ); // only optionally consume
 }
 
 #if 0
@@ -437,11 +437,12 @@ BOOST_AUTO_TEST_CASE( config_message_spirit )
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::message_type_grammar<BufOutIterType,
-                                             lmp::msg::MsgType::Config>  configMsgGenerateGrammar;
+    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
+//    lmp::msg::generate::message_type_grammar<BufOutIterType,
+//                                             lmp::msg::MsgType::Config>  configMsgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
-                         configMsgGenerateGrammar,
-                         expectedConfigMsg));
+                         msgGenerateGrammar,
+                         parsedMessage));
     BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                   emptySpace, emptySpace + msgLength);
   }
@@ -495,11 +496,12 @@ BOOST_AUTO_TEST_CASE( config_ack_message_spirit )
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::message_type_grammar<BufOutIterType,
-                                             lmp::msg::MsgType::ConfigAck>  configAckMsgGenerateGrammar;
+    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
+//    lmp::msg::generate::message_type_grammar<BufOutIterType,
+//                                             lmp::msg::MsgType::ConfigAck>  configAckMsgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
-                         configAckMsgGenerateGrammar,
-                         expectedConfigAckMsg));
+                         msgGenerateGrammar,
+                         parsedMessage));
     BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                   emptySpace, emptySpace + msgLength);
   }
@@ -556,11 +558,12 @@ BOOST_AUTO_TEST_CASE( config_nack_message_spirit )
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::message_type_grammar<BufOutIterType,
-                                             lmp::msg::MsgType::ConfigNack>  configNackMsgGenerateGrammar;
+    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
+//    lmp::msg::generate::message_type_grammar<BufOutIterType,
+//                                             lmp::msg::MsgType::ConfigNack>  configNackMsgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
-                         configNackMsgGenerateGrammar,
-                         expectedConfigNackMsg));
+                         msgGenerateGrammar,
+                         parsedMessage));
     BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                   emptySpace, emptySpace + msgLength);
   }
@@ -603,11 +606,12 @@ BOOST_AUTO_TEST_CASE( hello_message_spirit )
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::message_type_grammar<BufOutIterType,
-                                             lmp::msg::MsgType::Hello>  helloMsgGenerateGrammar;
+    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
+//    lmp::msg::generate::message_type_grammar<BufOutIterType,
+//                                             lmp::msg::MsgType::Hello>  helloMsgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
-                         helloMsgGenerateGrammar,
-                         expectedHelloMsg));
+                         msgGenerateGrammar,
+                         parsedMessage));
     BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                   emptySpace, emptySpace + msgLength);
   }

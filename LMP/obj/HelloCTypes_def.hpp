@@ -21,18 +21,18 @@ namespace lmp
 {
   namespace obj
   {
-	namespace hello
-	{
+    namespace hello
+    {
       namespace parse
-	  {
+      {
         namespace fusion = boost::fusion;
         namespace phoenix = boost::phoenix;
         namespace qi = boost::spirit::qi;
 
         template <typename Iterator>
         hello_ctypes_grammar<Iterator>::hello_ctypes_grammar()
-		: hello_ctypes_grammar::base_type(hello_ctypes_rule,
-				                          "hello_ctypes")
+        : hello_ctypes_grammar::base_type(hello_ctypes_rule,
+                                          "hello_ctypes")
         {
      	  using qi::big_word;
           using qi::big_dword;
@@ -41,15 +41,35 @@ namespace lmp
           using namespace qi::labels;
 
           hello_ctypes_rule %=
-        		hello |
-  				unknown_hello_ctype
-				;
+              hello |
+              unknown_hello_ctype
+              ;
 
           hello_ctypes_rule.name("hello_ctypes");
         }
+      } // namespace parse
+      namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
 
-	  } // namespace parse
-	} // namespace hello
+        template <typename OutputIterator>
+        hello_ctypes_grammar<OutputIterator>::hello_ctypes_grammar()
+        : hello_ctypes_grammar::base_type(hello_ctypes_rule, "hello_ctypes")
+        {
+          using phoenix::at_c;
+          using namespace qi::labels;
+
+          hello_ctypes_rule %=
+              hello |
+              unknown_hello_ctype
+              ;
+
+          hello_ctypes_rule.name("hello_ctypes");
+        }
+      } // namespace generate
+    } // namespace hello
   } // namespace obj
 } // namespace lmp
 

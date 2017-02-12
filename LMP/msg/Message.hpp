@@ -17,6 +17,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 #include <iostream>
 
 namespace lmp
@@ -57,7 +58,27 @@ namespace lmp
         lmp::msg::parse::unknown_message_grammar<Iterator>                    unknown_msg;
         qi::rule<Iterator, Message(), qi::locals<lmp::msg::CommonHeader>>     message_rule;
       };
-	}
+    }
+    namespace generate
+    {
+      namespace karma = boost::spirit::karma;
+      template <typename OutputIterator>
+      struct message_grammar : karma::grammar<OutputIterator, Message()>
+      {
+        message_grammar();
+
+        lmp::msg::generate::message_type_grammar<OutputIterator,
+                                                 lmp::msg::MsgType::Config>      config_msg;
+        lmp::msg::generate::message_type_grammar<OutputIterator,
+                                                 lmp::msg::MsgType::ConfigAck>   config_ack_msg;
+        lmp::msg::generate::message_type_grammar<OutputIterator,
+                                                 lmp::msg::MsgType::ConfigNack>  config_nack_msg;
+        lmp::msg::generate::message_type_grammar<OutputIterator,
+                                                 lmp::msg::MsgType::Hello>       hello_msg;
+        lmp::msg::generate::unknown_message_grammar<OutputIterator>              unknown_msg;
+        karma::rule<OutputIterator, Message()>                                   message_rule;
+      };
+    }
   } // namespace msg
 } // namespace lmp
 

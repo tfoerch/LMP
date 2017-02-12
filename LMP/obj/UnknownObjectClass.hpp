@@ -11,6 +11,7 @@
 #include "obj/ByteSequence.hpp"
 
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -40,8 +41,20 @@ namespace lmp
       {
         unknown_object_class_grammar();
 
-        lmp::obj::parse::byte_sequence_grammar<Iterator>                       byte_sequence;
-        qi::rule<Iterator, UnknownObjectClassData()>                           unknown_object_class_rule;
+        lmp::obj::parse::byte_sequence_grammar<Iterator>            byte_sequence;
+        qi::rule<Iterator, UnknownObjectClassData()>                unknown_object_class_rule;
+      };
+    }
+    namespace generate
+    {
+      namespace karma = boost::spirit::karma;
+      template <typename OutputIterator>
+      struct unknown_object_class_grammar : karma::grammar<OutputIterator, UnknownObjectClassData()>
+      {
+        unknown_object_class_grammar();
+
+        lmp::obj::generate::byte_sequence_grammar<OutputIterator>   byte_sequence;
+        karma::rule<OutputIterator, UnknownObjectClassData()>       unknown_object_class_rule;
       };
     }
   } // namespace obj

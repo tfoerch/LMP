@@ -8,6 +8,7 @@
  */
 
 #include "UDP_Msg_ReceiveIF.hpp"
+#include "IPCC_Msg_SendIF.hpp"
 #include "NetworkIFSocketIF.hpp"
 #include "base/ProtocolTypes.hpp"             // for DWORD
 
@@ -21,7 +22,8 @@ namespace lmp
   {
     class IpccMsgReceiveIF;
 
-    class UDPMsgHandler : public UDPMsgReceiveIF
+    class UDPMsgHandler : public UDPMsgReceiveIF,
+                          public IpccMsgSendIF
     {
     public:
       virtual ~UDPMsgHandler(){}
@@ -29,10 +31,16 @@ namespace lmp
         NetworkIFSocketIF&  netIfSocket);
     private:
       typedef std::map<lmp::DWORD, NetworkIFSocketIF*>  NetworkInterfaceMap;
+      // implement UDPMsgReceiveIF
       virtual void do_processReceivedMessage(
         lmp::DWORD                             localCCId,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         boost::asio::const_buffers_1&          messageBuffer);
+      // implement IpccMsgSendIF
+      virtual void do_sendMessage(
+        lmp::DWORD                             localCCId,
+        const boost::asio::ip::udp::endpoint&  destination_endpoint,
+        const msg::Message&                    message);
       NetworkInterfaceMap                    m_networkInterfaces;
     };
   } // namespace cc

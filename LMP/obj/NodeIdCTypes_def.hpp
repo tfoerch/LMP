@@ -49,6 +49,28 @@ namespace lmp
           node_id_ctypes_rule.name("node_id_ctypes");
         }
       } // namespace parse
+      namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
+
+        template <typename OutputIterator>
+        node_id_ctypes_grammar<OutputIterator>::node_id_ctypes_grammar()
+        : node_id_ctypes_grammar::base_type(node_id_ctypes_rule, "node_id_ctypes")
+        {
+          using phoenix::at_c;
+          using namespace qi::labels;
+
+          node_id_ctypes_rule %=
+              local_nodeid |
+              remote_nodeid |
+              unknown_nodeid_ctype
+              ;
+
+          node_id_ctypes_rule.name("node_id_ctypes");
+        }
+      } // namespace generate
     } // namespace nodeid
   } // namespace obj
 } // namespace lmp

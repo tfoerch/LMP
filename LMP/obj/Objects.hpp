@@ -16,6 +16,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/karma.hpp>
 
 namespace lmp
 {
@@ -47,6 +48,23 @@ namespace lmp
         lmp::obj::hello::parse::hello_ctypes_grammar<Iterator>                hello_ctypes;
         lmp::obj::parse::unknown_object_class_grammar<Iterator>               unknown_object_class;
         qi::rule<Iterator, Objects()>                                         objects;
+      };
+    }
+    namespace generate
+    {
+      namespace karma = boost::spirit::karma;
+      template <typename OutputIterator>
+      struct objects_grammar : karma::grammar<OutputIterator, Objects()>
+      {
+        objects_grammar();
+
+        lmp::obj::ccid::generate::control_channel_id_ctypes_grammar<OutputIterator>  control_channel_id_ctypes;
+        lmp::obj::msgid::generate::message_id_ctypes_grammar<OutputIterator>         message_id_ctypes;
+        lmp::obj::nodeid::generate::node_id_ctypes_grammar<OutputIterator>           node_id_ctypes;
+        lmp::obj::config::generate::config_ctypes_grammar<OutputIterator>            config_ctypes;
+        lmp::obj::hello::generate::hello_ctypes_grammar<OutputIterator>              hello_ctypes;
+        lmp::obj::generate::unknown_object_class_grammar<OutputIterator>             unknown_object_class;
+        karma::rule<OutputIterator, Objects()>                                       objects;
       };
     }
   } // namespace obj

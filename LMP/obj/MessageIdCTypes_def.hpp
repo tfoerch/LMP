@@ -41,14 +41,36 @@ namespace lmp
           using namespace qi::labels;
 
           message_id_ctypes_rule %=
-              local_msgid |
-              remote_msgid |
+              message_id |
+              message_id_ack |
               unknown_msgid_ctype
               ;
 
           message_id_ctypes_rule.name("message_id_ctypes");
         }
       } // namespace parse
+      namespace generate
+      {
+        namespace fusion = boost::fusion;
+        namespace phoenix = boost::phoenix;
+        namespace qi = boost::spirit::qi;
+
+        template <typename OutputIterator>
+        message_id_ctypes_grammar<OutputIterator>::message_id_ctypes_grammar()
+        : message_id_ctypes_grammar::base_type(message_id_ctypes_rule, "message_id_ctypes")
+        {
+          using phoenix::at_c;
+          using namespace qi::labels;
+
+          message_id_ctypes_rule %=
+              message_id |
+              message_id_ack |
+              unknown_msgid_ctype
+              ;
+
+          message_id_ctypes_rule.name("message_id_ctypes");
+        }
+      } // namespace generate
     } // namespace msgid
   } // namespace obj
 } // namespace lmp

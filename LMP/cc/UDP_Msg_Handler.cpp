@@ -23,5 +23,11 @@ namespace lmp
       boost::asio::const_buffers_1&          messageBuffer)
     {
     }
+    void UDPMsgHandler::do_sendMessage(
+      lmp::DWORD                             localCCId,
+      const boost::asio::ip::udp::endpoint&  destination_endpoint,
+      const msg::Message&                    message)
+    {
+    }
   } // namespace cc
 } // namespace lmp
