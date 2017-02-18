@@ -60,9 +60,9 @@ namespace lmp
         const msg::ConfigMsg&  configMsg) const;
       virtual void do_reportTransition(
     	const appl::State&   sourceState,
-		const appl::Event&   event,
-		const appl::State&   targetState,
-		const appl::Action&  action);
+    	const appl::Event&   event,
+    	const appl::State&   targetState,
+    	const appl::Action&  action);
       virtual void do_sendHelloMsg();
       // implement IpccMsgReceiveIF
       virtual void do_processReceivedMessage(
@@ -77,6 +77,9 @@ namespace lmp
       virtual void do_processReceivedMessage(
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::HelloMsg&                   helloMsg);
+      virtual void do_processReceivedMessage(
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+        const msg::UnknownMessage&             unknownMessage);
       // internal
       bool canAcceptNewConfig() const;
       bool isConntentionWinning(
@@ -86,9 +89,9 @@ namespace lmp
       lmp::DWORD                                   theLocalCCId;
       bool                                         theIsActiveSetup;
       FSM_IPCC                                     theFSM;
-  	  lmp::DWORD                                   theTxSeqNum;
-  	  lmp::DWORD                                   theRcvSeqNum;
-  	  boost::ptr_deque<appl::IpccObserverProxyIF>  theObservers;
+      lmp::DWORD                                   theTxSeqNum;
+      lmp::DWORD                                   theRcvSeqNum;
+      boost::ptr_deque<appl::IpccObserverProxyIF>  theObservers;
     };
   } // namespace cc
 } // namespace lmp

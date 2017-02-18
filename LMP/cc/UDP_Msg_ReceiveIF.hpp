@@ -7,8 +7,6 @@
  *      Author: tom
  */
 
-#include "base/ProtocolTypes.hpp"             // for DWORD
-
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/buffer.hpp>
 
@@ -16,18 +14,19 @@ namespace lmp
 {
   namespace cc
   {
+    class NetworkIFSocketIF;
     class UDPMsgReceiveIF
     {
     public:
       inline void processReceivedMessage(
-        lmp::DWORD                             localCCId,
+        NetworkIFSocketIF&                     networkIFSocket,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	boost::asio::const_buffers_1&          messageBuffer)
-      { do_processReceivedMessage(localCCId, sender_endpoint, messageBuffer); }
+      { do_processReceivedMessage(networkIFSocket, sender_endpoint, messageBuffer); }
       virtual ~UDPMsgReceiveIF(){}
     private:
       virtual void do_processReceivedMessage(
-        lmp::DWORD                             localCCId,
+        NetworkIFSocketIF&                     networkIFSocket,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         boost::asio::const_buffers_1&          messageBuffer) = 0;
     };

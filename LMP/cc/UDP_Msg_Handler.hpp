@@ -9,7 +9,6 @@
 
 #include "UDP_Msg_ReceiveIF.hpp"
 #include "IPCC_Msg_SendIF.hpp"
-#include "NetworkIFSocketIF.hpp"
 #include "base/ProtocolTypes.hpp"             // for DWORD
 
 #include <boost/asio/ip/udp.hpp>
@@ -18,30 +17,36 @@
 
 namespace lmp
 {
+  namespace node
+  {
+    class Node;
+  }
   namespace cc
   {
     class IpccMsgReceiveIF;
+    class NetworkIFSocketIF;
 
-    class UDPMsgHandler : public UDPMsgReceiveIF,
-                          public IpccMsgSendIF
+    class UDPMsgHandler : public UDPMsgReceiveIF
     {
     public:
+      UDPMsgHandler(
+        node::Node&           node);
       virtual ~UDPMsgHandler(){}
-      void registerNetIFSocket(
-        NetworkIFSocketIF&  netIfSocket);
-    private:
-      typedef std::map<lmp::DWORD, NetworkIFSocketIF*>  NetworkInterfaceMap;
-      // implement UDPMsgReceiveIF
-      virtual void do_processReceivedMessage(
-        lmp::DWORD                             localCCId,
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
-        boost::asio::const_buffers_1&          messageBuffer);
-      // implement IpccMsgSendIF
-      virtual void do_sendMessage(
-        lmp::DWORD                             localCCId,
+      inline const node::Node& getNode() const
+      { return m_node; }
+      static void sendMessage(
+        NetworkIFSocketIF&                     networkIFSocket,
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
         const msg::Message&                    message);
-      NetworkInterfaceMap                    m_networkInterfaces;
+    private:
+      typedef std::map<boost::asio::ip::udp::endpoint, IpccMsgReceiveIF*>  IPCCMap;
+      // implement UDPMsgReceiveIF
+      virtual void do_processReceivedMessage(
+        NetworkIFSocketIF&                     networkIFSocket,
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+        boost::asio::const_buffers_1&          messageBuffer);
+      node::Node&         m_node;
+      IPCCMap             m_IPCCs;
     };
   } // namespace cc
 } // namespace lmp

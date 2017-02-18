@@ -5,6 +5,7 @@
  *      Author: tom
  */
 
+#include "base/Node.hpp"
 #include "cc/IPCC_Impl.hpp"
 #include "cc/IPCC_NetIFSocket.hpp"
 #include "cc/UDP_Msg_Handler.hpp"
@@ -84,7 +85,8 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
   BOOST_CHECK(addr.first);
   if (addr.first)
   {
-    lmp::cc::UDPMsgHandler node1_MsgHandler;
+    lmp::node::Node  node1(1, boost::asio::ip::address::from_string("1.1.1.1"));
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 1;
@@ -92,7 +94,8 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
     lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
 
     BOOST_CHECK(addr.first);
-    lmp::cc::UDPMsgHandler node2_MsgHandler;
+    lmp::node::Node  node2(2, boost::asio::ip::address::from_string("2.2.2.2"));
+    lmp::cc::UDPMsgHandler node2_MsgHandler(node2);
     unsigned short node2_port = 9702;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
     lmp::DWORD  node2_1stCCId = 1;
@@ -137,7 +140,8 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_netif)
 {
   unsigned short port = 9701;
   std::string ifName = "virbr0";
-  lmp::cc::UDPMsgHandler node1_MsgHandler;
+  lmp::node::Node  node1(1, boost::asio::ip::address::from_string("1.1.1.1"));
+  lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
   lmp::DWORD  node1_1stCCId = 1;
 
   boost::asio::io_service io_service;

@@ -1,7 +1,7 @@
 #ifndef LIBS_Node_HPP_
 #define LIBS_Node_HPP_
 /*
- * IPCC_Impl.hpp
+ * IPCC_Node.hpp
  *
  *  Created on: 19.02.2015
  *      Author: tom
@@ -19,7 +19,7 @@ namespace lmp
     public:
       Node(
         lmp::DWORD                       nodeId,
-		const boost::asio::ip::address&  loopbackAddress);
+        const boost::asio::ip::address&  loopbackAddress);
       virtual ~Node();
       void enable();
       void disable();

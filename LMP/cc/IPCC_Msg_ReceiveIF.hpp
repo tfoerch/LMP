@@ -11,6 +11,7 @@
 #include "msg/ConfigAck.hpp"
 #include "msg/ConfigNack.hpp"
 #include "msg/Hello.hpp"
+#include "msg/UnknownMessage.hpp"
 
 #include <boost/asio/ip/udp.hpp>
 
@@ -38,6 +39,10 @@ namespace lmp
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::HelloMsg&                   helloMsg)
       { do_processReceivedMessage(sender_endpoint, helloMsg); }
+      inline void processReceivedMessage(
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+        const msg::UnknownMessage&             unknownMessage)
+      { do_processReceivedMessage(sender_endpoint, unknownMessage); }
       virtual ~IpccMsgReceiveIF(){}
     private:
       virtual void do_processReceivedMessage(
@@ -52,6 +57,9 @@ namespace lmp
       virtual void do_processReceivedMessage(
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::HelloMsg&                   helloMsg) = 0;
+      virtual void do_processReceivedMessage(
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+        const msg::UnknownMessage&             unknownMessage) = 0;
     };
   } // namespace cc
 } // namespace lmp

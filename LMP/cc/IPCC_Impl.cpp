@@ -231,6 +231,12 @@ namespace lmp
         theFSM.process_event(EvSeqNumErr());
       }
     }
+    void IpccImpl::do_processReceivedMessage(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const msg::UnknownMessage&             unknownMessage)
+    {
+      // report
+    }
     bool IpccImpl::canAcceptNewConfig() const
     {
       static const lmp::cc::appl::ConfRcv stateConfRcv;

@@ -19,14 +19,12 @@ namespace lmp
     {
     public:
       inline void sendMessage(
-        lmp::DWORD                             localCCId,
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
         const msg::Message&                    message)
-      { do_sendMessage(localCCId, destination_endpoint, message); }
+      { do_sendMessage(destination_endpoint, message); }
       virtual ~IpccMsgSendIF(){}
     private:
       virtual void do_sendMessage(
-        lmp::DWORD                             localCCId,
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
         const msg::Message&                    message) = 0;
     };

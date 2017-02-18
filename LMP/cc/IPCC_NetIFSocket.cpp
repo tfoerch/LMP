@@ -191,7 +191,7 @@ namespace lmp
       size_t                            bytes_recvd)
     {
       boost::asio::const_buffers_1  messageBuffer(m_buffer, bytes_recvd);
-      m_udpMsgHandler.processReceivedMessage(m_localCCId,
+      m_udpMsgHandler.processReceivedMessage(*this,
                                              m_sender_endpoint,
                                              messageBuffer);
       std::cout << "NetworkIFSocket::handle_received_msg(" << bytes_recvd << ")" << std::endl;
