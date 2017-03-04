@@ -8,7 +8,8 @@
 #include "UDP_Msg_Handler.hpp"
 #include "IPCC_Impl.hpp"
 #include "NetworkIFSocketIF.hpp"
-#include "base/Node.hpp"
+#include "node/Node.hpp"
+#include "neighbor/Neighbor.hpp"
 #include <boost/asio/buffers_iterator.hpp>
 
 namespace
@@ -51,7 +52,7 @@ namespace lmp
   namespace cc
   {
     UDPMsgHandler::UDPMsgHandler(
-        node::Node&           node)
+      node::Node&           node)
     : m_node(node)
     {
     }
@@ -82,10 +83,13 @@ namespace lmp
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter == m_IPCCs.end())
       {
-        IpccMsgReceiveIF*  ipccPtr = new IpccImpl(m_node.getNodeId(), networkIFSocket.getLocalCCId(), true);
+        IpccImpl*  ipccPtr = new IpccImpl(m_node.getNodeId(), networkIFSocket.getLocalCCId(), false);
         if (ipccPtr)
         {
-          ipccIter = m_IPCCs.insert(IPCCMap::value_type(sender_endpoint, ipccPtr)).first;
+          ipccPtr->enable();
+          ipccPtr->registerObserver(m_node);
+          ipccIter = m_IPCCs.insert(IPCCMap::value_type(sender_endpoint,
+                                                        ipccPtr)).first;
         }
       }
       if (ipccIter != m_IPCCs.end())

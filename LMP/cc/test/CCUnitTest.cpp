@@ -5,7 +5,7 @@
  *      Author: tom
  */
 
-#include "base/Node.hpp"
+#include "node/Node.hpp"
 #include "cc/IPCC_Impl.hpp"
 #include "cc/IPCC_NetIFSocket.hpp"
 #include "cc/UDP_Msg_Handler.hpp"
@@ -15,6 +15,7 @@
 #include "msg/Hello.hpp"
 #include "Test_IPCC_Observer.hpp"
 #include "Test_IPCC_Msg_Receiver.hpp"
+#include "Test_NeighborDiscoveredCheckFtor.hpp"
 #include "Test_Wait.hpp"
 
 #include <boost/asio/io_service.hpp>
@@ -85,7 +86,8 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
   BOOST_CHECK(addr.first);
   if (addr.first)
   {
-    lmp::node::Node  node1(1, boost::asio::ip::address::from_string("1.1.1.1"));
+    lmp::DWORD  node1_nodeId = 1;
+    lmp::node::Node  node1(node1_nodeId);
     lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
@@ -93,8 +95,8 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
     // lmp::cc::TestIpccMsgReceiver node1_msgReceiver;
     lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
 
-    BOOST_CHECK(addr.first);
-    lmp::node::Node  node2(2, boost::asio::ip::address::from_string("2.2.2.2"));
+    lmp::DWORD  node2_nodeId = 2;
+    lmp::node::Node  node2(node2_nodeId);
     lmp::cc::UDPMsgHandler node2_MsgHandler(node2);
     unsigned short node2_port = 9702;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
@@ -110,27 +112,18 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
     lmp::msg::ConfigMsg  configMsg =
       { false,
         false,
-        { { false, { 0x1020008 } },      // localCCId
+        { { false, { node1_1stCCId } },      // localCCId
           { false, { 0x1020508 } },      // messageId
-          { false, { 0x8600420 } },      // localNodeId
+          { false, { node2_nodeId } },      // localNodeId
           configObjectSequence } // configObjectss
       };
-    const lmp::WORD msgLength = lmp::msg::getLength(configMsg);
-    unsigned char rawBuffer[msgLength];
-    boost::asio::mutable_buffers_1 sendBuffer(rawBuffer, msgLength);
-    typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
-    BufOutIterType  gen_begin = boost::asio::buffers_begin(sendBuffer);
-    BufOutIterType gen_last = boost::asio::buffers_end(sendBuffer);
-    using boost::spirit::karma::generate;
-    lmp::msg::generate::message_type_grammar<BufOutIterType,
-                                             lmp::msg::MsgType::Config>  configMsgGenerateGrammar;
-    BOOST_CHECK(generate(gen_begin,
-                         configMsgGenerateGrammar,
-                         configMsg));
+    lmp::msg::Message sendMessage = configMsg;
 
-    node1_lmpSocket.send(node2_endpoint, sendBuffer);
+    node2_MsgHandler.sendMessage(node2_lmpSocket, node1_endpoint, sendMessage);
+//    node1_lmpSocket.send(node2_endpoint, sendBuffer);
 
-    //BOOST_CHECK(lmp::test::util::wait(node2_msgReceiver.getConfigMessageReceivedFtor(), io_service, boost::posix_time::seconds(1)));
+    lmp::cc::test::NeighborDiscoveredCheckFtor  neighborDiscoveredCheckFtor(node1, node2_nodeId);
+    BOOST_CHECK(lmp::test::util::wait(neighborDiscoveredCheckFtor, io_service, boost::posix_time::seconds(1)));
     //io_service.run_one();
     //io_service.run_one();
   }
@@ -140,7 +133,7 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_netif)
 {
   unsigned short port = 9701;
   std::string ifName = "virbr0";
-  lmp::node::Node  node1(1, boost::asio::ip::address::from_string("1.1.1.1"));
+  lmp::node::Node  node1(1);
   lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
   lmp::DWORD  node1_1stCCId = 1;
 
@@ -194,7 +187,8 @@ BOOST_AUTO_TEST_CASE( activeIPCC_CCDown )
     lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
                                                                                lmp::cc::appl::Event::EvBringUp,
-                                                                               lmp::cc::appl::State::ConfSnd,																		   lmp::cc::appl::Action::ActionSendConfig));
+                                                                               lmp::cc::appl::State::ConfSnd,
+                                                                               lmp::cc::appl::Action::ActionSendConfig));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -210,7 +204,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_CCDown )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
                                                                                lmp::cc::appl::Event::EvCCDn,
                                                                                lmp::cc::appl::State::Down,
-																			   lmp::cc::appl::Action::ActionStopSendConfig));
+                                                                               lmp::cc::appl::Action::ActionStopSendConfig));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
     BOOST_CHECK(activeState);
@@ -258,7 +252,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
                                                                                lmp::cc::appl::Event::EvBringUp,
                                                                                lmp::cc::appl::State::ConfSnd,
-																			   lmp::cc::appl::Action::ActionSendConfig));
+                                                                               lmp::cc::appl::Action::ActionSendConfig));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -311,7 +305,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
                                                                                lmp::cc::appl::Event::EvBringUp,
                                                                                lmp::cc::appl::State::ConfSnd,
-																			   lmp::cc::appl::Action::ActionSendConfig));
+                                                                               lmp::cc::appl::Action::ActionSendConfig));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -365,7 +359,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_Reconfig )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
                                                                                lmp::cc::appl::Event::EvBringUp,
                                                                                lmp::cc::appl::State::ConfSnd,
-																			   lmp::cc::appl::Action::ActionSendConfig));
+                                                                               lmp::cc::appl::Action::ActionSendConfig));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -398,7 +392,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfRet )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
                                                                                lmp::cc::appl::Event::EvBringUp,
                                                                                lmp::cc::appl::State::ConfSnd,
-																			   lmp::cc::appl::Action::ActionSendConfig));
+                                                                               lmp::cc::appl::Action::ActionSendConfig));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -433,7 +427,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
                                                                                lmp::cc::appl::Event::EvBringUp,
                                                                                lmp::cc::appl::State::ConfSnd,
-																			   lmp::cc::appl::Action::ActionSendConfig));
+                                                                               lmp::cc::appl::Action::ActionSendConfig));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -490,7 +484,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
                                                                                lmp::cc::appl::Event::EvBringUp,
                                                                                lmp::cc::appl::State::ConfSnd,
-																			   lmp::cc::appl::Action::ActionSendConfig));
+                                                                               lmp::cc::appl::Action::ActionSendConfig));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -515,11 +509,11 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
                                                                                lmp::cc::appl::Event::EvConfDone,
                                                                                lmp::cc::appl::State::Active,
-																			   lmp::cc::appl::Action::ActionStopSendConfig));
+                                                                               lmp::cc::appl::Action::ActionStopSendConfig));
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
                                                                                lmp::cc::appl::Event::EvConfDone,
                                                                                lmp::cc::appl::State::Active,
-																			   lmp::cc::appl::Action::ActionSendHello));
+                                                                               lmp::cc::appl::Action::ActionSendHello));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -541,7 +535,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
       expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Active,
                                                                                  lmp::cc::appl::Event::EvSeqNumErr,
                                                                                  lmp::cc::appl::State::Active,
-																				 lmp::cc::appl::Action::ActionNoAction));
+                                                                                 lmp::cc::appl::Action::ActionNoAction));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
       const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -564,7 +558,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
       expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Active,
                                                                                  lmp::cc::appl::Event::EvHelloRcvd,
                                                                                  lmp::cc::appl::State::Up,
-																				 lmp::cc::appl::Action::ActionNoAction));
+                                                                                 lmp::cc::appl::Action::ActionNoAction));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
       const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -581,7 +575,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Up,
                                                                                lmp::cc::appl::Event::EvHelloRet,
                                                                                lmp::cc::appl::State::Up,
-																			   lmp::cc::appl::Action::ActionSendHello));
+                                                                               lmp::cc::appl::Action::ActionSendHello));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -603,7 +597,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
       expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Up,
                                                                                  lmp::cc::appl::Event::EvHelloRcvd,
                                                                                  lmp::cc::appl::State::Up,
-																				 lmp::cc::appl::Action::ActionNoAction));
+                                                                                 lmp::cc::appl::Action::ActionNoAction));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
       const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -620,7 +614,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Up,
                                                                                lmp::cc::appl::Event::EvAdminDown,
                                                                                lmp::cc::appl::State::GoingDown,
-																			   lmp::cc::appl::Action::ActionSetCCDownFlag));
+                                                                               lmp::cc::appl::Action::ActionSetCCDownFlag));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -636,7 +630,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
     expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::GoingDown,
                                                                                lmp::cc::appl::Event::EvDownTimer,
                                                                                lmp::cc::appl::State::Down,
-																			   lmp::cc::appl::Action::ActionStopSendHello));
+                                                                               lmp::cc::appl::Action::ActionStopSendHello));
     BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
     ipccObserver.reset();
     const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();

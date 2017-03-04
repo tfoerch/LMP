@@ -7,6 +7,7 @@
  *      Author: tom
  */
 
+#include "cc/IPCCApplicationIF.hpp"
 #include "cc/IPCC_FSM.hpp"
 #include "cc/IPCC_FSM_InvokeIF.hpp"
 #include "cc/IPCC_Msg_ReceiveIF.hpp"
@@ -27,7 +28,8 @@ namespace lmp
       class IpccObserverProxyIF;
       class State;
     }
-    class IpccImpl : public IpccFsmInvokeIF,
+    class IpccImpl : public IpccApplicationIF,
+                     public IpccFsmInvokeIF,
                      public IpccMsgReceiveIF
     {
     public:
@@ -36,10 +38,6 @@ namespace lmp
         lmp::DWORD  localCCId,
         bool        isActiveSetup);
       virtual ~IpccImpl();
-      void enable();
-      void disable();
-      lmp::DWORD  getLocalNodeId() const;
-      lmp::DWORD  getLocalCCId() const;
       void reconfigure(
         const obj::config::HelloConfigBody&  helloConfig);
       void evtCCDown();
@@ -47,17 +45,32 @@ namespace lmp
       void evtHelloRet();
       void evtDownTimer();
       boost::optional<const lmp::cc::appl::State&> getActiveState() const;
-      void registerObserver(
-        appl::IpccObserverProxyIF&  observer);
-      void deregisterObserver(
-    	appl::IpccObserverProxyIF&  observer);
     private:
+      typedef boost::ptr_deque<appl::IpccObserverProxyIF>       IPCCObservers;
+      typedef std::set<neighbor::NeighborAdjacencyObserverIF*>  NeighborAdjacencyObservers;
+      // implement IpccApplicationIF
+      virtual void do_enable();
+      virtual void do_disable();
+      virtual lmp::DWORD do_getLocalNodeId() const;
+      virtual lmp::DWORD do_getRemoteNodeId() const;
+      virtual lmp::DWORD do_getLocalCCId() const;
+      virtual lmp::DWORD do_getRemoteCCId() const;
+      virtual void do_registerObserver(
+        appl::IpccObserverProxyIF&  observer);
+      virtual void do_deregisterObserver(
+        appl::IpccObserverProxyIF&  observer);
+      virtual void do_registerObserver(
+        neighbor::NeighborAdjacencyObserverIF&  observer);
+      virtual void do_deregisterObserver(
+        neighbor::NeighborAdjacencyObserverIF&  observer);
       // implement IpccFsmConnectIF
       virtual bool do_hasActiveSetupRole() const;
       virtual bool do_isConntentionWinning(
         lmp::DWORD  remoteNodeId) const;
       virtual bool do_isConfigAcceptable(
         const msg::ConfigMsg&  configMsg) const;
+      virtual void do_updateConfig(
+        const msg::ConfigMsg&  configMsg);
       virtual void do_reportTransition(
     	const appl::State&   sourceState,
     	const appl::Event&   event,
@@ -85,13 +98,16 @@ namespace lmp
       bool isConntentionWinning(
     	const msg::ConfigMsg&  configMsg) const;
 
-      lmp::DWORD                                   theLocalNodeId;
-      lmp::DWORD                                   theLocalCCId;
-      bool                                         theIsActiveSetup;
-      FSM_IPCC                                     theFSM;
-      lmp::DWORD                                   theTxSeqNum;
-      lmp::DWORD                                   theRcvSeqNum;
-      boost::ptr_deque<appl::IpccObserverProxyIF>  theObservers;
+      lmp::DWORD                                        m_localNodeId;
+      lmp::DWORD                                        m_remoteNodeId;
+      lmp::DWORD                                        m_localCCId;
+      lmp::DWORD                                        m_remoteCCId;
+      bool                                              theIsActiveSetup;
+      FSM_IPCC                                          theFSM;
+      lmp::DWORD                                        theTxSeqNum;
+      lmp::DWORD                                        theRcvSeqNum;
+      IPCCObservers                                     theObservers;
+      NeighborAdjacencyObservers                        m_neighborAdjacencyObservers;
     };
   } // namespace cc
 } // namespace lmp

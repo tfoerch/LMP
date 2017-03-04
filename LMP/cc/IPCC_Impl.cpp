@@ -7,6 +7,7 @@
 
 #include "IPCC_Impl.hpp"
 #include "IPCC_ObserverIF.hpp"
+#include "neighbor/NeighborAdjacencyObserverIF.hpp"
 #include "msg/Config.hpp"
 #include "msg/ConfigAck.hpp"
 #include "msg/ConfigNack.hpp"
@@ -43,13 +44,15 @@ namespace lmp
       lmp::DWORD  localNodeId,
       lmp::DWORD  localCCId,
       bool        isActiveSetup)
-      : theLocalNodeId(localNodeId),
-		theLocalCCId(localCCId),
+      : m_localNodeId(localNodeId),
+        m_remoteNodeId(0),
+        m_localCCId(localCCId),
+        m_remoteCCId(0),
         theIsActiveSetup(isActiveSetup),
         theFSM(*this),
-		theTxSeqNum(0),
-		theRcvSeqNum(0),
-		theObservers()
+        theTxSeqNum(0),
+        theRcvSeqNum(0),
+        theObservers()
     {
       theFSM.start();
     }
@@ -57,22 +60,30 @@ namespace lmp
     {
       theFSM.stop();
     }
-    void IpccImpl::enable()
+    void IpccImpl::do_enable()
     {
       theFSM.start();
       theFSM.process_event(EvBringUp());
     }
-    void IpccImpl::disable()
+    void IpccImpl::do_disable()
     {
       theFSM.process_event(EvAdminDown());
     }
-    lmp::DWORD  IpccImpl::getLocalNodeId() const
+    lmp::DWORD  IpccImpl::do_getLocalNodeId() const
     {
-      return theLocalNodeId;
+      return m_localNodeId;
     }
-    lmp::DWORD  IpccImpl::getLocalCCId() const
+    lmp::DWORD  IpccImpl::do_getRemoteNodeId() const
     {
-      return theLocalCCId;
+      return m_remoteNodeId;
+    }
+    lmp::DWORD  IpccImpl::do_getLocalCCId() const
+    {
+      return m_localCCId;
+    }
+     lmp::DWORD  IpccImpl::do_getRemoteCCId() const
+    {
+      return m_remoteCCId;
     }
     void IpccImpl::reconfigure(
       const obj::config::HelloConfigBody&  helloConfig)
@@ -100,18 +111,18 @@ namespace lmp
     {
       return theFSM.getActiveState();
     }
-    void IpccImpl::registerObserver(
+    void IpccImpl::do_registerObserver(
       appl::IpccObserverProxyIF&  observer)
     {
       theObservers.push_back(new_clone(observer));
     }
-    void IpccImpl::deregisterObserver(
+    void IpccImpl::do_deregisterObserver(
   	appl::IpccObserverProxyIF&  observer)
     {
       bool found = false;
       boost::ptr_deque<appl::IpccObserverProxyIF>::iterator  iter = theObservers.begin();
       while (!found &&
-    		  iter != theObservers.end())
+             iter != theObservers.end())
       {
         if (observer == *iter)
         {
@@ -124,6 +135,16 @@ namespace lmp
         }
       }
     }
+    void IpccImpl::do_registerObserver(
+      neighbor::NeighborAdjacencyObserverIF&  observer)
+    {
+      m_neighborAdjacencyObservers.insert(&observer);
+    }
+    void IpccImpl::do_deregisterObserver(
+      neighbor::NeighborAdjacencyObserverIF&  observer)
+    {
+      m_neighborAdjacencyObservers.erase(&observer);
+    }
     bool IpccImpl::do_hasActiveSetupRole() const
     {
       // std::cout << "activeSetupRole = " << (theIsActiveSetup ? "true" : "false") << std::endl;
@@ -132,10 +153,10 @@ namespace lmp
     bool IpccImpl::do_isConntentionWinning(
       lmp::DWORD  remoteNodeId) const
     {
-      return (theLocalNodeId > remoteNodeId);
+      return (m_localNodeId > remoteNodeId);
     }
     bool IpccImpl::do_isConfigAcceptable(
-  	  const msg::ConfigMsg&  configMsg) const
+      const msg::ConfigMsg&  configMsg) const
     {
       // remoteNodeId, remoeCCId valid; HelloConfig in acceptable range
       bool isAcceptable = true;
@@ -148,21 +169,59 @@ namespace lmp
       }
       return isAcceptable;
     }
+    void IpccImpl::do_updateConfig(
+      const msg::ConfigMsg&  configMsg)
+    {
+      std::cout << "IPCC[" << m_localCCId << "].updateConfig(" << configMsg << ")" << std::endl;
+      if (m_remoteNodeId != configMsg.m_data.m_localNodeId.m_data.m_nodeId)
+      {
+        if (m_remoteNodeId)
+        {
+          for (NeighborAdjacencyObservers::iterator iter = m_neighborAdjacencyObservers.begin(),
+                                                    end_iter = m_neighborAdjacencyObservers.end();
+               iter != end_iter;
+               ++iter)
+          {
+            if (*iter)
+            {
+              (*iter)->neighborAdjacencyRemoved(m_remoteNodeId, *this);
+            }
+          }
+        }
+        m_remoteNodeId = configMsg.m_data.m_localNodeId.m_data.m_nodeId;
+        m_remoteCCId = configMsg.m_data.m_localCCId.m_data.m_CCId;
+        if (m_remoteNodeId)
+        {
+          for (NeighborAdjacencyObservers::iterator iter = m_neighborAdjacencyObservers.begin(),
+                                                    end_iter = m_neighborAdjacencyObservers.end();
+               iter != end_iter;
+               ++iter)
+          {
+            if (*iter)
+            {
+              (*iter)->neighborAdjacencyAdded(m_remoteNodeId, *this);
+            }
+          }
+        }
+      }
+      std::cout << "IPCC[" << m_localCCId << "].updateConfig(): remoteNodeId = " << m_remoteNodeId
+                << ", remoteCCId = " << m_remoteCCId << std::endl;
+    }
     void IpccImpl::do_reportTransition(
       const appl::State&   sourceState,
       const appl::Event&   event,
       const appl::State&   targetState,
-	  const appl::Action&  action)
+      const appl::Action&  action)
     {
-      for (boost::ptr_deque<appl::IpccObserverIF>::iterator iter = theObservers.begin(),
-    		                                                end_iter = theObservers.end();
-    		  iter != end_iter;
-    		  ++iter)
+      for (IPCCObservers::iterator iter = theObservers.begin(),
+    		                   end_iter = theObservers.end();
+           iter != end_iter;
+           ++iter)
       {
     	iter->notifyTransition(sourceState, event, targetState, action);
       }
-//    std::cout << "IPCC[" << theLocalCCId << "]." << event << ": " << sourceState << " -> " << targetState
-//        		<< " executing " << action << std::endl;
+      std::cout << "IPCC[" << m_localCCId << "]." << event << ": " << sourceState << " -> " << targetState
+                << " executing " << action << std::endl;
     }
     void IpccImpl::do_sendHelloMsg()
     {
@@ -184,7 +243,7 @@ namespace lmp
       {
       	if (isConfigAcceptable(configMsg))
       	{
-      	  theFSM.process_event(EvNewConfOK());
+      	  theFSM.process_event(EvNewConfOK(configMsg));
       	}
       	else
       	{
@@ -247,10 +306,10 @@ namespace lmp
     	( activeState &&
     	  ( *activeState == stateConfRcv ||
     	    *activeState == stateActive ||
-    		*activeState == stateUp ) );
+    	    *activeState == stateUp ) );
     }
     bool IpccImpl::isConntentionWinning(
-  	  const msg::ConfigMsg&  configMsg) const
+      const msg::ConfigMsg&  configMsg) const
     {
       return do_isConntentionWinning(configMsg.m_data.m_localNodeId.m_data.m_nodeId);
     }
@@ -265,154 +324,153 @@ namespace lmp
       }
       std::ostream& operator<<(
         std::ostream&       os,
-	    State::Type         stType)
+        State::Type         stType)
       {
     	switch(stType)
     	{
           case State::Down:
-    		os << "Down";
-    		break;
+            os << "Down";
+            break;
     	  case State::ConfSnd:
-    		os << "ConfSnd";
-    		break;
+    	    os << "ConfSnd";
+    	    break;
     	  case State::ConfRcv:
-    		os << "ConfRcv";
-    		break;
+    	    os << "ConfRcv";
+    	    break;
     	  case State::Active:
-    		os << "Active";
-    		break;
+    	    os << "Active";
+    	    break;
           case State::Up:
-    		os << "Up";
-    		break;
+            os << "Up";
+            break;
           case State::GoingDown:
-        	os << "GoingDown";
-        	break;
+            os << "GoingDown";
+            break;
           default:
-    		os << "undefined (value = " << static_cast<lmp::DWORD>(stType) << ")";
-    		break;
+            os << "undefined (value = " << static_cast<lmp::DWORD>(stType) << ")";
+            break;
     	}
     	return os;
       }
       std::ostream& operator<<(
         std::ostream&       os,
-		const Event&   event)
+        const Event&   event)
       {
     	os << event.getType();
     	return os;
       }
       std::ostream& operator<<(
         std::ostream&       os,
-		Event::EvType  evType)
+        Event::EvType  evType)
       {
     	switch(evType)
     	{
     	  case Event::EvBringUp:
-    		os << "EvBringUp";
-    		break;
+    	    os << "EvBringUp";
+    	    break;
     	  case Event::EvCCDn:
-    		os << "EvCCDn";
-    		break;
+    	    os << "EvCCDn";
+    	    break;
     	  case Event::EvConfDone:
-    		os << "EvConfDone";
-    		break;
+    	    os << "EvConfDone";
+    	    break;
     	  case Event::EvConfErr:
-    		os << "EvConfErr";
-    		break;
+    	    os << "EvConfErr";
+    	    break;
     	  case Event::EvNewConfOK:
-    		os << "EvNewConfOK";
-    		break;
+    	    os << "EvNewConfOK";
+    	    break;
     	  case Event::EvNewConfErr:
-    		os << "EvNewConfErr";
-    		break;
+    	    os << "EvNewConfErr";
+    	    break;
     	  case Event::EvContenWin:
-    		os << "EvContenWin";
-    		break;
+    	    os << "EvContenWin";
+    	    break;
     	  case Event::EvContenLost:
-    		os << "EvContenLost";
-    		break;
+    	    os << "EvContenLost";
+    	    break;
     	  case Event::EvAdminDown:
-    		os << "EvAdminDown";
-    		break;
+    	    os << "EvAdminDown";
+    	    break;
     	  case Event::EvNbrGoesDn:
-    		os << "EvNbrGoesDn";
-    		break;
+    	    os << "EvNbrGoesDn";
+    	    break;
     	  case Event::EvHelloRcvd:
-    		os << "EvHelloRcvd";
-    		break;
+    	    os << "EvHelloRcvd";
+    	    break;
     	  case Event::EvHoldTimer:
-    		os << "EvHoldTimer";
-    		break;
+    	    os << "EvHoldTimer";
+    	    break;
     	  case Event::EvSeqNumErr:
-    		os << "EvSeqNumErr";
-    		break;
+    	    os << "EvSeqNumErr";
+    	    break;
     	  case Event::EvReconfig:
-    		os << "EvReconfig";
-    		break;
+    	    os << "EvReconfig";
+    	    break;
     	  case Event::EvConfRet:
-    		os << "EvConfRet";
-    		break;
+    	    os << "EvConfRet";
+    	    break;
     	  case Event::EvHelloRet:
-    		os << "EvHelloRet";
-    		break;
+    	    os << "EvHelloRet";
+    	    break;
     	  case Event::EvDownTimer:
-    		os << "EvDownTimer";
-    		break;
+    	    os << "EvDownTimer";
+    	    break;
     	  default:
-    		os << "undefined (value = " << static_cast<lmp::DWORD>(evType) << ")";
-    		break;
+    	    os << "undefined (value = " << static_cast<lmp::DWORD>(evType) << ")";
+    	    break;
     	}
     	return os;
       }
       std::ostream& operator<<(
         std::ostream&   os,
-		const Action&   action)
+        const Action&   action)
       {
     	os << action.getType();
     	return os;
       }
       std::ostream& operator<<(
         std::ostream&       os,
-		Action::ActionType  actionType)
+        Action::ActionType  actionType)
       {
     	switch(actionType)
     	{
     	  case Action::ActionSendConfig:
-    		os << "SendConfig";
-    		break;
+    	    os << "SendConfig";
+    	    break;
     	  case Action::ActionStopSendConfig:
-    		os << "StopSendConfig";
-    		break;
+    	    os << "StopSendConfig";
+    	    break;
     	  case Action::ActionResendConfig:
-    		os << "ResendConfig";
-    		break;
+    	    os << "ResendConfig";
+    	    break;
     	  case Action::ActionSendConfigAck:
-    		os << "SendConfigAck";
-    		break;
+    	    os << "SendConfigAck";
+    	    break;
     	  case Action::ActionSendConfigNack:
-    		os << "SendConfigNack";
-    		break;
+    	    os << "SendConfigNack";
+    	    break;
     	  case Action::ActionSendHello:
-    		os << "SendHello";
-    		break;
+    	    os << "SendHello";
+    	    break;
     	  case Action::ActionStopSendHello:
-    		os << "StopSendHello";
-    		break;
+    	    os << "StopSendHello";
+    	    break;
     	  case Action::ActionSetCCDownFlag:
-    		os << "SetCCDownFlag";
-    		break;
+    	    os << "SetCCDownFlag";
+    	    break;
     	  case Action::ActionClearCCDownFlag:
-    		os << "ClearCCDownFlag";
-    		break;
+    	    os << "ClearCCDownFlag";
+    	    break;
     	  case Action::ActionNoAction:
-    		os << "NoAction";
-    		break;
+    	    os << "NoAction";
+    	    break;
     	  default:
-    		os << "undefined (value = " << static_cast<lmp::DWORD>(actionType) << ")";
-    		break;
+    	    os << "undefined (value = " << static_cast<lmp::DWORD>(actionType) << ")";
+    	    break;
     	}
     	return os;
       }
-
     }
   } // namespace cc
 } // namespace lmp

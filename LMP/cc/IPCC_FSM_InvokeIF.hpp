@@ -23,16 +23,23 @@ namespace lmp
     class IpccFsmInvokeIF
     {
     public:
-      inline bool hasActiveSetupRole() const { return do_hasActiveSetupRole(); }
+      inline bool hasActiveSetupRole() const
+      { return do_hasActiveSetupRole(); }
       inline bool isConntentionWinning(
-        lmp::DWORD  remoteNodeId) const { return do_isConntentionWinning(remoteNodeId); }
+        lmp::DWORD  remoteNodeId) const
+      { return do_isConntentionWinning(remoteNodeId); }
       inline bool isConfigAcceptable(
-        const msg::ConfigMsg&  configMsg) const { return do_isConfigAcceptable(configMsg); }
+        const msg::ConfigMsg&  configMsg) const
+      { return do_isConfigAcceptable(configMsg); }
+      inline void updateConfig(
+        const msg::ConfigMsg&  configMsg)
+      { do_updateConfig(configMsg); }
       inline void reportTransition(
         const appl::State&   sourceState,
-		const appl::Event&   event,
-		const appl::State&   targetState,
-		const appl::Action&  action) {  do_reportTransition(sourceState, event, targetState, action); }
+        const appl::Event&   event,
+        const appl::State&   targetState,
+        const appl::Action&  action)
+      {  do_reportTransition(sourceState, event, targetState, action); }
       inline void sendHelloMsg() { do_sendHelloMsg(); }
       virtual ~IpccFsmInvokeIF(){}
     private:
@@ -41,11 +48,13 @@ namespace lmp
         lmp::DWORD  remoteNodeId) const = 0;
       virtual bool do_isConfigAcceptable(
         const msg::ConfigMsg&  configMsg) const = 0;
+      virtual void do_updateConfig(
+        const msg::ConfigMsg&  configMsg) = 0;
       virtual void do_reportTransition(
     	const appl::State&   sourceState,
-		const appl::Event&   event,
-		const appl::State&   targetState,
-		const appl::Action&  action) = 0;
+    	const appl::Event&   event,
+    	const appl::State&   targetState,
+    	const appl::Action&  action) = 0;
       virtual void do_sendHelloMsg() = 0;
     };
   } // namespace cc

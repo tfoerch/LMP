@@ -5,6 +5,8 @@
  *      Author: tom
  */
 
+#include "node/Node.hpp"
+
 #include <boost/asio/ip/address.hpp>
 #include <boost/bind.hpp>
 #include <functional>
@@ -112,7 +114,13 @@ namespace boost
   }
 }
 
-BOOST_AUTO_TEST_SUITE( util )
+BOOST_AUTO_TEST_SUITE( node )
+
+BOOST_AUTO_TEST_CASE( node_methods )
+{
+  lmp::node::Node  node(123);
+  BOOST_CHECK_EQUAL(node.getNodeId(), 123UL);
+}
 
 BOOST_AUTO_TEST_CASE( test_bind )
 {

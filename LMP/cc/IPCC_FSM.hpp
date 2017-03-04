@@ -18,103 +18,109 @@ namespace lmp
   namespace cc
   {
     class IpccFsmInvokeIF;
-	struct SomeVisitor
-	{
-	  template <class T>
-	  void visit_state(const T& astate)
-	  {
-		// std::cout << "visiting state:" << astate.getApplState() << std::endl;
-		theActiveState = boost::optional<const lmp::cc::appl::State&>(astate.getApplState());
-	  }
-	  boost::optional<const lmp::cc::appl::State&>  theActiveState;
-	};
+    struct SomeVisitor
+    {
+      template <class T>
+      void visit_state(const T& astate)
+      {
+        // std::cout << "visiting state:" << astate.getApplState() << std::endl;
+        theActiveState = boost::optional<const lmp::cc::appl::State&>(astate.getApplState());
+      }
+      boost::optional<const lmp::cc::appl::State&>  theActiveState;
+    };
     class EvBringUp
     {
-	public:
+    public:
       static lmp::cc::appl::EvBringUp  theApplEvent;
     };
     class EvCCDn
     {
-	public:
+    public:
       static lmp::cc::appl::EvCCDn  theApplEvent;
     };
     class EvConfDone
     {
-	public:
+    public:
       static lmp::cc::appl::EvConfDone  theApplEvent;
     };
     class EvConfErr
     {
-	public:
+    public:
       static lmp::cc::appl::EvConfErr  theApplEvent;
     };
     class EvNewConfOK
     {
-	public:
+    public:
+      explicit EvNewConfOK(
+        const msg::ConfigMsg&  configMsg)
+      : m_ConfigMsg(configMsg)
+      {}
+      const msg::ConfigMsg&  m_ConfigMsg;
       static lmp::cc::appl::EvNewConfOK  theApplEvent;
     };
     class EvNewConfErr
     {
-	public:
+    public:
       static lmp::cc::appl::EvNewConfErr  theApplEvent;
     };
     class EvContenWin
     {
-	public:
+    public:
       static lmp::cc::appl::EvContenWin  theApplEvent;
     };
     class EvContenLost
-	{
-	public:
-      explicit EvContenLost(const msg::ConfigMsg&  configMsg)
-	  : theConfigMsg(configMsg)
-	  {}
-      const msg::ConfigMsg&  theConfigMsg;
+    {
+    public:
+      explicit EvContenLost(
+        const msg::ConfigMsg&  configMsg)
+      : m_ConfigMsg(configMsg)
+      {}
+      const msg::ConfigMsg&  m_ConfigMsg;
       static lmp::cc::appl::EvContenLost  theApplEvent;
-	};
+    };
     class EvAdminDown
     {
-	public:
+    public:
       static lmp::cc::appl::EvAdminDown  theApplEvent;
     };
     class EvNbrGoesDn
     {
-	public:
+    public:
       static lmp::cc::appl::EvNbrGoesDn  theApplEvent;
     };
-   class EvHelloRcvd
-   {
-	public:
-     static lmp::cc::appl::EvHelloRcvd  theApplEvent;
-   };
+    class EvHelloRcvd
+    {
+    public:
+      static lmp::cc::appl::EvHelloRcvd  theApplEvent;
+    };
     class EvHoldTimer
     {
-	public:
+    public:
       static lmp::cc::appl::EvHoldTimer  theApplEvent;
     };
     class EvSeqNumErr
     {
-	public:
+    public:
       static lmp::cc::appl::EvSeqNumErr  theApplEvent;
     };
-   class EvReconfig
-   {
-	public:
-     static lmp::cc::appl::EvReconfig  theApplEvent;
-   };
+    class EvReconfig
+    {
+    public:
+      static lmp::cc::appl::EvReconfig  theApplEvent;
+    };
     class EvConfRet
     {
-	public:
+    public:
       static lmp::cc::appl::EvConfRet  theApplEvent;
     };
     class EvHelloRet
     {
-	public:
+    public:
       static lmp::cc::appl::EvHelloRet  theApplEvent;
     };
     class EvDownTimer
     {
-	public:
+    public:
       static lmp::cc::appl::EvDownTimer  theApplEvent;
     };
     class FSM_IPCC

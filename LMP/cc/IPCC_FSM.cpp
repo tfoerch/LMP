@@ -32,10 +32,10 @@ namespace boost
 {
   namespace msm
   {
-  	namespace front
-	{
+    namespace front
+    {
       struct none;
-	}
+    }
   }
 }
 
@@ -49,24 +49,24 @@ namespace lmp
 {
   namespace cc
   {
-	// overwrite of the base state (not default)
-	struct my_visitable_state
-	{
-	  // signature of the accept function
-	  typedef msm::back::args<void, SomeVisitor&> accept_sig;
+    // overwrite of the base state (not default)
+    struct my_visitable_state
+    {
+      // signature of the accept function
+      typedef msm::back::args<void, SomeVisitor&> accept_sig;
 
-	  // we also want polymorphic states
-	  virtual ~my_visitable_state() {}
-	  virtual const lmp::cc::appl::State& getApplState() const
-	  {
-		static lmp::cc::appl::Down dummy;
-		return dummy;
-	  }
-	  void accept(SomeVisitor& visitor) const
-	  {
-  	    visitor.visit_state(*this);
-	  }
-	};
+      // we also want polymorphic states
+      virtual ~my_visitable_state() {}
+      virtual const lmp::cc::appl::State& getApplState() const
+      {
+        static lmp::cc::appl::Down dummy;
+        return dummy;
+      }
+      void accept(SomeVisitor& visitor) const
+      {
+        visitor.visit_state(*this);
+      }
+    };
     // front-end: define the FSM structure
     struct cc_fsm_ : public msm::front::state_machine_def<cc_fsm_, my_visitable_state>
     {
@@ -270,6 +270,10 @@ namespace lmp
       {
         template <class EVT,class FSM,class SourceState,class TargetState>
         void operator()(EVT const&, FSM&,SourceState& ,TargetState& );
+        template <class FSM,class SourceState,class TargetState>
+        void operator()(EvContenLost const& evt, FSM& fsm,SourceState& src,TargetState& tgt);
+        template <class FSM,class SourceState,class TargetState>
+        void operator()(EvNewConfOK const& evt, FSM& fsm,SourceState& src,TargetState& tgt);
     	static lmp::cc::appl::ActionTag<lmp::cc::appl::Action::ActionSendConfigAck>  theActionTag;
       };
       struct SendConfigNack
@@ -514,6 +518,18 @@ namespace lmp
     {
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
     }
+    template <class FSM,class SourceState,class TargetState>
+    void cc_fsm_::SendConfigAck::operator()(EvContenLost const& evt, FSM& fsm,SourceState& src,TargetState& tgt)
+    {
+      fsm.theIPCC.updateConfig(evt.m_ConfigMsg);
+      fsm.theIPCC.reportTransition(SourceState::theApplState, EvContenLost::theApplEvent, TargetState::theApplState, theActionTag);
+    }
+    template <class FSM,class SourceState,class TargetState>
+    void cc_fsm_::SendConfigAck::operator()(EvNewConfOK const& evt, FSM& fsm,SourceState& src,TargetState& tgt)
+    {
+      fsm.theIPCC.updateConfig(evt.m_ConfigMsg);
+      fsm.theIPCC.reportTransition(SourceState::theApplState, EvNewConfOK::theApplEvent, TargetState::theApplState, theActionTag);
+    }
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::SendConfigNack::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {
@@ -565,7 +581,7 @@ namespace lmp
     template <class FSM,class SourceState,class TargetState>
     bool cc_fsm_::AcceptableConfig::operator()(EvContenLost const& evt, FSM& fsm,SourceState& src,TargetState& tgt)
     {
-      return fsm.theIPCC.isConfigAcceptable(evt.theConfigMsg);
+      return fsm.theIPCC.isConfigAcceptable(evt.m_ConfigMsg);
     }
     template <class EVT,class FSM,class SourceState,class TargetState>
     bool cc_fsm_::NotAcceptableConfig::operator()(EVT const& evt,FSM& fsm,SourceState& src,TargetState& tgt)
@@ -575,14 +591,14 @@ namespace lmp
     template <class FSM,class SourceState,class TargetState>
     bool cc_fsm_::NotAcceptableConfig::operator()(EvContenLost const& evt, FSM& fsm,SourceState& src,TargetState& tgt)
     {
-      return !fsm.theIPCC.isConfigAcceptable(evt.theConfigMsg);
+      return !fsm.theIPCC.isConfigAcceptable(evt.m_ConfigMsg);
     }
     // Replaces the default no-transition response.
     template <class FSM,class Event>
     void cc_fsm_::no_transition(Event const& e, FSM&, int state)
     {
       std::cout << "no transition from state " << state
-    			<< " on event " << typeid(e).name() << std::endl;
+                << " on event " << typeid(e).name() << std::endl;
     }
 
     // Pick a back-end

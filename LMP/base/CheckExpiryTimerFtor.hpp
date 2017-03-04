@@ -19,7 +19,7 @@ namespace lmp
     public:
       CheckExpiryTimerFtor(
     	boost::asio::io_service&                 io_service,
-		const boost::posix_time::time_duration&  expiry_time);
+    	const boost::posix_time::time_duration&  expiry_time);
       CheckExpiryTimerFtor(
         const CheckExpiryTimerFtor&      other);
     private:
