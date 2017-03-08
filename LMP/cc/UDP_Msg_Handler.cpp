@@ -17,33 +17,30 @@ namespace
   struct msg_variants_processor : boost::static_visitor<void>
   {
     msg_variants_processor(
-        lmp::cc::IpccMsgReceiveIF&           ipcc,
-      const boost::asio::ip::udp::endpoint&  sender_endpoint)
-    : m_ipcc(ipcc),
-      m_sender_endpoint(sender_endpoint)
+        lmp::cc::IpccMsgReceiveIF&           ipcc)
+    : m_ipcc(ipcc)
     {}
     void operator()(const lmp::msg::ConfigMsg& config) const
     {
-      m_ipcc.processReceivedMessage(m_sender_endpoint, config);
+      m_ipcc.processReceivedMessage(config);
     }
     void operator()(const lmp::msg::ConfigAckMsg& configAck) const
     {
-      m_ipcc.processReceivedMessage(m_sender_endpoint, configAck);
+      m_ipcc.processReceivedMessage(configAck);
     }
     void operator()(const lmp::msg::ConfigNackMsg& configNack) const
     {
-      m_ipcc.processReceivedMessage(m_sender_endpoint, configNack);
+      m_ipcc.processReceivedMessage(configNack);
     }
     void operator()(const lmp::msg::HelloMsg& hello) const
     {
-      m_ipcc.processReceivedMessage(m_sender_endpoint, hello);
+      m_ipcc.processReceivedMessage(hello);
     }
     void operator()(const lmp::msg::UnknownMessage& unknownMessage) const
     {
-      m_ipcc.processReceivedMessage(m_sender_endpoint, unknownMessage);
+      m_ipcc.processReceivedMessage(unknownMessage);
     }
     lmp::cc::IpccMsgReceiveIF&                      m_ipcc;
-    const boost::asio::ip::udp::endpoint&  m_sender_endpoint;
   };
 }
 
@@ -83,11 +80,10 @@ namespace lmp
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter == m_IPCCs.end())
       {
-        IpccImpl*  ipccPtr = new IpccImpl(m_node.getNodeId(), networkIFSocket.getLocalCCId(), false);
+        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, sender_endpoint, false);
         if (ipccPtr)
         {
           ipccPtr->enable();
-          ipccPtr->registerObserver(m_node);
           ipccIter = m_IPCCs.insert(IPCCMap::value_type(sender_endpoint,
                                                         ipccPtr)).first;
         }
@@ -108,7 +104,7 @@ namespace lmp
                     msgGrammar,
                     parsedMessage))
           {
-            boost::apply_visitor(msg_variants_processor(*ipccPtr, sender_endpoint), parsedMessage);
+            boost::apply_visitor(msg_variants_processor(*ipccPtr), parsedMessage);
           }
         }
       }

@@ -7,8 +7,6 @@
  *      Author: tom
  */
 
-#include <iostream>
-
 namespace lmp
 {
   namespace cc
@@ -19,9 +17,11 @@ namespace lmp
     {
     public:
       inline void ipccAdjacencyAdded(
-        IpccApplicationIF&   ipcc) {  do_ipccAdjacencyAdded(ipcc); }
+        IpccApplicationIF&   ipcc)
+      {  do_ipccAdjacencyAdded(ipcc); }
       inline void ipccAdjacencyRemoved(
-        IpccApplicationIF&   ipcc) {  do_ipccAdjacencyRemoved(ipcc); }
+        IpccApplicationIF&   ipcc)
+      {  do_ipccAdjacencyRemoved(ipcc); }
       virtual ~IpccAdjacencyObserverIF(){}
     private:
       virtual void do_ipccAdjacencyAdded(

@@ -7,7 +7,7 @@
  *      Author: tom
  */
 
-#include "cc/IPCC_ObserverIF.hpp"
+#include "cc/IPCC_Event.hpp"
 #include "msg/Config.hpp"
 
 #include <boost/optional/optional.hpp>     // for optional
@@ -17,6 +17,10 @@ namespace lmp
 {
   namespace cc
   {
+    namespace appl
+    {
+      class State;
+    }
     class IpccFsmInvokeIF;
     struct SomeVisitor
     {

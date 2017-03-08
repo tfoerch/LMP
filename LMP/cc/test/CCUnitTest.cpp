@@ -9,6 +9,9 @@
 #include "cc/IPCC_Impl.hpp"
 #include "cc/IPCC_NetIFSocket.hpp"
 #include "cc/UDP_Msg_Handler.hpp"
+#include "cc/IPCC_State.hpp"
+#include "cc/IPCC_Event.hpp"
+#include "cc/IPCC_Action.hpp"
 #include "msg/Config.hpp"
 #include "msg/ConfigAck.hpp"
 #include "msg/ConfigNack.hpp"
@@ -79,7 +82,6 @@ BOOST_AUTO_TEST_CASE( getIfAddress )
 
 BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
 {
-
   boost::asio::io_service io_service;
   std::string ifName = "lo";
   lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
@@ -180,362 +182,465 @@ BOOST_AUTO_TEST_SUITE( lmp_ipcc_active )
 
 BOOST_AUTO_TEST_CASE( activeIPCC_CCDown )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Event::EvBringUp,
-                                                                               lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Action::ActionSendConfig));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 1;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 1;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    unsigned short node2_port = 9702;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Event::EvBringUp,
+                                                                                 lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Action::ActionSendConfig));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  activeIPCC.evtCCDown();
-  {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Event::EvCCDn,
-                                                                               lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Action::ActionStopSendConfig));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    activeIPCC.evtCCDown();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Event::EvCCDn,
+                                                                                 lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Action::ActionStopSendConfig));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      }
     }
   }
 }
 
 BOOST_AUTO_TEST_CASE( activeIPCC_AdminDown )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 1;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 1;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    unsigned short node2_port = 9702;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  activeIPCC.disable();
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    activeIPCC.disable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      }
     }
   }
 }
 
 BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  boost::asio::ip::address_v4  loAddrV4 = boost::asio::ip::address_v4::from_string("127.0.0.1");
-  unsigned short node1_port = 9701;
-  boost::asio::ip::udp::endpoint node1_endpoint(loAddrV4, node1_port);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Event::EvBringUp,
-                                                                               lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Action::ActionSendConfig));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 1;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 1;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    unsigned short node2_port = 9702;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Event::EvBringUp,
+                                                                                 lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Action::ActionSendConfig));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  lmp::msg::ConfigNackMsg configNackMsg =
-    { false,
-      false,
-      { { false, { 2 } },        // localCCId
-	{ false, { 115 } },      // localNodeId
-        { false, { 7 } },        // remoteCCId
-        { false, { 34 } },       // messageId
-        { false, { 117 } },      // remoteNodeId
-        { true, { 100, 450 } } } // helloConfig
-    };
-  activeIPCC.processReceivedMessage(node1_endpoint, configNackMsg);
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::msg::ConfigNackMsg configNackMsg =
+      { false,
+        false,
+        { { false, { 2 } },        // localCCId
+          { false, { 115 } },      // localNodeId
+          { false, { 7 } },        // remoteCCId
+          { false, { 34 } },       // messageId
+          { false, { 117 } },      // remoteNodeId
+          { true, { 100, 450 } } } // helloConfig
+      };
+    activeIPCC.processReceivedMessage(configNackMsg);
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  activeIPCC.disable();
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    activeIPCC.disable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      }
     }
   }
 }
 
 BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  boost::asio::ip::address_v4  loAddrV4 = boost::asio::ip::address_v4::from_string("127.0.0.1");
-  unsigned short node1_port = 9701;
-  boost::asio::ip::udp::endpoint node1_endpoint(loAddrV4, node1_port);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Event::EvBringUp,
-                                                                               lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Action::ActionSendConfig));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 123;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 7001;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    lmp::DWORD  node2_nodeId = 115;
+    unsigned short node2_port = 9702;
+    lmp::DWORD  node2_1stCCId = 7002;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Event::EvBringUp,
+                                                                                 lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Action::ActionSendConfig));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
-  {
-    lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
-    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
-  }
-  lmp::msg::ConfigMsg  configMsg =
-    { false,
-      false,
-      { { false, { 2 } },      // localCCId
-        { false, { 34 } },     // messageId
-        { false, { 115 } },    // localNodeId
-        configObjectSequence } // configObjects
-    };
+    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+    {
+      lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
+      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+    }
+    lmp::msg::ConfigMsg  configMsg =
+      { false,
+        false,
+        { { false, { node2_1stCCId } },      // localCCId
+          { false, { 34 } },     // messageId
+          { false, { node2_nodeId } },    // localNodeId
+          configObjectSequence } // configObjects
+      };
 
-  activeIPCC.processReceivedMessage(node1_endpoint, configMsg);
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    activeIPCC.processReceivedMessage(configMsg);
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  activeIPCC.disable();
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    activeIPCC.disable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      }
     }
   }
 }
 
 BOOST_AUTO_TEST_CASE( activeIPCC_Reconfig )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Event::EvBringUp,
-                                                                               lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Action::ActionSendConfig));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 123;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 7001;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    lmp::DWORD  node2_nodeId = 115;
+    unsigned short node2_port = 9702;
+    lmp::DWORD  node2_1stCCId = 7002;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Event::EvBringUp,
+                                                                                 lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Action::ActionSendConfig));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  lmp::obj::config::HelloConfigBody  helloConfig = { 150, 600 };
-  activeIPCC.reconfigure(helloConfig);
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::obj::config::HelloConfigBody  helloConfig = { 150, 600 };
+    activeIPCC.reconfigure(helloConfig);
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
+    activeIPCC.disable();
   }
-  activeIPCC.disable();
 }
 
 BOOST_AUTO_TEST_CASE( activeIPCC_ConfRet )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Event::EvBringUp,
-                                                                               lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Action::ActionSendConfig));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 123;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 7001;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    lmp::DWORD  node2_nodeId = 115;
+    unsigned short node2_port = 9702;
+    lmp::DWORD  node2_1stCCId = 7002;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Event::EvBringUp,
+                                                                                 lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Action::ActionSendConfig));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  activeIPCC.evtConfRet();
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    activeIPCC.evtConfRet();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
+    activeIPCC.disable();
   }
-  activeIPCC.disable();
 }
 
 BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  boost::asio::ip::address_v4  loAddrV4 = boost::asio::ip::address_v4::from_string("127.0.0.1");
-  unsigned short node1_port = 9701;
-  boost::asio::ip::udp::endpoint node1_endpoint(loAddrV4, node1_port);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Event::EvBringUp,
-                                                                               lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Action::ActionSendConfig));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 123;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 7001;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    lmp::DWORD  node2_nodeId = 128;
+    unsigned short node2_port = 9702;
+    lmp::DWORD  node2_1stCCId = 7002;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Event::EvBringUp,
+                                                                                 lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Action::ActionSendConfig));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
-  {
-    lmp::obj::config::HelloConfigData  helloConfig = { true, { 450, 450 } };// helloConfig
-    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
-  }
-  lmp::msg::ConfigMsg  configMsg =
-    { false,
-      false,
-      { { false, { 2 } },      // localCCId
-        { false, { 34 } },     // messageId
-        { false, { 128 } },    // localNodeId
-        configObjectSequence } // configObjectss
-    };
-  activeIPCC.processReceivedMessage(node1_endpoint, configMsg);
-  // BOOST_TEST_MESSAGE("getActiveState");
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfRcv());
+      lmp::obj::config::HelloConfigData  helloConfig = { true, { 450, 450 } };// helloConfig
+      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
     }
-  }
-  activeIPCC.disable();
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::msg::ConfigMsg  configMsg =
+      { false,
+        false,
+        { { false, { node2_1stCCId } },      // localCCId
+          { false, { 34 } },     // messageId
+          { false, { node2_nodeId } },    // localNodeId
+          configObjectSequence } // configObjectss
+      };
+    activeIPCC.processReceivedMessage(configMsg);
+    // BOOST_TEST_MESSAGE("getActiveState");
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfRcv());
+      }
+    }
+    activeIPCC.disable();
+    {
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      }
     }
   }
 }
 
 BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  boost::asio::ip::address_v4  loAddrV4 = boost::asio::ip::address_v4::from_string("127.0.0.1");
-  unsigned short node1_port = 9701;
-  boost::asio::ip::udp::endpoint node1_endpoint(loAddrV4, node1_port);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Event::EvBringUp,
-                                                                               lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Action::ActionSendConfig));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
-    {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
-    }
-  }
-  lmp::msg::ConfigAckMsg configAckMsg =
-    { false,
-      false,
-      { { false, { 2 } },      // localCCId
-        { false, { 115 } },    // localNodeId
-        { false, { 7 } },      // remoteCCId
-        { false, { 34 } },     // messageId
-        { false, { 117 } } }   // remoteNodeId
-    };
-  activeIPCC.processReceivedMessage(node1_endpoint, configAckMsg);
-  {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Event::EvConfDone,
-                                                                               lmp::cc::appl::State::Active,
-                                                                               lmp::cc::appl::Action::ActionStopSendConfig));
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
-                                                                               lmp::cc::appl::Event::EvConfDone,
-                                                                               lmp::cc::appl::State::Active,
-                                                                               lmp::cc::appl::Action::ActionSendHello));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
-    {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Active());
-    }
-  }
-  {
-    lmp::msg::HelloMsg  helloMsg =
-      { false,
-        false,
-        { { false, { 1, 0 } } }    // hello
-      };
-    activeIPCC.processReceivedMessage(node1_endpoint, helloMsg);
+    lmp::DWORD  node1_nodeId = 123;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 7001;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    lmp::DWORD  node2_nodeId = 115;
+    unsigned short node2_port = 9702;
+    lmp::DWORD  node2_1stCCId = 7002;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
       lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Active,
-                                                                                 lmp::cc::appl::Event::EvSeqNumErr,
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Event::EvBringUp,
+                                                                                 lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Action::ActionSendConfig));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
+    }
+    lmp::msg::ConfigAckMsg configAckMsg =
+      { false,
+        false,
+        { { false, { node2_1stCCId } },      // localCCId
+          { false, { node2_nodeId } },    // localNodeId
+          { false, { node1_1stCCId } },      // remoteCCId
+          { false, { 34 } },     // messageId
+          { false, { node1_nodeId } } }   // remoteNodeId
+      };
+    activeIPCC.processReceivedMessage(configAckMsg);
+    {
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Event::EvConfDone,
                                                                                  lmp::cc::appl::State::Active,
-                                                                                 lmp::cc::appl::Action::ActionNoAction));
+                                                                                 lmp::cc::appl::Action::ActionStopSendConfig));
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::ConfSnd,
+                                                                                 lmp::cc::appl::Event::EvConfDone,
+                                                                                 lmp::cc::appl::State::Active,
+                                                                                 lmp::cc::appl::Action::ActionSendHello));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
       const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -545,59 +650,59 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Active());
       }
     }
-  }
-  {
-    lmp::msg::HelloMsg  helloMsg =
-      { false,
-        false,
-        { { false, { 1, 1 } } }     // hello
-      };
-    activeIPCC.processReceivedMessage(node1_endpoint, helloMsg);
     {
-      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Active,
-                                                                                 lmp::cc::appl::Event::EvHelloRcvd,
-                                                                                 lmp::cc::appl::State::Up,
-                                                                                 lmp::cc::appl::Action::ActionNoAction));
-      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-      ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-      BOOST_CHECK(activeState);
-      if (activeState)
+      lmp::msg::HelloMsg  helloMsg =
+        { false,
+          false,
+          { { false, { 1, 0 } } }    // hello
+        };
+      activeIPCC.processReceivedMessage(helloMsg);
       {
-        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Up());
+        lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+        expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Active,
+                                                                                 lmp::cc::appl::Event::EvSeqNumErr,
+                                                                                 lmp::cc::appl::State::Active,
+                                                                                 lmp::cc::appl::Action::ActionNoAction));
+        BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+        ipccObserver.reset();
+        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+        BOOST_CHECK(activeState);
+        if (activeState)
+        {
+          BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Active());
+        }
       }
     }
-  }
-  activeIPCC.evtHelloRet();
-  {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Up,
-                                                                               lmp::cc::appl::Event::EvHelloRet,
-                                                                               lmp::cc::appl::State::Up,
-                                                                               lmp::cc::appl::Action::ActionSendHello));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Up());
+      lmp::msg::HelloMsg  helloMsg =
+        { false,
+          false,
+          { { false, { 1, 1 } } }     // hello
+        };
+      activeIPCC.processReceivedMessage(helloMsg);
+      {
+        lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+        expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Active,
+                                                                                   lmp::cc::appl::Event::EvHelloRcvd,
+                                                                                   lmp::cc::appl::State::Up,
+                                                                                   lmp::cc::appl::Action::ActionNoAction));
+        BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+        ipccObserver.reset();
+        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+        BOOST_CHECK(activeState);
+        if (activeState)
+        {
+          BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Up());
+        }
+      }
     }
-  }
-  {
-    lmp::msg::HelloMsg  helloMsg =
-      { false,
-        false,
-        { { false, { 2, 2 } } }   // hello
-      };
-    activeIPCC.processReceivedMessage(node1_endpoint, helloMsg);
+    activeIPCC.evtHelloRet();
     {
       lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
       expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Up,
-                                                                                 lmp::cc::appl::Event::EvHelloRcvd,
+                                                                                 lmp::cc::appl::Event::EvHelloRet,
                                                                                  lmp::cc::appl::State::Up,
-                                                                                 lmp::cc::appl::Action::ActionNoAction));
+                                                                                 lmp::cc::appl::Action::ActionSendHello));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
       const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
@@ -607,37 +712,60 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Up());
       }
     }
-  }
-  activeIPCC.disable();
-  {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Up,
-                                                                               lmp::cc::appl::Event::EvAdminDown,
-                                                                               lmp::cc::appl::State::GoingDown,
-                                                                               lmp::cc::appl::Action::ActionSetCCDownFlag));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::GoingDown());
+      lmp::msg::HelloMsg  helloMsg =
+        { false,
+          false,
+          { { false, { 2, 2 } } }   // hello
+        };
+      activeIPCC.processReceivedMessage(helloMsg);
+      {
+        lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+        expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Up,
+                                                                                   lmp::cc::appl::Event::EvHelloRcvd,
+                                                                                   lmp::cc::appl::State::Up,
+                                                                                   lmp::cc::appl::Action::ActionNoAction));
+        BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+        ipccObserver.reset();
+        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+        BOOST_CHECK(activeState);
+        if (activeState)
+        {
+          BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Up());
+        }
+      }
     }
-  }
-  activeIPCC.evtDownTimer();
-  {
-    lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
-    expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::GoingDown,
-                                                                               lmp::cc::appl::Event::EvDownTimer,
-                                                                               lmp::cc::appl::State::Down,
-                                                                               lmp::cc::appl::Action::ActionStopSendHello));
-    BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-    ipccObserver.reset();
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    activeIPCC.disable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::Up,
+                                                                                 lmp::cc::appl::Event::EvAdminDown,
+                                                                                 lmp::cc::appl::State::GoingDown,
+                                                                                 lmp::cc::appl::Action::ActionSetCCDownFlag));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::GoingDown());
+      }
+    }
+    activeIPCC.evtDownTimer();
+    {
+      lmp::cc::appl::TestIpccObserver::TransistionSequence expectedTransitions;
+      expectedTransitions.push_back(lmp::cc::appl::TestIpccObserver::TransRecord(lmp::cc::appl::State::GoingDown,
+                                                                                 lmp::cc::appl::Event::EvDownTimer,
+                                                                                 lmp::cc::appl::State::Down,
+                                                                                 lmp::cc::appl::Action::ActionStopSendHello));
+      BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
+      ipccObserver.reset();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      }
     }
   }
 }
@@ -645,59 +773,74 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
 
 BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
 {
-  lmp::cc::IpccImpl  activeIPCC(123, 7001, true);
-  boost::asio::ip::address_v4  loAddrV4 = boost::asio::ip::address_v4::from_string("127.0.0.1");
-  unsigned short node1_port = 9701;
-  boost::asio::ip::udp::endpoint node1_endpoint(loAddrV4, node1_port);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
-  activeIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 123;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 7001;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    lmp::DWORD  node2_nodeId = 128;
+    unsigned short node2_port = 9702;
+    lmp::DWORD  node2_1stCCId = 7002;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, node2_endpoint, true);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
+    activeIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
+      }
     }
-  }
-  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
-  {
-    lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
-    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
-  }
-  lmp::msg::ConfigMsg  configMsg =
-    { false,
-      false,
-      { { false, { 2 } },      // localCCId
-        { false, { 32 } },     // messageId
-        { false, { 128 } },    // localNodeId
-        configObjectSequence } // configObjectss
-    };
-  activeIPCC.processReceivedMessage(node1_endpoint, configMsg);
-  // BOOST_TEST_MESSAGE("getActiveState");
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Active());
+      lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
+      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
     }
-  }
-  activeIPCC.disable();
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::msg::ConfigMsg  configMsg =
+      { false,
+        false,
+        { { false, { 7002 } },      // localCCId
+          { false, { 32 } },     // messageId
+          { false, { node2_nodeId } },    // localNodeId
+          configObjectSequence } // configObjectss
+      };
+    activeIPCC.processReceivedMessage(configMsg);
+    // BOOST_TEST_MESSAGE("getActiveState");
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::GoingDown());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Active());
+      }
     }
-  }
-  activeIPCC.evtDownTimer();
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    activeIPCC.disable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::GoingDown());
+      }
+    }
+    activeIPCC.evtDownTimer();
+    {
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Down());
+      }
     }
   }
 }
@@ -709,43 +852,58 @@ BOOST_AUTO_TEST_SUITE( lmp_ipcc_passive )
 
 BOOST_AUTO_TEST_CASE( passiveIPCC )
 {
-  lmp::cc::IpccImpl  passiveIPCC(123, 7001, false);
-  boost::asio::ip::address_v4  loAddrV4 = boost::asio::ip::address_v4::from_string("127.0.0.1");
-  unsigned short node1_port = 9701;
-  boost::asio::ip::udp::endpoint node1_endpoint(loAddrV4, node1_port);
-  lmp::cc::appl::TestIpccObserver  ipccObserver(passiveIPCC);
-  passiveIPCC.enable();
+  boost::asio::io_service io_service;
+  std::string ifName = "lo";
+  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  BOOST_CHECK(addr.first);
+  if (addr.first)
   {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = passiveIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::DWORD  node1_nodeId = 123;
+    lmp::node::Node  node1(node1_nodeId);
+    lmp::cc::UDPMsgHandler node1_MsgHandler(node1);
+    unsigned short node1_port = 9701;
+    boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
+    lmp::DWORD  node1_1stCCId = 7001;
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, node1_endpoint, node1_MsgHandler);
+    lmp::DWORD  node2_nodeId = 128;
+    unsigned short node2_port = 9702;
+    lmp::DWORD  node2_1stCCId = 7002;
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    lmp::cc::IpccImpl  passiveIPCC(node1, node1_lmpSocket, node2_endpoint, false);
+    lmp::cc::appl::TestIpccObserver  ipccObserver(passiveIPCC);
+    passiveIPCC.enable();
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfRcv());
+      const boost::optional<const lmp::cc::appl::State&>& activeState = passiveIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfRcv());
+      }
     }
-  }
-  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
-  {
-    lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
-    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
-  }
-  lmp::msg::ConfigMsg  configMsg =
-    { false,
-      false,
-      { { false, { 2 } },      // localCCId
-        { false, { 38 } },     // messageId
-        { false, { 128 } },    // localNodeId
-        configObjectSequence } // configObjectss
-    };
-  passiveIPCC.processReceivedMessage(node1_endpoint, configMsg);
-  {
-    const boost::optional<const lmp::cc::appl::State&>& activeState = passiveIPCC.getActiveState();
-    BOOST_CHECK(activeState);
-    if (activeState)
+    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
     {
-      BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Active());
+      lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
+      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
     }
+    lmp::msg::ConfigMsg  configMsg =
+      { false,
+        false,
+        { { false, { node2_1stCCId } },      // localCCId
+          { false, { 38 } },     // messageId
+          { false, { node2_nodeId } },    // localNodeId
+          configObjectSequence } // configObjectss
+      };
+    passiveIPCC.processReceivedMessage(configMsg);
+    {
+      const boost::optional<const lmp::cc::appl::State&>& activeState = passiveIPCC.getActiveState();
+      BOOST_CHECK(activeState);
+      if (activeState)
+      {
+        BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::Active());
+      }
+    }
+    passiveIPCC.disable();
   }
-  passiveIPCC.disable();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

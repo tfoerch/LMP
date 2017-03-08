@@ -41,7 +41,7 @@ lmp_ipcc::IPCC_ptr Node_i::createIPCC(
 {
   if (theIPCCByCCId.find(localCCId) == theIPCCByCCId.end())
   {
-	lmp_ipcc::IPCC_i* servant = new lmp_ipcc::IPCC_i(thePOA, this->_this(), localCCId, localAddress, localPortNumber);
+    lmp_ipcc::IPCC_i* servant = new lmp_ipcc::IPCC_i(thePOA, this->_this(), localCCId, localAddress, localPortNumber);
     PortableServer::ObjectId *oid=thePOA->activate_object(servant);  delete oid;
     lmp_ipcc::IPCC_ptr ipcc = servant->_this();
     return theIPCCByCCId.insert(IPCCByCCIdMap::value_type(localCCId, lmp_ipcc::IPCC::_duplicate(ipcc))).first->second;
@@ -55,7 +55,7 @@ lmp_ipcc::IPCC_ptr Node_i::getIPCC(
   IPCCByCCIdMap::const_iterator ipccIter = theIPCCByCCId.find(localCCId);
   if (ipccIter != theIPCCByCCId.end())
   {
-	return ipccIter->second;
+    return ipccIter->second;
   }
   throw lmp_node::No_Such_Entity();
 }
@@ -66,7 +66,7 @@ void Node_i::deleteIPCC(
   IPCCByCCIdMap::iterator ipccIter = theIPCCByCCId.find(localCCId);
   if (ipccIter != theIPCCByCCId.end())
   {
-	theIPCCByCCId.erase(ipccIter);
+    theIPCCByCCId.erase(ipccIter);
   }
   throw lmp_node::No_Such_Entity();
 }
@@ -77,10 +77,10 @@ lmp_neighbor::Neighbor_ptr Node_i::createNeighbor(
 {
   if (theNeighborByNodeIdMap.find(remoteNodeId) == theNeighborByNodeIdMap.end())
   {
-	lmp_neighbor::Neighbor_i* servant = new lmp_neighbor::Neighbor_i(thePOA, this->_this(), remoteNodeId);
-	PortableServer::ObjectId *oid=thePOA->activate_object(servant);  delete oid;
-	lmp_neighbor::Neighbor_ptr neighbor = servant->_this();
-	return theNeighborByNodeIdMap.insert(NeighborByNodeIdMap::value_type(remoteNodeId, lmp_neighbor::Neighbor::_duplicate(neighbor))).first->second;
+    lmp_neighbor::Neighbor_i* servant = new lmp_neighbor::Neighbor_i(thePOA, this->_this(), remoteNodeId);
+    PortableServer::ObjectId *oid=thePOA->activate_object(servant);  delete oid;
+    lmp_neighbor::Neighbor_ptr neighbor = servant->_this();
+    return theNeighborByNodeIdMap.insert(NeighborByNodeIdMap::value_type(remoteNodeId, lmp_neighbor::Neighbor::_duplicate(neighbor))).first->second;
   }
   throw lmp_node::Entity_Already_Exists();
 }
@@ -91,7 +91,7 @@ lmp_neighbor::Neighbor_ptr Node_i::getNeighbor(
   NeighborByNodeIdMap::const_iterator neighborIter = theNeighborByNodeIdMap.find(remoteNodeId);
   if (neighborIter != theNeighborByNodeIdMap.end())
   {
-	return neighborIter->second;
+    return neighborIter->second;
   }
   throw lmp_node::No_Such_Entity();
 }
@@ -102,7 +102,7 @@ void Node_i::deleteNeighbor(
   NeighborByNodeIdMap::iterator neighborIter = theNeighborByNodeIdMap.find(remoteNodeId);
   if (neighborIter != theNeighborByNodeIdMap.end())
   {
-	theNeighborByNodeIdMap.erase(neighborIter);
+    theNeighborByNodeIdMap.erase(neighborIter);
   }
   throw lmp_node::No_Such_Entity();
 }
@@ -111,7 +111,7 @@ void Node_i::destroy()
 {
   if (!CORBA::is_nil(theNodeRegistry))
   {
-	theNodeRegistry->deregisterNode(this->_this());
+    theNodeRegistry->deregisterNode(this->_this());
   }
   PortableServer::ObjectId *oid=thePOA->servant_to_id(this);
   std::cout << "before deactivate_object" << std::endl;
@@ -122,7 +122,6 @@ void Node_i::destroy()
   // Shutdown the ORB (but do not wait for completion).  This also
   // causes the main thread to unblock from CORBA::ORB::run().
   theORB->shutdown(0);
-
 }
 
 } // end namespace lmp_node

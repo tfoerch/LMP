@@ -26,21 +26,11 @@ namespace lmp
       { do_disable(); }
       inline lmp::DWORD getNodeId() const
       { return do_getNodeId(); }
-//      inline void registerObserver(
-//        appl::NeighborObserverProxyIF&  observer)
-//      { do_registerObserver(observer); }
-//      inline void deregisterObserver(
-//        appl::NeighborObserverProxyIF&  observer)
-//      { do_deregisterObserver(observer); }
       virtual ~NeighborApplicationIF(){}
     private:
       virtual void do_enable() = 0;
       virtual void do_disable() = 0;
       virtual lmp::DWORD do_getNodeId() const = 0;
-//      virtual void do_registerObserver(
-//        appl::NeighborObserverProxyIF&  observer) = 0;
-//      virtual void do_deregisterObserver(
-//        appl::NeighborObserverProxyIF&  observer) = 0;
     };
   } // namespace neighbor
 } // namespace lmp

@@ -25,22 +25,22 @@ namespace lmp
       inline NeighborApplicationIF const* getNeighbor(
         lmp::DWORD  neighborNodeId) const
       { return do_getNeighbor(neighborNodeId); }
-      inline NeighborApplicationIF const* neighborAdjacencyAdded(
+      inline void neighborAdjacencyAdded(
         lmp::DWORD              neighborNodeId,
         cc::IpccApplicationIF&  ipcc)
-      { return do_neighborAdjacencyAdded(neighborNodeId, ipcc); }
-      inline bool neighborAdjacencyRemoved(
+      { do_neighborAdjacencyAdded(neighborNodeId, ipcc); }
+      inline void neighborAdjacencyRemoved(
         lmp::DWORD              neighborNodeId,
         cc::IpccApplicationIF&  ipcc)
-      { return do_neighborAdjacencyRemoved(neighborNodeId, ipcc); }
+      { do_neighborAdjacencyRemoved(neighborNodeId, ipcc); }
       virtual ~NeighborAdjacencyObserverIF(){}
     private:
       virtual NeighborApplicationIF const* do_getNeighbor(
         lmp::DWORD  neighborNodeId) const = 0;
-      virtual NeighborApplicationIF const* do_neighborAdjacencyAdded(
+      virtual void do_neighborAdjacencyAdded(
         lmp::DWORD              neighborNodeId,
         cc::IpccApplicationIF&  ipcc) = 0;
-      virtual bool do_neighborAdjacencyRemoved(
+      virtual void do_neighborAdjacencyRemoved(
         lmp::DWORD              neighborNodeId,
         cc::IpccApplicationIF&  ipcc) = 0;
     };

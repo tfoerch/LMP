@@ -39,28 +39,24 @@ namespace lmp
     }
 
     void TestIpccMsgReceiver::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::ConfigMsg&      configMsg)
     {
       m_ConfigMessageReceivedFtor.set();
     }
 
     void TestIpccMsgReceiver::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::ConfigAckMsg&   configAckMsg)
     {
       m_ConfigAckMessageReceivedFtor.set();
     }
 
     void TestIpccMsgReceiver::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::ConfigNackMsg&  configNackMsg)
     {
       m_ConfigNackMessageReceivedFtor.set();
     }
 
     void TestIpccMsgReceiver::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::HelloMsg&       helloMsg)
     {
       m_HelloMessageReceivedFtor.set();

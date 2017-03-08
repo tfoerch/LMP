@@ -13,8 +13,6 @@
 #include "msg/Hello.hpp"
 #include "msg/UnknownMessage.hpp"
 
-#include <boost/asio/ip/udp.hpp>
-
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp
 {
@@ -24,41 +22,31 @@ namespace lmp
     {
     public:
       inline void processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigMsg&                  configMsg)
-      { do_processReceivedMessage(sender_endpoint, configMsg); }
+      { do_processReceivedMessage(configMsg); }
       inline void processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigAckMsg&               configAckMsg)
-      { do_processReceivedMessage(sender_endpoint, configAckMsg); }
+      { do_processReceivedMessage(configAckMsg); }
       inline void processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigNackMsg&              configNackMsg)
-      { do_processReceivedMessage(sender_endpoint, configNackMsg); }
+      { do_processReceivedMessage(configNackMsg); }
       inline void processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::HelloMsg&                   helloMsg)
-      { do_processReceivedMessage(sender_endpoint, helloMsg); }
+      { do_processReceivedMessage(helloMsg); }
       inline void processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
         const msg::UnknownMessage&             unknownMessage)
-      { do_processReceivedMessage(sender_endpoint, unknownMessage); }
+      { do_processReceivedMessage(unknownMessage); }
       virtual ~IpccMsgReceiveIF(){}
     private:
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigMsg&                  configMsg) = 0;
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigAckMsg&               configAckMsg) = 0;
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigNackMsg&              configNackMsg) = 0;
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::HelloMsg&                   helloMsg) = 0;
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
         const msg::UnknownMessage&             unknownMessage) = 0;
     };
   } // namespace cc

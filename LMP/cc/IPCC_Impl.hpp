@@ -14,13 +14,19 @@
 #include "obj/HelloConfig.hpp"
 #include "base/ProtocolTypes.hpp"             // for DWORD
 
+#include <boost/asio/ip/udp.hpp>
 #include <boost/optional/optional.hpp>        // for optional
 #include <boost/ptr_container/ptr_deque.hpp>  // for ptr_deque
 
 namespace lmp
 {
+  namespace node
+  {
+    class Node;
+  }
   namespace cc
   {
+    class NetworkIFSocketIF;
     namespace appl
     {
       class Action;
@@ -34,9 +40,10 @@ namespace lmp
     {
     public:
       IpccImpl(
-        lmp::DWORD  localNodeId,
-        lmp::DWORD  localCCId,
-        bool        isActiveSetup);
+        node::Node&                            node,
+        NetworkIFSocketIF&                     networkIFSocket,
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+        bool                                   isActiveSetup);
       virtual ~IpccImpl();
       void reconfigure(
         const obj::config::HelloConfigBody&  helloConfig);
@@ -69,7 +76,9 @@ namespace lmp
         lmp::DWORD  remoteNodeId) const;
       virtual bool do_isConfigAcceptable(
         const msg::ConfigMsg&  configMsg) const;
-      virtual void do_updateConfig(
+      virtual void do_sendConfigAck(
+        const msg::ConfigMsg&  configMsg);
+      virtual void do_sendConfigNack(
         const msg::ConfigMsg&  configMsg);
       virtual void do_reportTransition(
     	const appl::State&   sourceState,
@@ -79,28 +88,26 @@ namespace lmp
       virtual void do_sendHelloMsg();
       // implement IpccMsgReceiveIF
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigMsg&                  configMsg);
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigAckMsg&               configAckMsg);
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::ConfigNackMsg&              configNackMsg);
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	const msg::HelloMsg&                   helloMsg);
       virtual void do_processReceivedMessage(
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
         const msg::UnknownMessage&             unknownMessage);
       // internal
       bool canAcceptNewConfig() const;
       bool isConntentionWinning(
     	const msg::ConfigMsg&  configMsg) const;
+      void updateConfig(
+        const msg::ConfigMsg&  configMsg);
 
-      lmp::DWORD                                        m_localNodeId;
+      node::Node&                                       m_node;
+      NetworkIFSocketIF&                                m_networkIFSocket;
+      const boost::asio::ip::udp::endpoint&             m_sender_endpoint;
       lmp::DWORD                                        m_remoteNodeId;
-      lmp::DWORD                                        m_localCCId;
       lmp::DWORD                                        m_remoteCCId;
       bool                                              theIsActiveSetup;
       FSM_IPCC                                          theFSM;

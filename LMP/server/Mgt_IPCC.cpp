@@ -16,8 +16,8 @@ IPCC_i::IPCC_i(
     theNodePtr(lmp_node::Node::_duplicate(nodePtr)),
     theLocalCCId(localCCId),
     theLocalAddress(localAddress),
-    theLocalPortNumber(localPortNumber),
-	theIPCCImpl(theNodePtr->getNodeId(), theLocalCCId, true)
+    theLocalPortNumber(localPortNumber)//,
+    //theIPCCImpl(theNodePtr->getNodeId(), theLocalCCId, true)
 {
   std::cout << "IPCC(localCCId = " << localCCId
 	   << ", localAddress = " << localAddress
@@ -39,29 +39,29 @@ void IPCC_i::destroy()
 void IPCC_i::enable()
 {
   std::cout << "Node(" << theNodePtr->getNodeId() << ").IPCC(localCCId = " << theLocalCCId << ") enable" << std::endl;
-  theIPCCImpl.enable();
+  //theIPCCImpl.enable();
 }
 
 void IPCC_i::disable()
 {
   std::cout << "Node(" << theNodePtr->getNodeId() << ").IPCC(localCCId = " << theLocalCCId << ") disable" << std::endl;
-  theIPCCImpl.disable();
+  //theIPCCImpl.disable();
 }
 
 void IPCC_i::registerObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
   // std::cout << "registerObserver" << std::endl;
-  lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
-  theIPCCImpl.registerObserver(observerProxy);
+  //lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
+  //theIPCCImpl.registerObserver(observerProxy);
   // std::cout << "registerObserver finished" << std::endl;
 }
 
 void IPCC_i::deregisterObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
-  lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
-  theIPCCImpl.deregisterObserver(observerProxy);
+  //lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
+  //theIPCCImpl.deregisterObserver(observerProxy);
 }
 
 } // end namespace lmp_ipcc

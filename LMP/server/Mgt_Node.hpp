@@ -17,15 +17,15 @@ public:
     CORBA::ORB_ptr                         orb,
     PortableServer::POA_ptr                poa,
     ::CORBA::Long                          nodeId,
-	::lmp_node_registry::NodeRegistry_ptr  aNodeRegistry);
+     ::lmp_node_registry::NodeRegistry_ptr  aNodeRegistry);
   virtual ~Node_i();
   virtual ::CORBA::Long getNodeId();
   virtual ::lmp_ipcc::IPCC_ptr createIPCC(
     ::CORBA::Long localCCId,
     ::CORBA::Long localAddress,
-	::CORBA::Long remoteAddress,
+    ::CORBA::Long remoteAddress,
     ::CORBA::Short localPortNumber,
-	::CORBA::Short remotePortNumber);
+    ::CORBA::Short remotePortNumber);
   virtual ::lmp_ipcc::IPCC_ptr getIPCC(
     ::CORBA::Long localCCId);
   virtual void deleteIPCC(

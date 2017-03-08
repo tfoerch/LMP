@@ -14,7 +14,7 @@ class IPCC_i : public POA_lmp_ipcc::IPCC
 public:
   IPCC_i(
     PortableServer::POA_ptr  poa,
-	::lmp_node::Node_ptr     nodePtr,
+    ::lmp_node::Node_ptr     nodePtr,
     ::CORBA::Long            localCCId,
     ::CORBA::Long            localAddress,
     ::CORBA::Short           localPortNumber);
@@ -30,7 +30,7 @@ private:
   ::CORBA::Long           theLocalCCId;
   ::CORBA::Long           theLocalAddress;
   ::CORBA::Short          theLocalPortNumber;
-  lmp::cc::IpccImpl       theIPCCImpl;
+  //lmp::cc::IpccImpl       theIPCCImpl;
 };
 
 } // end namespace LMP

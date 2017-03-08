@@ -37,16 +37,12 @@ namespace lmp
 	  const lmp::base::CheckFtorIF& getHelloMessageReceivedFtor() const;
 	private:
 	  virtual void do_processReceivedMessage(
-	    const boost::asio::ip::udp::endpoint&  sender_endpoint,
 	    const msg::ConfigMsg&                  configMsg);
 	  virtual void do_processReceivedMessage(
-	    const boost::asio::ip::udp::endpoint&  sender_endpoint,
 	    const msg::ConfigAckMsg&               configAckMsg);
 	  virtual void do_processReceivedMessage(
-	    const boost::asio::ip::udp::endpoint&  sender_endpoint,
 	    const msg::ConfigNackMsg&              configNackMsg);
 	  virtual void do_processReceivedMessage(
-	    const boost::asio::ip::udp::endpoint&  sender_endpoint,
 	    const msg::HelloMsg&                   helloMsg);
 	  MsgReceivedFtor  m_ConfigMessageReceivedFtor;
 	  MsgReceivedFtor  m_ConfigAckMessageReceivedFtor;

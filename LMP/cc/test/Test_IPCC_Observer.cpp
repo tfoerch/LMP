@@ -5,8 +5,8 @@
  *      Author: tom
  */
 
-#include <Test_IPCC_Observer.hpp>
-#include <IPCC_Impl.hpp>
+#include "Test_IPCC_Observer.hpp"
+#include "IPCC_Impl.hpp"
 #include "IPCC_ObserverIF.hpp"  // for operator<<, State, Action, Event, etc
 #include <iostream>             // for operator<<, ostream, basic_ostream, etc
 #include <typeinfo>             // for bad_cast
@@ -38,10 +38,11 @@ namespace lmp
         theTransitions.clear();
       }
       void TestIpccObserver::do_notifyTransition(
-        const appl::State&   sourceState,
-        const appl::Event&   event,
-        const appl::State&   targetState,
-        const appl::Action&  action)
+        const cc::IpccApplicationIF&  ipcc,
+        const appl::State&            sourceState,
+        const appl::Event&            event,
+        const appl::State&            targetState,
+        const appl::Action&           action)
       {
         std::cout << "IPCC[" << theIpcc.getLocalCCId() << "]." << event << ": "
                   << sourceState << " -> " << targetState
@@ -63,12 +64,13 @@ namespace lmp
       {
       }
       void TestIpccObserverProxy::do_notifyTransition(
-        const appl::State&   sourceState,
-        const appl::Event&   event,
-        const appl::State&   targetState,
-        const appl::Action&  action)
+        const cc::IpccApplicationIF&  ipcc,
+        const appl::State&            sourceState,
+        const appl::Event&            event,
+        const appl::State&            targetState,
+        const appl::Action&           action)
       {
-    	theObserver.notifyTransition(sourceState, event, targetState, action);
+    	theObserver.notifyTransition(ipcc, sourceState, event, targetState, action);
       }
 
       bool TestIpccObserverProxy::is_equal(

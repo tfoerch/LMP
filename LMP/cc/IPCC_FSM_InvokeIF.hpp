@@ -19,6 +19,7 @@ namespace lmp
     {
       class State;
       class Event;
+      class Action;
     }
     class IpccFsmInvokeIF
     {
@@ -31,9 +32,12 @@ namespace lmp
       inline bool isConfigAcceptable(
         const msg::ConfigMsg&  configMsg) const
       { return do_isConfigAcceptable(configMsg); }
-      inline void updateConfig(
+      inline void sendConfigAck(
         const msg::ConfigMsg&  configMsg)
-      { do_updateConfig(configMsg); }
+      { do_sendConfigAck(configMsg); }
+      inline void sendConfigNack(
+        const msg::ConfigMsg&  configMsg)
+      { do_sendConfigNack(configMsg); }
       inline void reportTransition(
         const appl::State&   sourceState,
         const appl::Event&   event,
@@ -48,7 +52,9 @@ namespace lmp
         lmp::DWORD  remoteNodeId) const = 0;
       virtual bool do_isConfigAcceptable(
         const msg::ConfigMsg&  configMsg) const = 0;
-      virtual void do_updateConfig(
+      virtual void do_sendConfigAck(
+        const msg::ConfigMsg&  configMsg) = 0;
+      virtual void do_sendConfigNack(
         const msg::ConfigMsg&  configMsg) = 0;
       virtual void do_reportTransition(
     	const appl::State&   sourceState,

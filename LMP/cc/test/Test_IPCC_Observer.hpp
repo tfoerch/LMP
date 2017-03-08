@@ -7,7 +7,10 @@
  *      Author: tom
  */
 
-#include <IPCC_ObserverIF.hpp>
+#include "cc/IPCC_ObserverIF.hpp"
+#include "cc/IPCC_State.hpp"
+#include "cc/IPCC_Event.hpp"
+#include "cc/IPCC_Action.hpp"
 
 #include <deque>
 #include <iosfwd>               // for ostream
@@ -45,10 +48,11 @@ namespace lmp
     	void reset();
       private:
         virtual void do_notifyTransition(
-      	  const appl::State&   sourceState,
-      	  const appl::Event&   event,
-      	  const appl::State&   targetState,
-      	  const appl::Action&  action);
+          const cc::IpccApplicationIF&  ipcc,
+      	  const appl::State&            sourceState,
+      	  const appl::Event&            event,
+      	  const appl::State&            targetState,
+      	  const appl::Action&           action);
 
         IpccImpl&            theIpcc;
         TransistionSequence  theTransitions;
@@ -61,10 +65,11 @@ namespace lmp
     	virtual ~TestIpccObserverProxy();
 	  private:
         virtual void do_notifyTransition(
-      	  const appl::State&   sourceState,
-      	  const appl::Event&   event,
-      	  const appl::State&   targetState,
-      	  const appl::Action&  action);
+          const cc::IpccApplicationIF&  ipcc,
+     	  const appl::State&            sourceState,
+      	  const appl::Event&            event,
+      	  const appl::State&            targetState,
+      	  const appl::Action&           action);
         virtual bool is_equal(
           const IpccObserverProxyIF& other) const;
         virtual IpccObserverProxyIF* do_clone() const;

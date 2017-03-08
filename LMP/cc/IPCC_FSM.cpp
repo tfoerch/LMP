@@ -13,6 +13,8 @@
 #include "IPCC_FSM.hpp"
 #include "IPCC_ObserverIF.hpp"                            // for Action, etc
 #include "IPCC_FSM_InvokeIF.hpp"
+#include "cc/IPCC_State.hpp"
+#include "cc/IPCC_Action.hpp"
 
 #include <boost/core/ref.hpp>
 #include <boost/mpl/aux_/adl_barrier.hpp>                 // for mpl
@@ -521,13 +523,13 @@ namespace lmp
     template <class FSM,class SourceState,class TargetState>
     void cc_fsm_::SendConfigAck::operator()(EvContenLost const& evt, FSM& fsm,SourceState& src,TargetState& tgt)
     {
-      fsm.theIPCC.updateConfig(evt.m_ConfigMsg);
+      fsm.theIPCC.sendConfigAck(evt.m_ConfigMsg);
       fsm.theIPCC.reportTransition(SourceState::theApplState, EvContenLost::theApplEvent, TargetState::theApplState, theActionTag);
     }
     template <class FSM,class SourceState,class TargetState>
     void cc_fsm_::SendConfigAck::operator()(EvNewConfOK const& evt, FSM& fsm,SourceState& src,TargetState& tgt)
     {
-      fsm.theIPCC.updateConfig(evt.m_ConfigMsg);
+      fsm.theIPCC.sendConfigAck(evt.m_ConfigMsg);
       fsm.theIPCC.reportTransition(SourceState::theApplState, EvNewConfOK::theApplEvent, TargetState::theApplState, theActionTag);
     }
     template <class EVT,class FSM,class SourceState,class TargetState>

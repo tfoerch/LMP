@@ -6,7 +6,11 @@
  */
 
 #include "IPCC_Impl.hpp"
+#include "node/Node.hpp"
+#include "NetworkIFSocketIF.hpp"
 #include "IPCC_ObserverIF.hpp"
+#include "IPCC_State.hpp"
+#include "IPCC_Action.hpp"
 #include "neighbor/NeighborAdjacencyObserverIF.hpp"
 #include "msg/Config.hpp"
 #include "msg/ConfigAck.hpp"
@@ -41,12 +45,14 @@ namespace lmp
   namespace cc
   {
     IpccImpl::IpccImpl(
-      lmp::DWORD  localNodeId,
-      lmp::DWORD  localCCId,
-      bool        isActiveSetup)
-      : m_localNodeId(localNodeId),
+      node::Node&                            node,
+      NetworkIFSocketIF&                     networkIFSocket,
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      bool                                   isActiveSetup)
+      : m_node(node),
+        m_networkIFSocket(networkIFSocket),
+        m_sender_endpoint(sender_endpoint),
         m_remoteNodeId(0),
-        m_localCCId(localCCId),
         m_remoteCCId(0),
         theIsActiveSetup(isActiveSetup),
         theFSM(*this),
@@ -55,6 +61,7 @@ namespace lmp
         theObservers()
     {
       theFSM.start();
+      registerObserver(m_node);
     }
     IpccImpl::~IpccImpl()
     {
@@ -71,7 +78,7 @@ namespace lmp
     }
     lmp::DWORD  IpccImpl::do_getLocalNodeId() const
     {
-      return m_localNodeId;
+      return m_node.getNodeId();
     }
     lmp::DWORD  IpccImpl::do_getRemoteNodeId() const
     {
@@ -79,7 +86,7 @@ namespace lmp
     }
     lmp::DWORD  IpccImpl::do_getLocalCCId() const
     {
-      return m_localCCId;
+      return m_networkIFSocket.getLocalCCId();
     }
      lmp::DWORD  IpccImpl::do_getRemoteCCId() const
     {
@@ -153,7 +160,7 @@ namespace lmp
     bool IpccImpl::do_isConntentionWinning(
       lmp::DWORD  remoteNodeId) const
     {
-      return (m_localNodeId > remoteNodeId);
+      return (getLocalNodeId() > remoteNodeId);
     }
     bool IpccImpl::do_isConfigAcceptable(
       const msg::ConfigMsg&  configMsg) const
@@ -169,10 +176,19 @@ namespace lmp
       }
       return isAcceptable;
     }
-    void IpccImpl::do_updateConfig(
+    void IpccImpl::do_sendConfigAck(
       const msg::ConfigMsg&  configMsg)
     {
-      std::cout << "IPCC[" << m_localCCId << "].updateConfig(" << configMsg << ")" << std::endl;
+      updateConfig(configMsg);
+    }
+    void IpccImpl::do_sendConfigNack(
+      const msg::ConfigMsg&  configMsg)
+    {
+    }
+    void IpccImpl::updateConfig(
+      const msg::ConfigMsg&  configMsg)
+    {
+      std::cout << "IPCC[" << getLocalCCId() << "].updateConfig(" << configMsg << ")" << std::endl;
       if (m_remoteNodeId != configMsg.m_data.m_localNodeId.m_data.m_nodeId)
       {
         if (m_remoteNodeId)
@@ -204,7 +220,11 @@ namespace lmp
           }
         }
       }
-      std::cout << "IPCC[" << m_localCCId << "].updateConfig(): remoteNodeId = " << m_remoteNodeId
+      else if (m_remoteCCId != configMsg.m_data.m_localCCId.m_data.m_CCId)
+      {
+        m_remoteCCId = configMsg.m_data.m_localCCId.m_data.m_CCId;
+      }
+      std::cout << "IPCC[" << getLocalCCId() << "].updateConfig(): remoteNodeId = " << m_remoteNodeId
                 << ", remoteCCId = " << m_remoteCCId << std::endl;
     }
     void IpccImpl::do_reportTransition(
@@ -218,10 +238,10 @@ namespace lmp
            iter != end_iter;
            ++iter)
       {
-    	iter->notifyTransition(sourceState, event, targetState, action);
+    	iter->notifyTransition(*this, sourceState, event, targetState, action);
       }
-      std::cout << "IPCC[" << m_localCCId << "]." << event << ": " << sourceState << " -> " << targetState
-                << " executing " << action << std::endl;
+//      std::cout << "IPCC[" << m_localCCId << "]." << event << ": " << sourceState << " -> " << targetState
+//                << " executing " << action << std::endl;
     }
     void IpccImpl::do_sendHelloMsg()
     {
@@ -236,7 +256,6 @@ namespace lmp
       // create an send Hello message and schedule Hello retransmit timer
     }
     void IpccImpl::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::ConfigMsg&                  configMsg)
     {
       if (canAcceptNewConfig())
@@ -263,19 +282,16 @@ namespace lmp
       }
     }
     void IpccImpl::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::ConfigAckMsg&               configAckMsg)
     {
         theFSM.process_event(EvConfDone());
     }
     void IpccImpl::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::ConfigNackMsg&              configNackMsg)
     {
       theFSM.process_event(EvConfErr());
     }
     void IpccImpl::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::HelloMsg&                   helloMsg)
     {
 //      std::cout << "processReceivedMessage helloMsg.theRcvSeqNum = " << helloMsg.theRcvSeqNum
@@ -291,7 +307,6 @@ namespace lmp
       }
     }
     void IpccImpl::do_processReceivedMessage(
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
       const msg::UnknownMessage&             unknownMessage)
     {
       // report
@@ -312,165 +327,6 @@ namespace lmp
       const msg::ConfigMsg&  configMsg) const
     {
       return do_isConntentionWinning(configMsg.m_data.m_localNodeId.m_data.m_nodeId);
-    }
-    namespace appl
-    {
-      std::ostream& operator<<(
-       std::ostream&       os,
-	    const State&        state)
-      {
-    	os << state.getType();
-    	return os;
-      }
-      std::ostream& operator<<(
-        std::ostream&       os,
-        State::Type         stType)
-      {
-    	switch(stType)
-    	{
-          case State::Down:
-            os << "Down";
-            break;
-    	  case State::ConfSnd:
-    	    os << "ConfSnd";
-    	    break;
-    	  case State::ConfRcv:
-    	    os << "ConfRcv";
-    	    break;
-    	  case State::Active:
-    	    os << "Active";
-    	    break;
-          case State::Up:
-            os << "Up";
-            break;
-          case State::GoingDown:
-            os << "GoingDown";
-            break;
-          default:
-            os << "undefined (value = " << static_cast<lmp::DWORD>(stType) << ")";
-            break;
-    	}
-    	return os;
-      }
-      std::ostream& operator<<(
-        std::ostream&       os,
-        const Event&   event)
-      {
-    	os << event.getType();
-    	return os;
-      }
-      std::ostream& operator<<(
-        std::ostream&       os,
-        Event::EvType  evType)
-      {
-    	switch(evType)
-    	{
-    	  case Event::EvBringUp:
-    	    os << "EvBringUp";
-    	    break;
-    	  case Event::EvCCDn:
-    	    os << "EvCCDn";
-    	    break;
-    	  case Event::EvConfDone:
-    	    os << "EvConfDone";
-    	    break;
-    	  case Event::EvConfErr:
-    	    os << "EvConfErr";
-    	    break;
-    	  case Event::EvNewConfOK:
-    	    os << "EvNewConfOK";
-    	    break;
-    	  case Event::EvNewConfErr:
-    	    os << "EvNewConfErr";
-    	    break;
-    	  case Event::EvContenWin:
-    	    os << "EvContenWin";
-    	    break;
-    	  case Event::EvContenLost:
-    	    os << "EvContenLost";
-    	    break;
-    	  case Event::EvAdminDown:
-    	    os << "EvAdminDown";
-    	    break;
-    	  case Event::EvNbrGoesDn:
-    	    os << "EvNbrGoesDn";
-    	    break;
-    	  case Event::EvHelloRcvd:
-    	    os << "EvHelloRcvd";
-    	    break;
-    	  case Event::EvHoldTimer:
-    	    os << "EvHoldTimer";
-    	    break;
-    	  case Event::EvSeqNumErr:
-    	    os << "EvSeqNumErr";
-    	    break;
-    	  case Event::EvReconfig:
-    	    os << "EvReconfig";
-    	    break;
-    	  case Event::EvConfRet:
-    	    os << "EvConfRet";
-    	    break;
-    	  case Event::EvHelloRet:
-    	    os << "EvHelloRet";
-    	    break;
-    	  case Event::EvDownTimer:
-    	    os << "EvDownTimer";
-    	    break;
-    	  default:
-    	    os << "undefined (value = " << static_cast<lmp::DWORD>(evType) << ")";
-    	    break;
-    	}
-    	return os;
-      }
-      std::ostream& operator<<(
-        std::ostream&   os,
-        const Action&   action)
-      {
-    	os << action.getType();
-    	return os;
-      }
-      std::ostream& operator<<(
-        std::ostream&       os,
-        Action::ActionType  actionType)
-      {
-    	switch(actionType)
-    	{
-    	  case Action::ActionSendConfig:
-    	    os << "SendConfig";
-    	    break;
-    	  case Action::ActionStopSendConfig:
-    	    os << "StopSendConfig";
-    	    break;
-    	  case Action::ActionResendConfig:
-    	    os << "ResendConfig";
-    	    break;
-    	  case Action::ActionSendConfigAck:
-    	    os << "SendConfigAck";
-    	    break;
-    	  case Action::ActionSendConfigNack:
-    	    os << "SendConfigNack";
-    	    break;
-    	  case Action::ActionSendHello:
-    	    os << "SendHello";
-    	    break;
-    	  case Action::ActionStopSendHello:
-    	    os << "StopSendHello";
-    	    break;
-    	  case Action::ActionSetCCDownFlag:
-    	    os << "SetCCDownFlag";
-    	    break;
-    	  case Action::ActionClearCCDownFlag:
-    	    os << "ClearCCDownFlag";
-    	    break;
-    	  case Action::ActionNoAction:
-    	    os << "NoAction";
-    	    break;
-    	  default:
-    	    os << "undefined (value = " << static_cast<lmp::DWORD>(actionType) << ")";
-    	    break;
-    	}
-    	return os;
-      }
     }
   } // namespace cc
 } // namespace lmp

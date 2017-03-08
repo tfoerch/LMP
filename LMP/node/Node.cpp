@@ -8,6 +8,8 @@
 #include "Node.hpp"
 #include "neighbor/Neighbor.hpp"
 
+#include <iostream>
+
 namespace lmp
 {
   namespace node
@@ -32,7 +34,7 @@ namespace lmp
           iter->second :
           0 );
     }
-    neighbor::NeighborApplicationIF const*  Node::do_neighborAdjacencyAdded(
+    void Node::do_neighborAdjacencyAdded(
       lmp::DWORD              neighborNodeId,
       cc::IpccApplicationIF&  ipcc)
     {
@@ -57,14 +59,17 @@ namespace lmp
         {
           ipccAdjObservPtr->ipccAdjacencyAdded(ipcc);
         }
+        else
+        {
+          std::cout << "Node::do_neighborAdjacencyAdded() dynamic_cast failed" << std::endl;
+        }
       }
-      return neighborPtr;
     }
-    bool Node::do_neighborAdjacencyRemoved(
+    void Node::do_neighborAdjacencyRemoved(
       lmp::DWORD              neighborNodeId,
       cc::IpccApplicationIF&  ipcc)
     {
-      return false;
+      std::cout << "Node::do_neighborAdjacencyRemoved(" << neighborNodeId << ")" << std::endl;
     }
   } // namespace node
 } // namespace lmp
