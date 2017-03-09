@@ -6,7 +6,7 @@
  */
 
 #include "IPCC_Impl.hpp"
-#include "node/Node.hpp"
+#include "node/NodeApplicationIF.hpp"
 #include "NetworkIFSocketIF.hpp"
 #include "IPCC_ObserverIF.hpp"
 #include "IPCC_State.hpp"
@@ -45,7 +45,7 @@ namespace lmp
   namespace cc
   {
     IpccImpl::IpccImpl(
-      node::Node&                            node,
+      node::NodeApplicationIF&               node,
       NetworkIFSocketIF&                     networkIFSocket,
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
       bool                                   isActiveSetup)

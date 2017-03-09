@@ -22,7 +22,7 @@ namespace lmp
 {
   namespace node
   {
-    class Node;
+    class NodeApplicationIF;
   }
   namespace cc
   {
@@ -40,7 +40,7 @@ namespace lmp
     {
     public:
       IpccImpl(
-        node::Node&                            node,
+        node::NodeApplicationIF&                            node,
         NetworkIFSocketIF&                     networkIFSocket,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         bool                                   isActiveSetup);
@@ -104,7 +104,7 @@ namespace lmp
       void updateConfig(
         const msg::ConfigMsg&  configMsg);
 
-      node::Node&                                       m_node;
+      node::NodeApplicationIF&                          m_node;
       NetworkIFSocketIF&                                m_networkIFSocket;
       const boost::asio::ip::udp::endpoint&             m_sender_endpoint;
       lmp::DWORD                                        m_remoteNodeId;

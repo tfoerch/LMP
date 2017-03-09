@@ -19,11 +19,15 @@ namespace lmp
       : m_nodeId(nodeId)
     {
     }
-    void Node::enable()
+    void Node::do_enable()
     {
     }
-    void Node::disable()
+    void Node::do_disable()
     {
+    }
+    lmp::DWORD Node::do_getNodeId() const
+    {
+      return m_nodeId;
     }
     neighbor::NeighborApplicationIF const* Node::do_getNeighbor(
       lmp::DWORD  neighborNodeId) const

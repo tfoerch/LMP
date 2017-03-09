@@ -7,7 +7,7 @@
  *      Author: tom
  */
 
-#include "neighbor/NeighborAdjacencyObserverIF.hpp"
+#include "node/NodeApplicationIF.hpp"
 
 #include <map>
 
@@ -15,16 +15,12 @@ namespace lmp
 {
   namespace node
   {
-    class Node : public neighbor::NeighborAdjacencyObserverIF
+    class Node : public NodeApplicationIF
     {
     public:
       Node(
         lmp::DWORD                       nodeId);
       virtual ~Node(){}
-      void enable();
-      void disable();
-      inline lmp::DWORD  getNodeId() const
-      { return m_nodeId; }
     private:
       typedef std::map<lmp::DWORD, // nodeId
                        neighbor::NeighborApplicationIF*>  NeighborNodes;
@@ -37,6 +33,11 @@ namespace lmp
       virtual void do_neighborAdjacencyRemoved(
         lmp::DWORD              neighborNodeId,
         cc::IpccApplicationIF&  ipcc);
+      // implement NodeApplicationIF
+      virtual void do_enable();
+      virtual void do_disable();
+      virtual lmp::DWORD do_getNodeId() const;
+
       lmp::DWORD                  m_nodeId;
       NeighborNodes               m_neighborNodes;
     };

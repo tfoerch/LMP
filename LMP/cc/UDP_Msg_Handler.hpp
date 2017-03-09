@@ -19,7 +19,7 @@ namespace lmp
 {
   namespace node
   {
-    class Node;
+    class NodeApplicationIF;
   }
   namespace cc
   {
@@ -30,9 +30,9 @@ namespace lmp
     {
     public:
       UDPMsgHandler(
-        node::Node&           node);
+        node::NodeApplicationIF&           node);
       virtual ~UDPMsgHandler(){}
-      inline const node::Node& getNode() const
+      inline const node::NodeApplicationIF& getNode() const
       { return m_node; }
       static void sendMessage(
         NetworkIFSocketIF&                     networkIFSocket,
@@ -45,8 +45,8 @@ namespace lmp
         NetworkIFSocketIF&                     networkIFSocket,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         boost::asio::const_buffers_1&          messageBuffer);
-      node::Node&         m_node;
-      IPCCMap             m_IPCCs;
+      node::NodeApplicationIF&  m_node;
+      IPCCMap                   m_IPCCs;
     };
   } // namespace cc
 } // namespace lmp

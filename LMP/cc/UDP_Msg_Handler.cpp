@@ -8,7 +8,7 @@
 #include "UDP_Msg_Handler.hpp"
 #include "IPCC_Impl.hpp"
 #include "NetworkIFSocketIF.hpp"
-#include "node/Node.hpp"
+#include "node/NodeApplicationIF.hpp"
 #include "neighbor/Neighbor.hpp"
 #include <boost/asio/buffers_iterator.hpp>
 
@@ -17,7 +17,7 @@ namespace
   struct msg_variants_processor : boost::static_visitor<void>
   {
     msg_variants_processor(
-        lmp::cc::IpccMsgReceiveIF&           ipcc)
+      lmp::cc::IpccMsgReceiveIF&           ipcc)
     : m_ipcc(ipcc)
     {}
     void operator()(const lmp::msg::ConfigMsg& config) const
@@ -49,7 +49,7 @@ namespace lmp
   namespace cc
   {
     UDPMsgHandler::UDPMsgHandler(
-      node::Node&           node)
+      node::NodeApplicationIF&           node)
     : m_node(node)
     {
     }
