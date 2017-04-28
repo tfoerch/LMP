@@ -1,5 +1,7 @@
-
-#include "lmp_mgtif_node.idl"
+module lmp_node
+{
+  interface Node;
+};
 
 module lmp_node_registry
 {

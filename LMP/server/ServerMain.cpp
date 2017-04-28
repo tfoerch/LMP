@@ -54,11 +54,14 @@ int main(int argc, char* argv[])
               cout << "registerNode(nodeObj)" << endl;
               lmp_node::Node_i* myNode = new lmp_node::Node_i(orb, poa, vm["node-id"].as<unsigned int>(), nodeRegistry);
 
+              cout << "activate object" << endl;
               PortableServer::ObjectId_var myNodeId = poa->activate_object(myNode);
+              cout << "object activated" << endl;
 
               lmp_node::Node_var nodeObj = myNode->_this();
               myNode->_remove_ref();
-              nodeRegistry->registerNode(nodeObj);
+              cout << "call registerNode(nodeObj)" << endl;
+             nodeRegistry->registerNode(nodeObj);
 
               CORBA::String_var sior(orb->object_to_string(nodeObj));
               cout << sior << endl;
@@ -68,22 +71,22 @@ int main(int argc, char* argv[])
           }
           cout << "returned from orb->run()." << endl;
           orb->destroy();
-	    }
+        }
         catch(CORBA::SystemException& ex)
         {
-		  cerr << "Caught CORBA::" << ex._name() << endl;
-	    }
-	    catch(CORBA::Exception& ex)
-	    {
-		  cerr << "Caught CORBA::Exception: " << ex._name() << endl;
-	    }
-	    catch(omniORB::fatalException& fe)
-	    {
-		  cerr << "Caught omniORB::fatalException:" << endl;
-		  cerr << "  file: " << fe.file() << endl;
-		  cerr << "  line: " << fe.line() << endl;
-		  cerr << "  mesg: " << fe.errmsg() << endl;
-	    }
+          cerr << "Caught CORBA::" << ex._name() << endl;
+        }
+        catch(CORBA::Exception& ex)
+        {
+          cerr << "Caught CORBA::Exception: " << ex._name() << endl;
+        }
+        catch(omniORB::fatalException& fe)
+        {
+          cerr << "Caught omniORB::fatalException:" << endl;
+          cerr << "  file: " << fe.file() << endl;
+          cerr << "  line: " << fe.line() << endl;
+          cerr << "  mesg: " << fe.errmsg() << endl;
+        }
       }
     }
     else

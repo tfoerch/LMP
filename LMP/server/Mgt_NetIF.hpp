@@ -1,0 +1,61 @@
+#include <lmp_mgtif_netif.hpp>
+#include <lmp_mgtif_node.hpp>
+#include "lmp_mgtif_ipcc.hpp"                // for IPCC_var, IPCC_ptr
+#include "lmp_mgtif_ipcc_adjacency_observer.hpp"      // for Neighbor_var, etc
+#include <Mgt_UDPMsgReceiveIFProxy.hpp>
+#include "cc/IPCC_NetIFSocket.hpp"
+
+#include <omniORB4/CORBA.h>  // for Long, Short
+#include <omniORB4/poa.h>    // for POA_ptr
+
+#include <boost/asio/ip/udp.hpp>
+
+#include <map>
+#include <set>
+
+namespace lmp_node
+{
+  class NodeApplProxy;
+}
+
+namespace lmp_netif
+{
+  class NetworkIF_i : public POA_lmp_netif::NetworkIF
+  {
+  public:
+    NetworkIF_i(
+      PortableServer::POA_ptr          poa,
+      lmp_node::NodeApplProxy&         node,
+      ::CORBA::Long                    localCCId,
+      boost::asio::io_service&         io_service,
+      boost::asio::ip::udp::endpoint&  listen_endpoint);
+    virtual ~NetworkIF_i();
+    virtual ::CORBA::Long getLocalCCId();
+    virtual void destroy();
+    virtual void enable();
+    virtual void disable();
+    virtual ::lmp_ipcc::IPCC_ptr createIPCC(
+      ::CORBA::Long remoteAddress,
+      ::CORBA::Short remotePortNumber);
+    virtual ::lmp_ipcc::IPCC_ptr getIPCC(
+      ::CORBA::Long remoteAddress,
+      ::CORBA::Short remotePortNumber);
+    virtual void deleteIPCC(
+      ::CORBA::Long remoteAddress,
+      ::CORBA::Short remotePortNumber);
+    virtual void registerIPCCAdjacencyObserver(
+      ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr observer);
+    virtual void deregisterIPCCAdjacencyObserver(
+      ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr observer);
+  private:
+    typedef  std::map<boost::asio::ip::udp::endpoint, ::lmp_ipcc::IPCC_var>       IPCCByRemoteEndPointMap;
+    typedef  std::set<::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_var>   IPCCAdjacencyObserverContainer;
+    PortableServer::POA_ptr          m_POA;
+    lmp_node::NodeApplProxy&         m_node;
+    IPCCByRemoteEndPointMap          m_IPCCs;
+    IPCCAdjacencyObserverContainer   m_ipccAdjacencyObservers;
+    lmp_netif::UDPMsgReceiveIFProxy  m_msgHandler;
+    lmp::cc::NetworkIFSocket         m_networkIfSocket;
+  };
+
+} // end namespace LMP

@@ -1,4 +1,7 @@
-#include "lmp_mgtif_ipcc_observer.idl"
+module lmp_ipcc_observer
+{
+  interface IPCCObserver;
+};
 
 module lmp_ipcc
 {

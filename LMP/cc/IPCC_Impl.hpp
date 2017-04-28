@@ -40,7 +40,7 @@ namespace lmp
     {
     public:
       IpccImpl(
-        node::NodeApplicationIF&                            node,
+        node::NodeApplicationIF&               node,
         NetworkIFSocketIF&                     networkIFSocket,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         bool                                   isActiveSetup);

@@ -4,7 +4,7 @@ find_package(Boost COMPONENTS chrono system)
 
 include_directories ("${PROJECT_SOURCE_DIR}/client")
 
-add_executable (LMPClient_T Mgt_Client.cpp  Mgt_NodeRegistry.cpp Mgt_IPCCObserver.cpp Mgt_ClientFixture.cpp)
+add_executable (LMPClient_T Mgt_Client.cpp  Mgt_NodeRegistry.cpp Mgt_IPCCObserver.cpp Mgt_IPCCAdjacencyObserver.cpp Mgt_NeighborAdjacencyObserver.cpp Mgt_ClientFixture.cpp)
 
 add_cppcheck(LMPClient_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 
