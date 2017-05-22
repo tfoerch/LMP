@@ -42,33 +42,56 @@ BOOST_AUTO_TEST_SUITE( LMPClient )
 BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
 {
   std::cout << "running test case 1\n";
-  BOOST_CHECK(theNodeRegistry->isNodeRegistered(theNodeId));
-  ::lmp_node::Node_ptr node = theNodeRegistry->getNode(theNodeId);
-  BOOST_CHECK(!CORBA::is_nil(node));
-  if (!CORBA::is_nil(node))
+  BOOST_CHECK(theNodeRegistry->isNodeRegistered(m_1stNodeId));
+  BOOST_CHECK(theNodeRegistry->isNodeRegistered(m_2ndNodeId));
+
+  CORBA::ORB_var orb = *theOrb;
+  CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
+  PortableServer::POA_var poa = PortableServer::POA::_narrow(obj);
+  lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_i* neighborAdjacencyObserver =
+    new lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_i(orb, poa);
+  poa->activate_object(neighborAdjacencyObserver);
+  lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_ptr neighborAdjacencyObserverPtr = neighborAdjacencyObserver->_this();
+
+  ::lmp_node::Node_ptr node1 = theNodeRegistry->getNode(m_1stNodeId);
+  BOOST_CHECK(!CORBA::is_nil(node1));
+  if (!CORBA::is_nil(node1))
   {
-    std::cout << "test case 1 node retrieved\n";
-    ::lmp_netif::NetworkIF_ptr netif = node->createNetIF(7011, 2130706433, 7011);
+    std::cout << "test case 1 node 1 retrieved\n";
+    std::cout << "before register observer" << std::endl;
+    node1->registerNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
+    ::lmp_netif::NetworkIF_ptr netif = node1->createNetIF(7011, 2130706433, 7011);
     BOOST_CHECK(!CORBA::is_nil(netif));
     if (theOrb &&
         !CORBA::is_nil(netif))
     {
-      CORBA::ORB_var orb = *theOrb;
-      CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
-      PortableServer::POA_var poa = PortableServer::POA::_narrow(obj);
-      lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_i* neighborAdjacencyObserver =
-        new lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_i(orb, poa);
-      poa->activate_object(neighborAdjacencyObserver);
-      lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_ptr neighborAdjacencyObserverPtr = neighborAdjacencyObserver->_this();
-      std::cout << "before register observer" << std::endl;
-      node->registerNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
       std::cout << "before enable" << std::endl;
       netif->enable();
       std::cout << "after enable" << std::endl;
       netif->disable();
-
-      node->deregisterNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
-      neighborAdjacencyObserverPtr->destroy();
+    }
+    node1->deregisterNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
+  }
+  ::lmp_node::Node_ptr node2 = theNodeRegistry->getNode(m_2ndNodeId);
+  BOOST_CHECK(!CORBA::is_nil(node2));
+  if (!CORBA::is_nil(node2))
+  {
+    std::cout << "test case 1 node 2 retrieved\n";
+    std::cout << "before register observer" << std::endl;
+    node2->registerNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
+    ::lmp_netif::NetworkIF_ptr netif = node2->createNetIF(7012, 2130706433, 7012);
+    BOOST_CHECK(!CORBA::is_nil(netif));
+    if (theOrb &&
+        !CORBA::is_nil(netif))
+    {
+      std::cout << "before enable" << std::endl;
+      netif->enable();
+      std::cout << "after enable" << std::endl;
+      netif->disable();
+    }
+    node2->deregisterNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
+  }
+  neighborAdjacencyObserverPtr->destroy();
 //    ::lmp_ipcc::IPCC_ptr ipcc = node->createIPCC(7011, 2130706433, 2130706433, 7011, 7012);
 //    BOOST_CHECK(!CORBA::is_nil(ipcc));
 //    if (theOrb &&
@@ -91,8 +114,6 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
 //
 //      ipcc->deregisterObserver(ipccObserverPtr);
 //      ipccObserverPtr->destroy();
-    }
-  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

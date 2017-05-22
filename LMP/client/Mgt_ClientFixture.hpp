@@ -16,11 +16,16 @@ public:
   LaunchServer();
   ~LaunchServer();
 private:
+  static void launchChildProgram(
+    unsigned long       nodeId,
+    const std::string&  registryURIString);
   LaunchServer(const LaunchServer&); // disabled
 public:
   lmp_node_registry::NodeRegistry_i*  theNodeRegistry;
   boost::optional<CORBA::ORB_var>     theOrb;
-  unsigned long                       theNodeId;
-  pid_t                               theChildPid;
+  unsigned long                       m_1stNodeId;
+  pid_t                               m_1stChildPid;
+  unsigned long                       m_2ndNodeId;
+  pid_t                               m_2ndChildPid;
 };
 #endif /* MGT_CLIENT_FIXTURE_HPP_ */

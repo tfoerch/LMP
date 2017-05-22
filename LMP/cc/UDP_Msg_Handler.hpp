@@ -8,6 +8,7 @@
  */
 
 #include "UDP_Msg_ReceiveIF.hpp"
+#include "IPCCFactoryIF.hpp"
 #include "IPCC_Msg_SendIF.hpp"
 #include "base/ProtocolTypes.hpp"             // for DWORD
 
@@ -26,7 +27,8 @@ namespace lmp
     class IpccMsgReceiveIF;
     class NetworkIFSocketIF;
 
-    class UDPMsgHandler : public UDPMsgReceiveIF
+    class UDPMsgHandler : public UDPMsgReceiveIF,
+                          public IpccFactoryIF
     {
     public:
       UDPMsgHandler(
@@ -45,6 +47,16 @@ namespace lmp
         NetworkIFSocketIF&                     networkIFSocket,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         boost::asio::const_buffers_1&          messageBuffer);
+      // implement IpccFactoryIF
+      virtual IpccMsgReceiveIF const* do_getIpcc(
+        const boost::asio::ip::udp::endpoint&  sender_endpoint) const;
+      virtual IpccMsgReceiveIF* do_accessIpcc(
+        const boost::asio::ip::udp::endpoint&  sender_endpoint);
+      virtual IpccMsgReceiveIF* do_createIpcc(
+        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+        NetworkIFSocketIF&                     networkIFSocket);
+      virtual bool do_removeIpcc(
+        const boost::asio::ip::udp::endpoint&  sender_endpoint);
       node::NodeApplicationIF&  m_node;
       IPCCMap                   m_IPCCs;
     };

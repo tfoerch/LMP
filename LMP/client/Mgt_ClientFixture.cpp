@@ -31,8 +31,10 @@
 LaunchServer::LaunchServer()
   : theNodeRegistry(0),
     theOrb(),
-    theNodeId(10001),
-    theChildPid(0)
+    m_1stNodeId(10001),
+    m_1stChildPid(0),
+    m_2ndNodeId(10002),
+    m_2ndChildPid(0)
 {
   std::cout << "launch server setup\n";
   try
@@ -68,59 +70,46 @@ LaunchServer::LaunchServer()
         orb->perform_work();
       };
 
-      // pid_t parent = getpid();
-      theChildPid = fork();
+      m_1stChildPid = fork();
 
-      if (theChildPid == -1)
+      if (m_1stChildPid == -1)
       {
         // error, failed to fork()
       }
-      else if (theChildPid > 0)
+      else if (m_1stChildPid > 0)
       {
-        boost::chrono::steady_clock::time_point expireTime =
-          boost::chrono::steady_clock::now() + boost::chrono::milliseconds(500);
-        std::cout << boost::chrono::steady_clock::now() << ": enter while" << std::endl;
-        while (boost::chrono::steady_clock::now() < expireTime)
-        {
-          // std::cout << boost::chrono::steady_clock::now() << ": checking work_pending()" << std::endl;
-          if (orb->work_pending())
-          {
-            std::cout << boost::chrono::steady_clock::now() << ": enter perform_work()" << std::endl;
-            orb->perform_work();
-            std::cout << boost::chrono::steady_clock::now() << ": leaving perform_work()" << std::endl;
-          };
-        }
-        std::cout << boost::chrono::steady_clock::now() << ": leaving while" << std::endl;
-        //theNodeRegistry->isNodeRegistered(theNodeId);
+        m_2ndChildPid = fork();
 
+        if (m_2ndChildPid == -1)
+        {
+          // error, failed to fork()
+        }
+        else if (m_2ndChildPid > 0)
+        {
+          boost::chrono::steady_clock::time_point expireTime =
+            boost::chrono::steady_clock::now() + boost::chrono::milliseconds(500);
+          std::cout << boost::chrono::steady_clock::now() << ": enter while" << std::endl;
+          while (boost::chrono::steady_clock::now() < expireTime)
+          {
+            // std::cout << boost::chrono::steady_clock::now() << ": checking work_pending()" << std::endl;
+            if (orb->work_pending())
+            {
+              std::cout << boost::chrono::steady_clock::now() << ": enter perform_work()" << std::endl;
+              orb->perform_work();
+              std::cout << boost::chrono::steady_clock::now() << ": leaving perform_work()" << std::endl;
+            };
+          }
+          std::cout << boost::chrono::steady_clock::now() << ": leaving while" << std::endl;
+          //theNodeRegistry->isNodeRegistered(m_1stNodeId;);
+        }
+        else
+        { // we are the 2nd child
+          launchChildProgram(m_2ndNodeId, registryURIString);
+        }
       }
       else
-      {
-        // we are the child
-        const char serverPath[] = "/home/tom/build/LMP/g++/server/LMPServer_T";
-        const char nodeIdOptStr[] = "--node-id";
-        const char nodeRegistryOptStr[] = "--node-registry";
-        std::ostringstream nodeIdStream;
-        nodeIdStream << theNodeId << std::ends;
-        const char* newargv[] =
-        { serverPath,
-          serverPath,
-          nodeIdOptStr,
-          nodeIdStream.str().c_str(),
-          nodeRegistryOptStr,
-          registryURIString.c_str(),
-          nullptr
-        };
-        std::cout << newargv[0] << " "
-    	   << newargv[1] << " "
-    	   << newargv[2] << " "
-    	   << newargv[3] << " "
-    	   << newargv[4] << " "
-    	   << newargv[5] << std::endl;
-        char* newenviron[] = { NULL };
-        execve(newargv[0], const_cast<char* const*>(newargv), newenviron);
-        perror("execve");   /* execve() only returns on error */
-        exit(EXIT_FAILURE);   // exec never returns
+      { // we are the 1st child
+        launchChildProgram(m_1stNodeId, registryURIString);
       }
 
       // orb->run();
@@ -157,6 +146,37 @@ LaunchServer::~LaunchServer()
     theNodeRegistry->shutdown();
   }
   int status;
-  waitpid(theChildPid, &status, 0);
+  waitpid(m_1stChildPid, &status, 0);
+}
+
+void LaunchServer::launchChildProgram(
+  unsigned long       nodeId,
+  const std::string&  registryURIString)
+{
+  const char serverPath[] = "/home/tom/build/LMP/g++/server/LMPServer_T";
+  const char nodeIdOptStr[] = "--node-id";
+  const char nodeRegistryOptStr[] = "--node-registry";
+  std::ostringstream nodeIdStream;
+  nodeIdStream << nodeId << std::ends;
+  const char* newargv[] =
+  { serverPath,
+    serverPath,
+    nodeIdOptStr,
+    nodeIdStream.str().c_str(),
+    nodeRegistryOptStr,
+    registryURIString.c_str(),
+    nullptr
+  };
+  std::cout << newargv[0] << " "
+     << newargv[1] << " "
+     << newargv[2] << " "
+     << newargv[3] << " "
+     << newargv[4] << " "
+     << newargv[5] << std::endl;
+  char* newenviron[] = { NULL };
+  execve(newargv[0], const_cast<char* const*>(newargv), newenviron);
+  perror("execve");   /* execve() only returns on error */
+  exit(EXIT_FAILURE);   // exec never returns
+
 }
 

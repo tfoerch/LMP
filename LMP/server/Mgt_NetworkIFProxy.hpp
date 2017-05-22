@@ -17,7 +17,7 @@ namespace lmp_netif
   {
   public:
     NetworkIFProxy(
-      ::lmp_netif::NetworkIF_ptr     netifPtr);
+      lmp::cc::NetworkIFSocketIF&    networkIf);
     virtual ~NetworkIFProxy(){}
   private:
     // implement NetworkIFSocketIF
@@ -25,7 +25,8 @@ namespace lmp_netif
     virtual void do_send(
       const boost::asio::ip::udp::endpoint&  destination_endpoint,
       boost::asio::mutable_buffers_1&        messageBuffer);
-    ::lmp_netif::NetworkIF_var    m_netifPtr;
+
+    lmp::cc::NetworkIFSocketIF&   m_networkIf;
   };
 
 } // end namespace lmp_netif

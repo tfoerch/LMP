@@ -3,6 +3,8 @@
 #include "lmp_mgtif_ipcc.hpp"                // for IPCC_var, IPCC_ptr
 #include "lmp_mgtif_ipcc_adjacency_observer.hpp"      // for Neighbor_var, etc
 #include <Mgt_UDPMsgReceiveIFProxy.hpp>
+#include <Mgt_NetworkIFProxy.hpp>
+#include <Mgt_IPCCAdjacencyChangeFtorIF.hpp>
 #include "cc/IPCC_NetIFSocket.hpp"
 
 #include <omniORB4/CORBA.h>  // for Long, Short
@@ -50,12 +52,24 @@ namespace lmp_netif
   private:
     typedef  std::map<boost::asio::ip::udp::endpoint, ::lmp_ipcc::IPCC_var>       IPCCByRemoteEndPointMap;
     typedef  std::set<::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_var>   IPCCAdjacencyObserverContainer;
+    class IPCCAdjDiscoveredFtor : public IPCCAdjacencyChangeFtorIF
+    {
+    public:
+      IPCCAdjDiscoveredFtor(
+        NetworkIF_i&  networkIF);
+    private:
+      virtual void do_process(
+        const boost::asio::ip::udp::endpoint&  sender_endpointl);
+      NetworkIF_i&  m_networkIF;
+    };
     PortableServer::POA_ptr          m_POA;
     lmp_node::NodeApplProxy&         m_node;
     IPCCByRemoteEndPointMap          m_IPCCs;
     IPCCAdjacencyObserverContainer   m_ipccAdjacencyObservers;
+    IPCCAdjDiscoveredFtor            m_ipccAdjDiscoveredFtor;
     lmp_netif::UDPMsgReceiveIFProxy  m_msgHandler;
     lmp::cc::NetworkIFSocket         m_networkIfSocket;
+    lmp_netif::NetworkIFProxy        m_networkIfProxy;
   };
 
 } // end namespace LMP

@@ -20,10 +20,10 @@ namespace lmp_ipcc
   {
   public:
     IPCC_i(
-      PortableServer::POA_ptr                poa,
-      lmp_node::NodeApplProxy&               node,
-      ::lmp_netif::NetworkIF_ptr             networkIfPtr,
-      const boost::asio::ip::udp::endpoint&  sender_endpoint);
+      PortableServer::POA_ptr     poa,
+      lmp_node::NodeApplProxy&    node,
+      lmp_netif::NetworkIFProxy&  metworkIf,
+      lmp::cc::IpccApplicationIF&  ipcc);
     virtual ~IPCC_i();
     virtual void destroy();
     virtual void enable();
@@ -33,10 +33,10 @@ namespace lmp_ipcc
     virtual void deregisterObserver(
       ::lmp_ipcc_observer::IPCCObserver_ptr  observer);
   private:
-    PortableServer::POA_ptr    thePOA;
-    lmp_node::NodeApplProxy&   m_node;
-    lmp_netif::NetworkIFProxy  m_metworkIf;
-    lmp::cc::IpccImpl          m_IPCCImpl;
+    PortableServer::POA_ptr     thePOA;
+    lmp_node::NodeApplProxy&    m_node;
+    lmp_netif::NetworkIFProxy&  m_metworkIf;
+    lmp::cc::IpccApplicationIF&  m_ipcc;
   };
 
 } // end namespace LMP

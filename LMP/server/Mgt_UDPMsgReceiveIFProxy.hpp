@@ -8,6 +8,7 @@
  */
 
 #include "cc/UDP_Msg_ReceiveIF.hpp"
+#include "cc/IPCCFactoryIF.hpp"
 #include "cc/UDP_Msg_Handler.hpp"
 #include <lmp_mgtif_node.hpp>
 #include <lmp_mgtif_netif.hpp>
@@ -19,25 +20,36 @@ namespace lmp_node
 
 namespace lmp_netif
 {
-  class UDPMsgReceiveIFProxy : public lmp::cc::UDPMsgReceiveIF
+  class IPCCAdjacencyChangeFtorIF;
+
+  class UDPMsgReceiveIFProxy : public lmp::cc::UDPMsgReceiveIF,
+                               public lmp::cc::IpccFactoryIF
   {
   public:
     UDPMsgReceiveIFProxy(
-      lmp_node::NodeApplProxy&    node);
+      lmp_node::NodeApplProxy&    node,
+      IPCCAdjacencyChangeFtorIF&  ipccAdjDiscoveredFtor);
     virtual ~UDPMsgReceiveIFProxy(){}
-    void setNetworkIFObjRef(
-      ::lmp_netif::NetworkIF_ptr  networkIfPtr);
-    void clearNetworkIFObjRef();
   private:
     // implement UDPMsgReceiveIF
     virtual void do_processReceivedMessage(
       lmp::cc::NetworkIFSocketIF&            networkIFSocket,
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
       boost::asio::const_buffers_1&          messageBuffer);
+    // implement IpccFactoryIF
+    virtual lmp::cc::IpccMsgReceiveIF const* do_getIpcc(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint) const;
+    virtual lmp::cc::IpccMsgReceiveIF* do_accessIpcc(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint);
+    virtual lmp::cc::IpccMsgReceiveIF* do_createIpcc(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      lmp::cc::NetworkIFSocketIF&            networkIFSocket);
+    virtual bool do_removeIpcc(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint);
 
     lmp_node::NodeApplProxy&    m_node;
     lmp::cc::UDPMsgHandler      m_udpMsgHandler;
-    ::lmp_netif::NetworkIF_var  m_netifPtr;
+    IPCCAdjacencyChangeFtorIF&  m_ipccAdjDiscoveredFtor;
   };
 
 } // end namespace LMP

@@ -1,5 +1,6 @@
 #include <Mgt_UDPMsgReceiveIFProxy.hpp>
 #include <Mgt_NodeApplProxy.hpp>
+#include <Mgt_IPCCAdjacencyChangeFtorIF.hpp>
 #include <lmp_mgtif_ipcc.hpp>
 
 #include "base/ProtocolTypes.hpp"                  // for DWORD
@@ -9,10 +10,11 @@
 namespace lmp_netif
 {
   UDPMsgReceiveIFProxy::UDPMsgReceiveIFProxy(
-    lmp_node::NodeApplProxy&    node)
+    lmp_node::NodeApplProxy&    node,
+    IPCCAdjacencyChangeFtorIF&  ipccAdjDiscoveredFtor)
   : m_node(node),
     m_udpMsgHandler(m_node),
-    m_netifPtr(lmp_netif::NetworkIF::_nil())
+    m_ipccAdjDiscoveredFtor(ipccAdjDiscoveredFtor)
   {
   }
 
@@ -21,26 +23,45 @@ namespace lmp_netif
     const boost::asio::ip::udp::endpoint&  sender_endpoint,
     boost::asio::const_buffers_1&          messageBuffer)
   {
-    lmp::DWORD  ipAddr = sender_endpoint.address().to_v4().to_ulong();
-    ::lmp_ipcc::IPCC_ptr ipccPtr = m_netifPtr->getIPCC(ipAddr, sender_endpoint.port());
-    if (CORBA::is_nil(ipccPtr))
+    lmp::cc::IpccMsgReceiveIF* ipccPtr =
+      m_udpMsgHandler.accessIpcc(sender_endpoint);
+    if (!ipccPtr)
     {
-      std::cout << "need to create new IPCC" << std::endl;
-      ipccPtr = m_netifPtr->createIPCC(ipAddr, sender_endpoint.port());
+      m_ipccAdjDiscoveredFtor(sender_endpoint);
+      ipccPtr =
+        m_udpMsgHandler.accessIpcc(sender_endpoint);
     }
-    if (!CORBA::is_nil(ipccPtr))
+    if (ipccPtr)
     {
-      std::cout << "IPCC exists" << std::endl;
+      m_udpMsgHandler.processReceivedMessage(networkIFSocket,
+                                             sender_endpoint,
+                                             messageBuffer);
     }
   }
-  void UDPMsgReceiveIFProxy::setNetworkIFObjRef(
-    ::lmp_netif::NetworkIF_ptr  networkIfPtr)
+
+  lmp::cc::IpccMsgReceiveIF const* UDPMsgReceiveIFProxy::do_getIpcc(
+    const boost::asio::ip::udp::endpoint&  sender_endpoint) const
   {
-    m_netifPtr = lmp_netif::NetworkIF::_duplicate(networkIfPtr);
+    return m_udpMsgHandler.getIpcc(sender_endpoint);
   }
-  void UDPMsgReceiveIFProxy::clearNetworkIFObjRef()
+
+  lmp::cc::IpccMsgReceiveIF* UDPMsgReceiveIFProxy::do_accessIpcc(
+    const boost::asio::ip::udp::endpoint&  sender_endpoint)
   {
-    m_netifPtr = lmp_netif::NetworkIF::_nil();
+    return m_udpMsgHandler.accessIpcc(sender_endpoint);
+  }
+
+  lmp::cc::IpccMsgReceiveIF* UDPMsgReceiveIFProxy::do_createIpcc(
+    const boost::asio::ip::udp::endpoint&  sender_endpoint,
+    lmp::cc::NetworkIFSocketIF&            networkIFSocket)
+  {
+    return m_udpMsgHandler.createIpcc(sender_endpoint, networkIFSocket);
+  }
+
+  bool UDPMsgReceiveIFProxy::do_removeIpcc(
+    const boost::asio::ip::udp::endpoint&  sender_endpoint)
+  {
+    return m_udpMsgHandler.removeIpcc(sender_endpoint);
   }
 
 } // end namespace lmp_netif

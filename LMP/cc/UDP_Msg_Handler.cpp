@@ -72,6 +72,7 @@ namespace lmp
         networkIFSocket.send(destination_endpoint, sendBuffer);
       }
     }
+
     void UDPMsgHandler::do_processReceivedMessage(
       NetworkIFSocketIF&                     networkIFSocket,
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
@@ -109,5 +110,63 @@ namespace lmp
         }
       }
     }
+
+    IpccMsgReceiveIF const* UDPMsgHandler::do_getIpcc(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint) const
+    {
+      IPCCMap::const_iterator ipccIter = m_IPCCs.find(sender_endpoint);
+      return
+        ( ipccIter != m_IPCCs.end() ?
+          ipccIter->second :
+          0 );
+    }
+
+    IpccMsgReceiveIF* UDPMsgHandler::do_accessIpcc(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint)
+    {
+      IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
+      return
+        ( ipccIter != m_IPCCs.end() ?
+          ipccIter->second :
+          0 );
+    }
+
+    IpccMsgReceiveIF* UDPMsgHandler::do_createIpcc(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      NetworkIFSocketIF&                     networkIFSocket)
+    {
+      IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
+      if (ipccIter == m_IPCCs.end())
+      {
+        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, sender_endpoint, false);
+        if (ipccPtr)
+        {
+          ipccPtr->enable();
+          ipccIter = m_IPCCs.insert(IPCCMap::value_type(sender_endpoint,
+                                                        ipccPtr)).first;
+        }
+      }
+      return
+        ( ipccIter != m_IPCCs.end() ?
+          ipccIter->second :
+          0 );
+    }
+
+    bool UDPMsgHandler::do_removeIpcc(
+      const boost::asio::ip::udp::endpoint&  sender_endpoint)
+    {
+      IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
+      if (ipccIter != m_IPCCs.end())
+      {
+        if (ipccIter->second)
+        {
+          delete ipccIter->second;
+        }
+        m_IPCCs.erase(ipccIter);
+        return true;
+      }
+      return false;
+    }
+
   } // namespace cc
 } // namespace lmp

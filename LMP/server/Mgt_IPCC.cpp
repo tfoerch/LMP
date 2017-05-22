@@ -7,14 +7,14 @@ namespace lmp_ipcc
 {
 
 IPCC_i::IPCC_i(
-  PortableServer::POA_ptr                poa,
-  lmp_node::NodeApplProxy&               node,
-  ::lmp_netif::NetworkIF_ptr             networkIfPtr,
-  const boost::asio::ip::udp::endpoint&  sender_endpoint)
+  PortableServer::POA_ptr     poa,
+  lmp_node::NodeApplProxy&    node,
+  lmp_netif::NetworkIFProxy&  metworkIf,
+  lmp::cc::IpccApplicationIF&  ipcc)
   : thePOA(PortableServer::POA::_duplicate(poa)),
     m_node(node),
-    m_metworkIf(lmp_netif::NetworkIF::_duplicate(networkIfPtr)),
-    m_IPCCImpl(m_node, m_metworkIf, sender_endpoint, false)
+    m_metworkIf(metworkIf),
+    m_ipcc(ipcc)
 {
   std::cout << "IPCC(localCCId = " << m_metworkIf.getLocalCCId()
 //	   << ", localAddress = " << localAddress
@@ -37,13 +37,13 @@ void IPCC_i::destroy()
 void IPCC_i::enable()
 {
   std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_metworkIf.getLocalCCId() << ") enable" << std::endl;
-  m_IPCCImpl.enable();
+  m_ipcc.enable();
 }
 
 void IPCC_i::disable()
 {
   std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_metworkIf.getLocalCCId() << ") disable" << std::endl;
-  //theIPCCImpl.disable();
+  m_ipcc.disable();
 }
 
 void IPCC_i::registerObserver(
