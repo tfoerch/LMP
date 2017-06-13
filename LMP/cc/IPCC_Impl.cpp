@@ -47,11 +47,11 @@ namespace lmp
     IpccImpl::IpccImpl(
       node::NodeApplicationIF&               node,
       NetworkIFSocketIF&                     networkIFSocket,
-      const boost::asio::ip::udp::endpoint&  sender_endpoint,
+      const boost::asio::ip::udp::endpoint&  remote_endpoint,
       bool                                   isActiveSetup)
       : m_node(node),
         m_networkIFSocket(networkIFSocket),
-        m_sender_endpoint(sender_endpoint),
+        m_remote_endpoint(remote_endpoint),
         m_remoteNodeId(0),
         m_remoteCCId(0),
         theIsActiveSetup(isActiveSetup),
@@ -60,6 +60,9 @@ namespace lmp
         theRcvSeqNum(0),
         theObservers()
     {
+      std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIFSocket.getLocalCCId()
+                << ", remoteAddress = " << m_remote_endpoint.address().to_v4().to_ulong()
+                << ", remotePortNumber = " << m_remote_endpoint.port() << ") enable" << std::endl;
       theFSM.start();
       registerObserver(m_node);
     }
@@ -88,9 +91,13 @@ namespace lmp
     {
       return m_networkIFSocket.getLocalCCId();
     }
-     lmp::DWORD  IpccImpl::do_getRemoteCCId() const
+    lmp::DWORD  IpccImpl::do_getRemoteCCId() const
     {
       return m_remoteCCId;
+    }
+    const boost::asio::ip::udp::endpoint& IpccImpl::do_getRemoteEndpoint() const
+    {
+      return m_remote_endpoint;
     }
     void IpccImpl::reconfigure(
       const obj::config::HelloConfigBody&  helloConfig)

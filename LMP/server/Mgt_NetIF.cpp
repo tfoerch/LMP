@@ -1,5 +1,6 @@
 #include <Mgt_NetIF.hpp>
 #include <Mgt_IPCC.hpp>
+#include "Mgt_NetworkIFInDestructionFtorIF.hpp"
 
 #include <iostream>                     // for operator<<, etc
 
@@ -7,23 +8,27 @@ namespace lmp_netif
 {
 
 NetworkIF_i::NetworkIF_i(
-  PortableServer::POA_ptr          poa,
-  lmp_node::NodeApplProxy&         node,
-  ::CORBA::Long                    localCCId,
-  boost::asio::io_service&         io_service,
-  boost::asio::ip::udp::endpoint&  listen_endpoint)
+  PortableServer::POA_ptr                  poa,
+  lmp_node::NodeApplProxy&                 node,
+  ::CORBA::Long                            localCCId,
+  boost::asio::io_service&                 io_service,
+  boost::asio::ip::udp::endpoint&          listen_endpoint,
+  lmp_node::NetworkIFInDestructionFtorIF&  networkIFInDestructionFtor)
   : m_POA(PortableServer::POA::_duplicate(poa)),
     m_node(node),
     m_ipccAdjDiscoveredFtor(*this),
+    m_ipccInDestructionFtor(*this),
     m_msgHandler(m_node, m_ipccAdjDiscoveredFtor),
     m_networkIfSocket(io_service, localCCId, listen_endpoint, m_msgHandler),
-    m_networkIfProxy(m_networkIfSocket)
+    m_networkIfProxy(m_networkIfSocket),
+    m_networkIFInDestructionFtor(networkIFInDestructionFtor)
 {
   std::cout << "NetworkIF(localCCId = " << localCCId << ')' << std::endl;
 }
 
 NetworkIF_i::~NetworkIF_i()
 {
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") destructor" << std::endl;
 }
 
 ::CORBA::Long NetworkIF_i::getLocalCCId()
@@ -33,6 +38,8 @@ NetworkIF_i::~NetworkIF_i()
 
 void NetworkIF_i::destroy()
 {
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") destroy" << std::endl;
+  m_networkIFInDestructionFtor(getLocalCCId());
   // TODO theNodePtr->deleteNetworkIF(m_localCCId);
   PortableServer::ObjectId *oid = m_POA->servant_to_id(this);
   m_POA->deactivate_object(*oid);  delete oid;
@@ -60,7 +67,9 @@ lmp_ipcc::IPCC_ptr NetworkIF_i::createIPCC(
 {
   boost::asio::ip::address_v4  ipv4(remoteAddress);
   boost::asio::ip::udp::endpoint remote_endpoint(ipv4, remotePortNumber);
-  if (m_IPCCs.find(remote_endpoint) == m_IPCCs.end())
+
+  IPCCByRemoteEndPointMap::const_iterator ipccIter = m_IPCCs.find(remote_endpoint);
+  if (ipccIter == m_IPCCs.end())
   {
     lmp::cc::IpccMsgReceiveIF* ipccPtr =
       m_msgHandler.createIpcc(remote_endpoint, m_networkIfProxy);
@@ -71,14 +80,32 @@ lmp_ipcc::IPCC_ptr NetworkIF_i::createIPCC(
       if (ipccApplPtr)
       {
         lmp_ipcc::IPCC_i* servant =
-          new lmp_ipcc::IPCC_i(m_POA, m_node, m_networkIfProxy, *ipccApplPtr);
+          new lmp_ipcc::IPCC_i(m_POA, m_node, m_networkIfProxy, *ipccApplPtr, m_ipccInDestructionFtor);
         PortableServer::ObjectId *oid = m_POA->activate_object(servant);  delete oid;
         lmp_ipcc::IPCC_ptr ipcc = servant->_this();
-        return m_IPCCs.insert(IPCCByRemoteEndPointMap::value_type(remote_endpoint, lmp_ipcc::IPCC::_duplicate(ipcc))).first->second;
+        ipccIter = m_IPCCs.insert(IPCCByRemoteEndPointMap::value_type(remote_endpoint, lmp_ipcc::IPCC::_duplicate(ipcc))).first;
+        if (ipccIter != m_IPCCs.end())
+        {
+          lmp_ipcc::IPCC_ptr ipcc_ptr = ipccIter->second;
+          if (ipcc_ptr)
+          {
+            for (IPCCAdjacencyObserverContainer::const_iterator obsIter = m_ipccAdjacencyObservers.begin();
+                obsIter != m_ipccAdjacencyObservers.end();
+                ++obsIter)
+            {
+              if (*obsIter)
+              {
+                ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_var observer = *obsIter;
+                observer->ipccAdjacencyAdded(ipcc_ptr);
+              }
+            }
+          }
+          return ipcc_ptr;
+        }
       }
     }
   }
-  throw lmp_node::Entity_Already_Exists();
+  throw lmp_netif::Entity_Already_Exists();
 }
 
 lmp_ipcc::IPCC_ptr NetworkIF_i::getIPCC(
@@ -92,7 +119,7 @@ lmp_ipcc::IPCC_ptr NetworkIF_i::getIPCC(
   {
     return ipccIter->second;
   }
-  throw lmp_node::No_Such_Entity();
+  throw lmp_netif::No_Such_Entity();
 }
 
 void NetworkIF_i::deleteIPCC(
@@ -104,16 +131,31 @@ void NetworkIF_i::deleteIPCC(
   IPCCByRemoteEndPointMap::iterator ipccIter = m_IPCCs.find(remote_endpoint);
   if (ipccIter != m_IPCCs.end())
   {
+    lmp_ipcc::IPCC_ptr ipcc_ptr = ipccIter->second;
+    if (ipcc_ptr)
+    {
+      for (IPCCAdjacencyObserverContainer::const_iterator obsIter = m_ipccAdjacencyObservers.begin();
+          obsIter != m_ipccAdjacencyObservers.end();
+          ++obsIter)
+      {
+        if (*obsIter)
+        {
+          ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_var observer = *obsIter;
+          observer->ipccAdjacencyRemoved(ipcc_ptr);
+        }
+      }
+    }
     m_IPCCs.erase(ipccIter);
+    return;
   }
-  throw lmp_node::No_Such_Entity();
+  throw lmp_netif::No_Such_Entity();
 }
 
 void NetworkIF_i::registerIPCCAdjacencyObserver(
   ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId()
-            << ").registerIPCCAdjacencyObserver()" << std::endl;
+            << ").NetworkIF(localCCId = " << getLocalCCId() << ").registerIPCCAdjacencyObserver()" << std::endl;
   m_ipccAdjacencyObservers.insert(lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver::_duplicate(observer));
 }
 
@@ -121,7 +163,7 @@ void NetworkIF_i::deregisterIPCCAdjacencyObserver(
   ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId()
-            << ").deregisterIPCCAdjacencyObserver()" << std::endl;
+            << ").NetworkIF(localCCId = " << getLocalCCId() << ").deregisterIPCCAdjacencyObserver()" << std::endl;
   m_ipccAdjacencyObservers.erase(lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver::_duplicate(observer));
 }
 
@@ -138,6 +180,26 @@ void NetworkIF_i::IPCCAdjDiscoveredFtor::do_process(
   {
     m_networkIF.createIPCC(sender_endpointl.address().to_v4().to_ulong(),
                            sender_endpointl.port());
+  }
+}
+
+NetworkIF_i::IPCCInDestructionFtor::IPCCInDestructionFtor(
+  NetworkIF_i&  networkIF)
+: m_networkIF(networkIF)
+{
+}
+
+void NetworkIF_i::IPCCInDestructionFtor::do_process(
+  lmp::DWORD                   remoteAddress,
+  lmp::WORD                    remotePortNumber)
+{
+  try
+  {
+    std::cout << "calling delete" << std::endl;
+    m_networkIF.deleteIPCC(remoteAddress, remotePortNumber);
+  }
+  catch(lmp_netif::No_Such_Entity& nsE)
+  {
   }
 }
 

@@ -21,6 +21,7 @@
 #include <Mgt_NodeRegistry.hpp>
 #include <Mgt_IPCCObserver.hpp>
 #include <Mgt_NeighborAdjacencyObserver.hpp>
+#include <Mgt_IPCCAdjacencyObserver.hpp>
 #include <lmp_mgtif_node.hpp>
 #include "lmp_mgtif_netif.hpp"               // for NetworkIF_var, IPCC_ptr
 
@@ -51,7 +52,8 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
   lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_i* neighborAdjacencyObserver =
     new lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_i(orb, poa);
   poa->activate_object(neighborAdjacencyObserver);
-  lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_ptr neighborAdjacencyObserverPtr = neighborAdjacencyObserver->_this();
+  lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_ptr neighborAdjacencyObserverPtr =
+    neighborAdjacencyObserver->_this();
 
   ::lmp_node::Node_ptr node1 = theNodeRegistry->getNode(m_1stNodeId);
   BOOST_CHECK(!CORBA::is_nil(node1));
@@ -65,12 +67,38 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
     if (theOrb &&
         !CORBA::is_nil(netif))
     {
+      lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_i* ipccAdjacencyObserver =
+        new lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_i(orb, poa);
+      poa->activate_object(ipccAdjacencyObserver);
+      lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr ipccAdjacencyObserverPtr =
+        ipccAdjacencyObserver->_this();
+      netif->registerIPCCAdjacencyObserver(ipccAdjacencyObserverPtr);
       std::cout << "before enable" << std::endl;
       netif->enable();
       std::cout << "after enable" << std::endl;
+      lmp_ipcc::IPCC_ptr ipcc = netif->createIPCC(2130706433, 7012);
+      BOOST_CHECK(!CORBA::is_nil(ipcc));
+      if (theOrb &&
+          !CORBA::is_nil(ipcc))
+      {
+        lmp_ipcc_observer::IPCCObserver_i* ipccObserver =
+          new lmp_ipcc_observer::IPCCObserver_i(orb, poa);
+        poa->activate_object(ipccObserver);
+        lmp_ipcc_observer::IPCCObserver_ptr ipccObserverPtr =
+          ipccObserver->_this();
+        ipcc->registerObserver(ipccObserverPtr);
+        ipcc->enable();
+        ipcc->disable();
+        ipcc->deregisterObserver(ipccObserverPtr);
+        ipcc->destroy();
+      }
+      //netif->deleteIPCC(2130706433, 7012);
       netif->disable();
+      netif->deregisterIPCCAdjacencyObserver(ipccAdjacencyObserverPtr);
+      netif->destroy();
     }
     node1->deregisterNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
+    //node1->deleteNetIF(7011);
   }
   ::lmp_node::Node_ptr node2 = theNodeRegistry->getNode(m_2ndNodeId);
   BOOST_CHECK(!CORBA::is_nil(node2));

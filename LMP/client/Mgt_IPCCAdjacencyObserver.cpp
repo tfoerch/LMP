@@ -31,15 +31,19 @@ void IPCCAdjacencyObserver_i::destroy()
 void IPCCAdjacencyObserver_i::ipccAdjacencyAdded(
    ::lmp_ipcc::IPCC_ptr aIPCC)
 {
-  std::cout << "ipccAdjacencyObserver["
-            << /* localCCId << */ "].ipccAdjacencyAdded()" << std::endl;
+  std::cout << "ipccAdjacencyObserver.ipccAdjacencyAdded("
+            << aIPCC->getLocalCCId() << ", "
+            << aIPCC->getRemoteAddress() << ", "
+            << aIPCC->getRemotePortNumber() << ")" << std::endl;
 }
 
 void IPCCAdjacencyObserver_i::ipccAdjacencyRemoved(
   ::lmp_ipcc::IPCC_ptr aIPCC)
 {
-  std::cout << "ipccAdjacencyObserver["
-            << /* localCCId << */ "].ipccAdjacencyAdded()" << std::endl;
+  std::cout << "ipccAdjacencyObserver.ipccAdjacencyRemoved("
+            << aIPCC->getLocalCCId() << ", "
+            << aIPCC->getRemoteAddress() << ", "
+            << aIPCC->getRemotePortNumber() << ")" << std::endl;
 }
 
 } // end namespace lmp_ipcc_adjacency_observer

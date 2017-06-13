@@ -13,6 +13,10 @@ namespace lmp_node
 {
   class NodeApplProxy;
 }
+namespace lmp_netif
+{
+  class IPCCInDestructionFtorIF;
+}
 
 namespace lmp_ipcc
 {
@@ -20,11 +24,15 @@ namespace lmp_ipcc
   {
   public:
     IPCC_i(
-      PortableServer::POA_ptr     poa,
-      lmp_node::NodeApplProxy&    node,
-      lmp_netif::NetworkIFProxy&  metworkIf,
-      lmp::cc::IpccApplicationIF&  ipcc);
+      PortableServer::POA_ptr              poa,
+      lmp_node::NodeApplProxy&             node,
+      lmp_netif::NetworkIFProxy&           networkIf,
+      lmp::cc::IpccApplicationIF&          ipcc,
+      lmp_netif::IPCCInDestructionFtorIF&  ipccInDestructionFtor);
     virtual ~IPCC_i();
+    virtual ::CORBA::Long getLocalCCId();
+    virtual ::CORBA::Long getRemoteAddress();
+    virtual ::CORBA::Short getRemotePortNumber();
     virtual void destroy();
     virtual void enable();
     virtual void disable();
@@ -33,10 +41,11 @@ namespace lmp_ipcc
     virtual void deregisterObserver(
       ::lmp_ipcc_observer::IPCCObserver_ptr  observer);
   private:
-    PortableServer::POA_ptr     thePOA;
-    lmp_node::NodeApplProxy&    m_node;
-    lmp_netif::NetworkIFProxy&  m_metworkIf;
-    lmp::cc::IpccApplicationIF&  m_ipcc;
+    PortableServer::POA_ptr              thePOA;
+    lmp_node::NodeApplProxy&             m_node;
+    lmp_netif::NetworkIFProxy&           m_networkIf;
+    lmp::cc::IpccApplicationIF&          m_ipcc;
+    lmp_netif::IPCCInDestructionFtorIF&  m_ipccInDestructionFtor;
   };
 
 } // end namespace LMP

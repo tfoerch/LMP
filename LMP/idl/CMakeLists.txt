@@ -46,6 +46,8 @@ add_custom_command(
   COMMAND omniidl -bcxx -nf -Wbh=.hpp -Wbs=.cpp -I${PROJECT_SOURCE_DIR}/idl ${PROJECT_SOURCE_DIR}/idl/lmp_mgtif_netif.idl
 )
 
+include_directories ("${PROJECT_BINARY_DIR}/idl")
+
 add_library (
 lmp_mgtif SHARED
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_node.cpp

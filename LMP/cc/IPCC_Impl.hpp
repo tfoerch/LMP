@@ -42,7 +42,7 @@ namespace lmp
       IpccImpl(
         node::NodeApplicationIF&               node,
         NetworkIFSocketIF&                     networkIFSocket,
-        const boost::asio::ip::udp::endpoint&  sender_endpoint,
+        const boost::asio::ip::udp::endpoint&  remote_endpoint,
         bool                                   isActiveSetup);
       virtual ~IpccImpl();
       void reconfigure(
@@ -62,6 +62,7 @@ namespace lmp
       virtual lmp::DWORD do_getRemoteNodeId() const;
       virtual lmp::DWORD do_getLocalCCId() const;
       virtual lmp::DWORD do_getRemoteCCId() const;
+      virtual const boost::asio::ip::udp::endpoint& do_getRemoteEndpoint() const;
       virtual void do_registerObserver(
         appl::IpccObserverProxyIF&  observer);
       virtual void do_deregisterObserver(
@@ -106,7 +107,7 @@ namespace lmp
 
       node::NodeApplicationIF&                          m_node;
       NetworkIFSocketIF&                                m_networkIFSocket;
-      const boost::asio::ip::udp::endpoint&             m_sender_endpoint;
+      boost::asio::ip::udp::endpoint                    m_remote_endpoint;
       lmp::DWORD                                        m_remoteNodeId;
       lmp::DWORD                                        m_remoteCCId;
       bool                                              theIsActiveSetup;

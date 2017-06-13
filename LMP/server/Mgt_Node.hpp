@@ -4,6 +4,7 @@
 #include "lmp_mgtif_neighbor.hpp"            // for Neighbor_var, etc
 #include "lmp_mgtif_neighbor_adjacency_observer.hpp"      // for Neighbor_var, etc
 #include <Mgt_NeighborAdjacencyChangeFtorIF.hpp>
+#include "Mgt_NetworkIFInDestructionFtorIF.hpp"
 #include <Mgt_NodeApplProxy.hpp>
 
 #include "node/Node.hpp"
@@ -67,13 +68,23 @@ private:
   class NeighborAdjRemovedFtor : public NeighborAdjacencyChangeFtorIF
   {
   public:
-    NeighborAdjRemovedFtor(
+    explicit NeighborAdjRemovedFtor(
       NeighborAdjacencyObserverContainer&  observers);
   private:
     virtual void do_process(
       lmp::DWORD                   neighborNodeId,
       lmp::cc::IpccApplicationIF&  ipcc);
     NeighborAdjacencyObserverContainer&  m_observers;
+  };
+  class NetworkIFInDestructionFtor : public NetworkIFInDestructionFtorIF
+  {
+  public:
+    explicit NetworkIFInDestructionFtor(
+      Node_i&  node);
+  private:
+    virtual void do_process(
+      lmp::DWORD                   localCCId);
+    Node_i&                      m_node;
   };
 
   CORBA::ORB_ptr                         theORB;
@@ -86,6 +97,7 @@ private:
   NeighborByNodeIdMap                    theNeighborByNodeIdMap;
   NeighborAdjAddedFtor                   m_neighborAdjAddedFtor;
   NeighborAdjRemovedFtor                 m_neighborAdjRemovedFtor;
+  NetworkIFInDestructionFtor             m_networkIFInDestructionFtor;
   NodeApplProxy                          m_nodeProxy;
 };
 

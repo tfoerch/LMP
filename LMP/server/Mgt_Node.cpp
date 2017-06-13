@@ -22,6 +22,7 @@ Node_i::Node_i(
   theNeighborByNodeIdMap(),
   m_neighborAdjAddedFtor(m_neighborAdjacencyObserver),
   m_neighborAdjRemovedFtor(m_neighborAdjacencyObserver),
+  m_networkIFInDestructionFtor(*this),
   m_nodeProxy(m_node,
               m_neighborAdjAddedFtor,
               m_neighborAdjRemovedFtor)
@@ -57,7 +58,7 @@ lmp_netif::NetworkIF_ptr Node_i::createNetIF(
     boost::asio::ip::address_v4  ipv4(localAddress);
     boost::asio::ip::udp::endpoint local_endpoint(ipv4, localPortNumber);
     lmp_netif::NetworkIF_i* servant =
-      new lmp_netif::NetworkIF_i(m_POA, m_nodeProxy, localCCId, m_io_service, local_endpoint);
+      new lmp_netif::NetworkIF_i(m_POA, m_nodeProxy, localCCId, m_io_service, local_endpoint, m_networkIFInDestructionFtor);
     PortableServer::ObjectId *oid = m_POA->activate_object(servant);  delete oid;
     lmp_netif::NetworkIF_ptr netif = servant->_this();
     return m_netIFByLocalCCI.insert(NetIFByLocalCCIdMap::value_type(localCCId, lmp_netif::NetworkIF::_duplicate(netif))).first->second;
@@ -84,6 +85,7 @@ void Node_i::deleteNetIF(
   if (netIfIter != m_netIFByLocalCCI.end())
   {
     m_netIFByLocalCCI.erase(netIfIter);
+    return;
   }
   throw lmp_node::No_Such_Entity();
 }
@@ -180,6 +182,23 @@ void Node_i::NeighborAdjRemovedFtor::do_process(
 {
 }
 
+Node_i::NetworkIFInDestructionFtor::NetworkIFInDestructionFtor(
+  Node_i&  node)
+: m_node(node)
+{
+}
+
+void Node_i::NetworkIFInDestructionFtor::do_process(
+  lmp::DWORD                   localCCId)
+{
+  try
+  {
+    m_node.deleteNetIF(localCCId);
+  }
+  catch(lmp_node::No_Such_Entity& nsE)
+  {
+  }
+}
 
 
 } // end namespace lmp_node

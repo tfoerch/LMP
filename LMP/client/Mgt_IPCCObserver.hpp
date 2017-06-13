@@ -16,12 +16,12 @@ public:
   virtual ~IPCCObserver_i();
   virtual void destroy();
   virtual void stateHasChanged(
-	::CORBA::Long    localCCId,
-	::lmp_ipcc_observer::IPCC_State newState);
+    ::CORBA::Long                   localCCId,
+    ::lmp_ipcc_observer::IPCC_State newState);
   virtual void peerIpccDiscovered(
     ::CORBA::Long    localCCId,
-	::CORBA::Long    remoteCCId,
-	::CORBA::Long    remoteNodeId);
+    ::CORBA::Long    remoteCCId,
+    ::CORBA::Long    remoteNodeId);
 private:
 
   CORBA::ORB_ptr           theORB;

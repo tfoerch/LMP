@@ -8,6 +8,7 @@
  */
 
 #include "base/ProtocolTypes.hpp"             // for DWORD
+#include <boost/asio/ip/udp.hpp>
 #include <iostream>
 
 namespace lmp
@@ -37,6 +38,8 @@ namespace lmp
       { return do_getLocalCCId(); }
       inline lmp::DWORD getRemoteCCId() const
       { return do_getRemoteCCId(); }
+      inline const boost::asio::ip::udp::endpoint&  getRemoteEndpoint() const
+      { return do_getRemoteEndpoint(); }
       inline void registerObserver(
         appl::IpccObserverProxyIF&  observer)
       { do_registerObserver(observer); }
@@ -57,6 +60,7 @@ namespace lmp
       virtual lmp::DWORD do_getRemoteNodeId() const = 0;
       virtual lmp::DWORD do_getLocalCCId() const = 0;
       virtual lmp::DWORD do_getRemoteCCId() const = 0;
+      virtual const boost::asio::ip::udp::endpoint& do_getRemoteEndpoint() const = 0;
       virtual void do_registerObserver(
         appl::IpccObserverProxyIF&  observer) = 0;
       virtual void do_deregisterObserver(
