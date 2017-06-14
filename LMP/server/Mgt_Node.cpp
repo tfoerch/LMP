@@ -1,6 +1,6 @@
 #include <Mgt_Node.hpp>
 #include <Mgt_Neighbor.hpp>
-#include <Mgt_NetIF.hpp>
+#include <Mgt_NetworkIF.hpp>
 #include "lmp_mgtif_node.hpp"           // for No_Such_Entity, etc
 #include "lmp_mgtif_node_registry.hpp"  // for NodeRegistry_var, etc
 #include <iostream>

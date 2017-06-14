@@ -1,4 +1,4 @@
-#include <Mgt_NetIF.hpp>
+#include <Mgt_NetworkIF.hpp>
 #include <Mgt_IPCC.hpp>
 #include "Mgt_NetworkIFInDestructionFtorIF.hpp"
 
