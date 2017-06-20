@@ -31,13 +31,9 @@ namespace lmp
     	lmp::DWORD                        localCCId,
         const std::string&                ifName,
         lmp::WORD                         port,
-        UDPMsgReceiveIF&                  udpMsgHandler); // bind socket to interface device
-      NetworkIFSocket(
-    	boost::asio::io_service&          io_service,
-    	lmp::DWORD                        localCCId,
-    	boost::asio::ip::udp::endpoint&   listen_endpoint,
-    	UDPMsgReceiveIF&                  udpMsgHandler); // bind socket to local listen_endpoint
-      virtual ~NetworkIFSocket();
+        UDPMsgReceiveIF&                  udpMsgHandler,
+        bool                              bind2Interface); // bind socket to interface device
+     virtual ~NetworkIFSocket();
       typedef boost::optional<boost::asio::ip::address_v4> OptAddressV4;
       typedef boost::optional<boost::asio::ip::address_v6> OptAddressV6;
       typedef std::pair<OptAddressV4, OptAddressV6>        OptAddresses;
@@ -48,6 +44,8 @@ namespace lmp
         NetworkIFSocket&&  other) = default;
       // implement NetworkIFSocketIF
       virtual lmp::DWORD do_getLocalCCId() const;
+      virtual void do_enable();
+      virtual void do_disable();
       virtual void do_send(
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
         boost::asio::mutable_buffers_1&        messageBuffer);
@@ -57,14 +55,17 @@ namespace lmp
       void handle_send_msg(
     	const boost::system::error_code&  error,
     	size_t                            bytes_sent);
-      lmp::DWORD                             m_localCCId;
-      UDPMsgReceiveIF&                       m_udpMsgHandler;
-      boost::asio::ip::udp::endpoint         m_listen_endpoint;
-      boost::asio::ip::udp::socket           m_socket;
-      boost::asio::ip::udp::endpoint         m_sender_endpoint;
+      boost::asio::io_service&                       m_io_service;
+      lmp::DWORD                                     m_localCCId;
+      UDPMsgReceiveIF&                               m_udpMsgHandler;
+      std::string                                    m_ifName;
+      lmp::WORD                                      m_port;
+      bool                                           m_bind2Interface;
+      boost::asio::ip::udp::socket                   m_socket;
+      boost::asio::ip::udp::endpoint                 m_sender_endpoint;
       enum { max_buffer_length = 4096 };
-      char                                   m_buffer[max_buffer_length];
-      static const boost::asio::ip::address  c_multicast_address;
+      char                                           m_buffer[max_buffer_length];
+      static const boost::asio::ip::address          c_multicast_address;
     };
   } // namespace cc
 } // namespace lmp

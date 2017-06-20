@@ -46,6 +46,7 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
   BOOST_CHECK(theNodeRegistry->isNodeRegistered(m_1stNodeId));
   BOOST_CHECK(theNodeRegistry->isNodeRegistered(m_2ndNodeId));
 
+  CORBA::String_var ifName = (const char*) "lo";
   CORBA::ORB_var orb = *theOrb;
   CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
   PortableServer::POA_var poa = PortableServer::POA::_narrow(obj);
@@ -62,7 +63,7 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
     std::cout << "test case 1 node 1 retrieved\n";
     std::cout << "before register observer" << std::endl;
     node1->registerNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
-    ::lmp_netif::NetworkIF_ptr netif = node1->createNetIF(7011, 2130706433, 7011);
+    ::lmp_netif::NetworkIF_ptr netif = node1->createNetworkIF(7011, ifName, 7011);
     BOOST_CHECK(!CORBA::is_nil(netif));
     if (theOrb &&
         !CORBA::is_nil(netif))
@@ -98,8 +99,9 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
       netif->destroy();
     }
     node1->deregisterNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
-    //node1->deleteNetIF(7011);
+    //node1->deleteNetworkIF(7011);
   }
+  node1->destroy();
   ::lmp_node::Node_ptr node2 = theNodeRegistry->getNode(m_2ndNodeId);
   BOOST_CHECK(!CORBA::is_nil(node2));
   if (!CORBA::is_nil(node2))
@@ -107,7 +109,7 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
     std::cout << "test case 1 node 2 retrieved\n";
     std::cout << "before register observer" << std::endl;
     node2->registerNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
-    ::lmp_netif::NetworkIF_ptr netif = node2->createNetIF(7012, 2130706433, 7012);
+    ::lmp_netif::NetworkIF_ptr netif = node2->createNetworkIF(7012, ifName, 7012);
     BOOST_CHECK(!CORBA::is_nil(netif));
     if (theOrb &&
         !CORBA::is_nil(netif))

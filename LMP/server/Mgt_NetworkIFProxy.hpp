@@ -22,6 +22,8 @@ namespace lmp_netif
   private:
     // implement NetworkIFSocketIF
     virtual lmp::DWORD do_getLocalCCId() const;
+    virtual void do_enable();
+    virtual void do_disable();
     virtual void do_send(
       const boost::asio::ip::udp::endpoint&  destination_endpoint,
       boost::asio::mutable_buffers_1&        messageBuffer);

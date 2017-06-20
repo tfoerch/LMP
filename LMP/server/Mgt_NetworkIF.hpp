@@ -28,11 +28,12 @@ namespace lmp_netif
   {
   public:
     NetworkIF_i(
-      PortableServer::POA_ptr                  lpoa,
-      lmp_node::NodeApplProxy&                 lnode,
-      ::CORBA::Long                            llocalCCId,
-      boost::asio::io_service&                 lio_service,
-      boost::asio::ip::udp::endpoint&          listen_endpoint,
+      PortableServer::POA_ptr                  poa,
+      lmp_node::NodeApplProxy&                 node,
+      boost::asio::io_service&                 io_service,
+      lmp::DWORD                               localCCId,
+      const std::string&                       ifName,
+      lmp::WORD                                port,
       lmp_node::NetworkIFInDestructionFtorIF&  networkIFInDestructionFtor);
     virtual ~NetworkIF_i();
     virtual ::CORBA::Long getLocalCCId();

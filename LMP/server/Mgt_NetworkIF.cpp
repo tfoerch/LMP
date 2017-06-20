@@ -10,16 +10,17 @@ namespace lmp_netif
 NetworkIF_i::NetworkIF_i(
   PortableServer::POA_ptr                  poa,
   lmp_node::NodeApplProxy&                 node,
-  ::CORBA::Long                            localCCId,
   boost::asio::io_service&                 io_service,
-  boost::asio::ip::udp::endpoint&          listen_endpoint,
+  lmp::DWORD                               localCCId,
+  const std::string&                       ifName,
+  lmp::WORD                                port,
   lmp_node::NetworkIFInDestructionFtorIF&  networkIFInDestructionFtor)
   : m_POA(PortableServer::POA::_duplicate(poa)),
     m_node(node),
     m_ipccAdjDiscoveredFtor(*this),
     m_ipccInDestructionFtor(*this),
     m_msgHandler(m_node, m_ipccAdjDiscoveredFtor),
-    m_networkIfSocket(io_service, localCCId, listen_endpoint, m_msgHandler),
+    m_networkIfSocket(io_service, localCCId, ifName, port, m_msgHandler, false),
     m_networkIfProxy(m_networkIfSocket),
     m_networkIFInDestructionFtor(networkIFInDestructionFtor)
 {
@@ -44,19 +45,20 @@ void NetworkIF_i::destroy()
   PortableServer::ObjectId *oid = m_POA->servant_to_id(this);
   m_POA->deactivate_object(*oid);  delete oid;
   _remove_ref(); // delete this;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") destroy finished" << std::endl;
 }
 
 void NetworkIF_i::enable()
 {
   std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") enable" << std::endl;
-  //theIPCCImpl.enable();
+  m_networkIfProxy.enable();
   // m_msgHandler.setNetworkIFObjRef(this->_this());
 }
 
 void NetworkIF_i::disable()
 {
   std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") disable" << std::endl;
-  //theIPCCImpl.disable();
+  m_networkIfProxy.disable();
   // m_msgHandler.clearNetworkIFObjRef();
 }
 

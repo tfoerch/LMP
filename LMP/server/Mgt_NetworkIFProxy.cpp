@@ -14,6 +14,16 @@ namespace lmp_netif
     return m_networkIf.getLocalCCId();
   }
 
+  void NetworkIFProxy::do_enable()
+  {
+    m_networkIf.enable();
+  }
+
+  void NetworkIFProxy::do_disable()
+  {
+    m_networkIf.disable();
+  }
+
   void NetworkIFProxy::do_send(
       const boost::asio::ip::udp::endpoint&  destination_endpoint,
       boost::asio::mutable_buffers_1&        messageBuffer)

@@ -30,81 +30,107 @@ namespace lmp
       lmp::DWORD                localCCId,
       const std::string&        ifName,
       lmp::WORD                 port,
-      UDPMsgReceiveIF&          udpMsgHandler)
-      : m_localCCId(localCCId),
+      UDPMsgReceiveIF&          udpMsgHandler,
+      bool                      bind2Interface)
+      : m_io_service(io_service),
+        m_localCCId(localCCId),
         m_udpMsgHandler(udpMsgHandler),
-        m_listen_endpoint(c_multicast_address, port),
-        m_socket(io_service, m_listen_endpoint),
+        m_ifName(ifName),
+        m_port(port),
+        m_bind2Interface(bind2Interface),
+        m_socket(m_io_service),
         m_sender_endpoint()
     {
-      OptAddresses optAddr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
-      boost::asio::ip::address if_address =
-        ( optAddr.first ?
-          *optAddr.first :
-          ( optAddr.second ?
-            *optAddr.second :
-            boost::asio::ip::address::from_string("127.0.0.1") ) );
-      // SO_BINDTODEVICE
-      if ((::setsockopt(m_socket.native(), SOL_SOCKET, SO_BINDTODEVICE,
-    	  ifName.c_str(), ifName.size() + 1) == -1))
-      {
-    	throw std::runtime_error("setsockopt() SO_BINDTODEVICE");
-      }
-
-      // bind
-      m_socket.set_option(boost::asio::ip::udp::socket::reuse_address(true));
-
-      //m_socket.bind(listen_endpoint);
-
-      // disable loopback (no copies of our packets)
-      m_socket.set_option(boost::asio::ip::multicast::enable_loopback(false));
-
-      // set oif - the socket will use this interface as outgoing interface
-      m_socket.set_option(boost::asio::ip::multicast::outbound_interface(if_address.to_v4()));
-
-      // set mcast group - join group
-      m_socket.set_option(boost::asio::ip::multicast::join_group(c_multicast_address.to_v4(),
-                                                                 if_address.to_v4()));
-      m_socket.async_receive_from(boost::asio::buffer(m_buffer, max_buffer_length),
-                                  m_sender_endpoint,
-                                  boost::bind(&NetworkIFSocket::handle_received_msg,
-                                              this,
-                                              boost::asio::placeholders::error,
-                                              boost::asio::placeholders::bytes_transferred));
+      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") ctor" << std::endl;
     }
 
-    NetworkIFSocket::NetworkIFSocket(
-      boost::asio::io_service&          io_service,
-      lmp::DWORD                        localCCId,
-      boost::asio::ip::udp::endpoint&   listen_endpoint,
-      UDPMsgReceiveIF&                  udpMsgHandler)
-    : m_localCCId(localCCId),
-      m_udpMsgHandler(udpMsgHandler),
-      m_listen_endpoint(listen_endpoint),
-      m_socket(io_service, m_listen_endpoint),
-      m_sender_endpoint()
-    {
-      // bind
-      m_socket.set_option(boost::asio::ip::udp::socket::reuse_address(true));
-
-      // m_socket.bind(m_listen_endpoint);
-
-      // disable loopback (no copies of our packets)
-      m_socket.set_option(boost::asio::ip::multicast::enable_loopback(false));
-
-      m_socket.async_receive_from(boost::asio::buffer(m_buffer, max_buffer_length),
-                                  m_sender_endpoint,
-                                  boost::bind(&NetworkIFSocket::handle_received_msg,
-                                              this,
-                                              boost::asio::placeholders::error,
-                                              boost::asio::placeholders::bytes_transferred));
-    }
     NetworkIFSocket::~NetworkIFSocket()
     {
+      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") dtor" << std::endl;
+      if (m_socket.is_open())
+      {
+        m_socket.cancel();
+        m_socket.close();
+      }
+      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") dtor after cancel" << std::endl;
     }
     lmp::DWORD NetworkIFSocket::do_getLocalCCId() const
     {
       return m_localCCId;
+    }
+    void NetworkIFSocket::do_enable()
+    {
+      OptAddresses optAddr = lmp::cc::NetworkIFSocket::getIfAddress(m_ifName);
+      if (optAddr.first ||
+          optAddr.second)
+      {
+        boost::asio::ip::address if_address;
+        if (optAddr.first)
+        {
+          if_address = *optAddr.first;
+        }
+        else
+        {
+          if_address = *optAddr.second;
+        }
+        boost::asio::ip::udp::endpoint
+          listen_endpoint( ( m_bind2Interface ?
+                             c_multicast_address :
+                             if_address ),
+                           m_port);
+        try
+        {
+          std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") socket created" << std::endl;
+          m_socket.open(boost::asio::ip::udp::v4());
+          if (m_bind2Interface)
+          {
+            // SO_BINDTODEVICE
+            if ((::setsockopt(m_socket.native(), SOL_SOCKET, SO_BINDTODEVICE,
+                              m_ifName.c_str(), m_ifName.size() + 1) == -1))
+            {
+              throw std::runtime_error("setsockopt() SO_BINDTODEVICE");
+            }
+          }
+          // bind
+          m_socket.set_option(boost::asio::ip::udp::socket::reuse_address(true));
+          m_socket.bind(listen_endpoint);
+          std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ").enable after bind" << std::endl;
+
+          // disable loopback (no copies of our packets)
+          m_socket.set_option(boost::asio::ip::multicast::enable_loopback(false));
+
+          if (m_bind2Interface)
+          {
+            // set oif - the socket will use this interface as outgoing interface
+            m_socket.set_option(boost::asio::ip::multicast::outbound_interface(if_address.to_v4()));
+
+            // set mcast group - join group
+            m_socket.set_option(boost::asio::ip::multicast::join_group(c_multicast_address.to_v4(),
+                                                                       if_address.to_v4()));
+          }
+          m_socket.async_receive_from(boost::asio::buffer(m_buffer, max_buffer_length),
+                                    m_sender_endpoint,
+                                    boost::bind(&NetworkIFSocket::handle_received_msg,
+                                                this,
+                                                boost::asio::placeholders::error,
+                                                boost::asio::placeholders::bytes_transferred));
+        }
+        catch (std::exception& e)
+        {
+          std::cerr << "NetworkIFSocket(localCCId = " << m_localCCId << ").enable exception '"
+                    << e.what() << "' caught while creating socket" << std::endl;
+        }
+      }
+    }
+    void NetworkIFSocket::do_disable()
+    {
+      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") disable" << std::endl;
+      if (m_socket.is_open())
+      {
+        m_socket.cancel();
+        m_socket.close();
+      }
+      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") disable after cancel" << std::endl;
     }
     void NetworkIFSocket::do_send(
       const boost::asio::ip::udp::endpoint&  destination_endpoint,
@@ -190,11 +216,14 @@ namespace lmp
       const boost::system::error_code&  error,
       size_t                            bytes_recvd)
     {
-      boost::asio::const_buffers_1  messageBuffer(m_buffer, bytes_recvd);
-      m_udpMsgHandler.processReceivedMessage(*this,
-                                             m_sender_endpoint,
-                                             messageBuffer);
-      std::cout << "NetworkIFSocket::handle_received_msg(" << bytes_recvd << ")" << std::endl;
+      if (!error || error == boost::asio::error::message_size)
+      {
+        boost::asio::const_buffers_1  messageBuffer(m_buffer, bytes_recvd);
+        m_udpMsgHandler.processReceivedMessage(*this,
+                                               m_sender_endpoint,
+                                               messageBuffer);
+        std::cout << "NetworkIFSocket::handle_received_msg(" << bytes_recvd << ")" << std::endl;
+      }
     }
     void NetworkIFSocket::handle_send_msg(
   	  const boost::system::error_code&  error,

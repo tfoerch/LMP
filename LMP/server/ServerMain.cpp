@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
               lmp_node::Node_var nodeObj = myNode->_this();
               myNode->_remove_ref();
               cout << "call registerNode(nodeObj)" << endl;
-             nodeRegistry->registerNode(nodeObj);
+              nodeRegistry->registerNode(nodeObj);
 
               CORBA::String_var sior(orb->object_to_string(nodeObj));
               cout << sior << endl;

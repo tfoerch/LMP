@@ -16,6 +16,9 @@
 
 #include <map>
 #include <set>
+#include <vector>
+#include <thread>
+
 
 namespace lmp_node
 {
@@ -30,14 +33,14 @@ public:
     ::lmp_node_registry::NodeRegistry_ptr  aNodeRegistry);
   virtual ~Node_i();
   virtual ::CORBA::Long getNodeId();
-  virtual lmp_netif::NetworkIF_ptr createNetIF(
-    ::CORBA::Long localCCId,
-    ::CORBA::Long localAddress,
-    ::CORBA::Short localPortNumber);
-  virtual lmp_netif::NetworkIF_ptr getNetIF(
-    ::CORBA::Long localCCId);
-  virtual void deleteNetIF(
-   ::CORBA::Long localCCId);
+  virtual lmp_netif::NetworkIF_ptr createNetworkIF(
+    ::CORBA::Long   localCCId,
+    const char*     interfaceName,
+    ::CORBA::Short  localPortNumber);
+  virtual lmp_netif::NetworkIF_ptr getNetworkIF(
+    ::CORBA::Long   localCCId);
+  virtual void deleteNetworkIF(
+   ::CORBA::Long    localCCId);
   virtual void registerNeighborAdjacencyObserver(
     ::lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_ptr observer);
   virtual void deregisterNeighborAdjacencyObserver(
@@ -50,7 +53,7 @@ public:
     ::CORBA::Long remoteNodeId);
   virtual void destroy();
 private:
-  typedef  std::map<CORBA::Long, ::lmp_netif::NetworkIF_var>    NetIFByLocalCCIdMap;
+  typedef  std::map<CORBA::Long, ::lmp_netif::NetworkIF_var>    NetworkIFByLocalCCIdMap;
   typedef  std::set<::lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_var>   NeighborAdjacencyObserverContainer;
   typedef  std::map<CORBA::Long, ::lmp_neighbor::Neighbor_var>  NeighborByNodeIdMap;
 
@@ -90,9 +93,11 @@ private:
   CORBA::ORB_ptr                         theORB;
   PortableServer::POA_ptr                m_POA;
   boost::asio::io_service                m_io_service;
+  boost::asio::io_service::work          m_work;
+  std::vector<std::thread>               m_threadPool;
   lmp::node::Node                        m_node;
   ::lmp_node_registry::NodeRegistry_var  theNodeRegistry;
-  NetIFByLocalCCIdMap                    m_netIFByLocalCCI;
+  NetworkIFByLocalCCIdMap                m_netIFByLocalCCI;
   NeighborAdjacencyObserverContainer     m_neighborAdjacencyObserver;
   NeighborByNodeIdMap                    theNeighborByNodeIdMap;
   NeighborAdjAddedFtor                   m_neighborAdjAddedFtor;

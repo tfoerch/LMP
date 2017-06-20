@@ -21,6 +21,10 @@ namespace lmp
     public:
       inline lmp::DWORD getLocalCCId() const
       { return do_getLocalCCId(); }
+      inline void enable()
+      { do_enable(); }
+      inline void disable()
+      { do_disable(); }
       inline void send(
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
         boost::asio::mutable_buffers_1&        messageBuffer)
@@ -28,6 +32,8 @@ namespace lmp
       virtual ~NetworkIFSocketIF(){}
     private:
       virtual lmp::DWORD do_getLocalCCId() const = 0;
+      virtual void do_enable() = 0;
+      virtual void do_disable() = 0;
       virtual void do_send(
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
         boost::asio::mutable_buffers_1&        messageBuffer) = 0;
