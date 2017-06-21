@@ -75,13 +75,14 @@ namespace lmp
 
     void UDPMsgHandler::do_processReceivedMessage(
       NetworkIFSocketIF&                     networkIFSocket,
+      boost::asio::io_service&               io_service,
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
       boost::asio::const_buffers_1&          messageBuffer)
     {
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter == m_IPCCs.end())
       {
-        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, sender_endpoint, false);
+        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, io_service, sender_endpoint, false);
         if (ipccPtr)
         {
           ipccPtr->enable();
@@ -133,12 +134,13 @@ namespace lmp
 
     IpccMsgReceiveIF* UDPMsgHandler::do_createIpcc(
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
-      NetworkIFSocketIF&                     networkIFSocket)
+      NetworkIFSocketIF&                     networkIFSocket,
+      boost::asio::io_service&               io_service)
     {
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter == m_IPCCs.end())
       {
-        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, sender_endpoint, false);
+        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, io_service, sender_endpoint, false);
         if (ipccPtr)
         {
           ipccPtr->enable();

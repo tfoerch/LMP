@@ -9,6 +9,8 @@
 
 #include <boost/asio/ip/udp.hpp>
 
+namespace boost { namespace asio { class io_service; } }
+
 namespace lmp
 {
   namespace cc
@@ -26,8 +28,9 @@ namespace lmp
       { return do_accessIpcc(sender_endpoint); }
       inline IpccMsgReceiveIF* createIpcc(
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
-        NetworkIFSocketIF&                     networkIFSocket)
-      {  return do_createIpcc(sender_endpoint, networkIFSocket); }
+        NetworkIFSocketIF&                     networkIFSocket,
+        boost::asio::io_service&               io_service)
+      {  return do_createIpcc(sender_endpoint, networkIFSocket, io_service); }
       inline bool removeIpcc(
         const boost::asio::ip::udp::endpoint&  sender_endpoint)
       {  return do_removeIpcc(sender_endpoint); }
@@ -39,7 +42,8 @@ namespace lmp
         const boost::asio::ip::udp::endpoint&  sender_endpoint) = 0;
       virtual IpccMsgReceiveIF* do_createIpcc(
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
-        NetworkIFSocketIF&                     networkIFSocket) = 0;
+        NetworkIFSocketIF&                     networkIFSocket,
+        boost::asio::io_service&               io_service) = 0;
       virtual bool do_removeIpcc(
         const boost::asio::ip::udp::endpoint&  sender_endpoint) = 0;
     };

@@ -17,10 +17,11 @@ NetworkIF_i::NetworkIF_i(
   lmp_node::NetworkIFInDestructionFtorIF&  networkIFInDestructionFtor)
   : m_POA(PortableServer::POA::_duplicate(poa)),
     m_node(node),
+    m_io_service(io_service),
     m_ipccAdjDiscoveredFtor(*this),
     m_ipccInDestructionFtor(*this),
     m_msgHandler(m_node, m_ipccAdjDiscoveredFtor),
-    m_networkIfSocket(io_service, localCCId, ifName, port, m_msgHandler, false),
+    m_networkIfSocket(m_io_service, localCCId, ifName, port, m_msgHandler, false),
     m_networkIfProxy(m_networkIfSocket),
     m_networkIFInDestructionFtor(networkIFInDestructionFtor)
 {
@@ -74,7 +75,7 @@ lmp_ipcc::IPCC_ptr NetworkIF_i::createIPCC(
   if (ipccIter == m_IPCCs.end())
   {
     lmp::cc::IpccMsgReceiveIF* ipccPtr =
-      m_msgHandler.createIpcc(remote_endpoint, m_networkIfProxy);
+      m_msgHandler.createIpcc(remote_endpoint, m_networkIfProxy, m_io_service);
     if (ipccPtr)
     {
       lmp::cc::IpccApplicationIF* ipccApplPtr =

@@ -79,6 +79,7 @@ namespace lmp_netif
     };
     PortableServer::POA_ptr                  m_POA;
     lmp_node::NodeApplProxy&                 m_node;
+    boost::asio::io_service&                 m_io_service;
     IPCCByRemoteEndPointMap                  m_IPCCs;
     IPCCAdjacencyObserverContainer           m_ipccAdjacencyObservers;
     IPCCAdjDiscoveredFtor                    m_ipccAdjDiscoveredFtor;

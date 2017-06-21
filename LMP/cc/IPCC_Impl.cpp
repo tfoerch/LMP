@@ -47,10 +47,12 @@ namespace lmp
     IpccImpl::IpccImpl(
       node::NodeApplicationIF&               node,
       NetworkIFSocketIF&                     networkIFSocket,
+      boost::asio::io_service&               io_service,
       const boost::asio::ip::udp::endpoint&  remote_endpoint,
       bool                                   isActiveSetup)
       : m_node(node),
         m_networkIFSocket(networkIFSocket),
+        m_io_service(io_service),
         m_remote_endpoint(remote_endpoint),
         m_remoteNodeId(0),
         m_remoteCCId(0),
