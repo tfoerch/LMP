@@ -19,6 +19,7 @@
 #include "Test_IPCC_Observer.hpp"
 #include "Test_IPCC_Msg_Receiver.hpp"
 #include "Test_NeighborDiscoveredCheckFtor.hpp"
+#include "Test_EventCallbackCalledCheckFtor.hpp"
 #include "Test_Wait.hpp"
 
 #include <boost/asio/io_service.hpp>
@@ -44,6 +45,20 @@
 // NetIFSocket x sender_endpoint <-> IPCC
 
 BOOST_AUTO_TEST_SUITE( lmp_socket )
+
+BOOST_AUTO_TEST_CASE( test_RetransmitTimer )
+{
+  boost::asio::io_service io_service;
+  lmp::cc::test::EventCallbackCalledCheckFtor  eventCallbackCalledCheckFtor;
+  lmp::base::RetransmitTimer
+    retransmitTimer(io_service,
+                    boost::posix_time::seconds(1),
+                    boost::function<void()>(boost::bind(&lmp::cc::test::EventCallbackCalledCheckFtor::eventOccurred,
+                                                        &eventCallbackCalledCheckFtor)));
+  retransmitTimer.start();
+  BOOST_CHECK(lmp::test::util::wait(eventCallbackCalledCheckFtor, io_service, boost::posix_time::seconds(2)));
+
+}
 
 BOOST_AUTO_TEST_CASE( getIfAddress )
 {

@@ -1,6 +1,6 @@
 # Add executable called "LMP_T" that is built from the source files
 
-find_package(Boost COMPONENTS chrono system program_options)
+find_package( Boost REQUIRED COMPONENTS program_options system chrono thread )
 
 include_directories ("${PROJECT_SOURCE_DIR}/server")
 

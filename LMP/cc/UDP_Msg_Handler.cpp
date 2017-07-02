@@ -82,7 +82,7 @@ namespace lmp
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter == m_IPCCs.end())
       {
-        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, io_service, sender_endpoint, false);
+        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, io_service, sender_endpoint, true);
         if (ipccPtr)
         {
           ipccPtr->enable();
@@ -140,10 +140,10 @@ namespace lmp
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter == m_IPCCs.end())
       {
-        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, io_service, sender_endpoint, false);
+        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, io_service, sender_endpoint, true);
         if (ipccPtr)
         {
-          ipccPtr->enable();
+          // ipccPtr->enable();
           ipccIter = m_IPCCs.insert(IPCCMap::value_type(sender_endpoint,
                                                         ipccPtr)).first;
         }

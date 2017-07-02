@@ -501,6 +501,7 @@ namespace lmp
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::SendConfig::operator()(EVT const&, FSM& fsm, SourceState&, TargetState&)
     {
+      fsm.theIPCC.sendConfig();
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
     }
 
@@ -513,6 +514,7 @@ namespace lmp
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::ResendConfig::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {
+      fsm.theIPCC.resendConfig();
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
     }
     template <class EVT,class FSM,class SourceState,class TargetState>
@@ -652,6 +654,7 @@ namespace lmp
     {
       if (theFSMImpl)
       {
+        // std::cout << "FSM process event " << typeid(e).name() << std::endl;
         theFSMImpl->process_event(e);
         return true;
       }

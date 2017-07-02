@@ -141,6 +141,8 @@ namespace lmp
       struct FsmIpccImpl;
       // with shared_ptr, you don't need the complete type yet.
       boost::shared_ptr<FsmIpccImpl> theFSMImpl;
+      FSM_IPCC(const FSM_IPCC&) = delete;
+      void operator=(const FSM_IPCC&) = delete;
     };
   } // namespace cc
 } // namespace lmp

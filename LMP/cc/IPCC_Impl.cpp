@@ -20,6 +20,7 @@
 #include <boost/core/explicit_operator_bool.hpp>
 #include <boost/ptr_container/detail/reversible_ptr_container.hpp>
 #include <boost/ptr_container/detail/void_ptr_iterator.hpp>
+#include <boost/bind.hpp>
 #include <deque>
 #include <limits>
 #include <ostream>
@@ -56,30 +57,60 @@ namespace lmp
         m_remote_endpoint(remote_endpoint),
         m_remoteNodeId(0),
         m_remoteCCId(0),
-        theIsActiveSetup(isActiveSetup),
-        theFSM(*this),
-        theTxSeqNum(0),
-        theRcvSeqNum(0),
-        theObservers()
+        m_isActiveSetup(isActiveSetup),
+        m_FSM(*this),
+        m_configSend_timer(m_io_service,
+                           boost::posix_time::seconds(1),
+                           boost::function<void()>(
+                             boost::bind(&IpccImpl::evtConfRet,
+                                         this))),
+        m_hello_timer(m_io_service),
+        m_helloDead_timer(m_io_service),
+        m_goingDown_timer(m_io_service),
+        m_TxSeqNum(0),
+        m_RcvSeqNum(0),
+        m_Observers()
     {
       std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIFSocket.getLocalCCId()
                 << ", remoteAddress = " << m_remote_endpoint.address().to_v4().to_ulong()
-                << ", remotePortNumber = " << m_remote_endpoint.port() << ") enable" << std::endl;
-      theFSM.start();
+                << ", remotePortNumber = " << m_remote_endpoint.port() << ") ctor" << std::endl;
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.start();
+      }
       registerObserver(m_node);
     }
     IpccImpl::~IpccImpl()
     {
-      theFSM.stop();
+      boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+      m_FSM.stop();
     }
     void IpccImpl::do_enable()
     {
-      theFSM.start();
-      theFSM.process_event(EvBringUp());
+//      std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIFSocket.getLocalCCId()
+//                << ", remoteAddress = " << m_remote_endpoint.address().to_v4().to_ulong()
+//                << ", remotePortNumber = " << m_remote_endpoint.port() << ") enable" << std::endl;
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.start();
+        m_FSM.process_event(EvBringUp());
+      }
+      static const lmp::cc::appl::ConfSnd stateConfSnd;
+      const boost::optional<const lmp::cc::appl::State&>& activeState = getActiveState();
+      if (activeState &&
+          *activeState == stateConfSnd )
+      {
+        std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIFSocket.getLocalCCId()
+                  << ", remoteAddress = " << m_remote_endpoint.address().to_v4().to_ulong()
+                  << ", remotePortNumber = " << m_remote_endpoint.port() << ") enable changed to ConfSnd state" << std::endl;
+      }
     }
     void IpccImpl::do_disable()
     {
-      theFSM.process_event(EvAdminDown());
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvAdminDown());
+      }
     }
     lmp::DWORD  IpccImpl::do_getLocalNodeId() const
     {
@@ -104,45 +135,61 @@ namespace lmp
     void IpccImpl::reconfigure(
       const obj::config::HelloConfigBody&  helloConfig)
     {
-      theFSM.process_event(EvReconfig());
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvReconfig());
+      }
     }
     void IpccImpl::evtCCDown()
     {
-      theFSM.process_event(EvCCDn());
-      theFSM.stop();
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvCCDn());
+        m_FSM.stop();
+      }
     }
     void IpccImpl::evtConfRet()
     {
-      theFSM.process_event(EvConfRet());
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvConfRet());
+      }
     }
     void IpccImpl::evtHelloRet()
     {
-      theFSM.process_event(EvHelloRet());
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvHelloRet());
+      }
     }
     void IpccImpl::evtDownTimer()
     {
-      theFSM.process_event(EvDownTimer());
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvDownTimer());
+      }
     }
     boost::optional<const lmp::cc::appl::State&> IpccImpl::getActiveState() const
     {
-      return theFSM.getActiveState();
+      boost::shared_lock<boost::shared_mutex> guard(m_fsm_mutex);
+      return m_FSM.getActiveState();
     }
     void IpccImpl::do_registerObserver(
       appl::IpccObserverProxyIF&  observer)
     {
-      theObservers.push_back(new_clone(observer));
+      m_Observers.push_back(new_clone(observer));
     }
     void IpccImpl::do_deregisterObserver(
   	appl::IpccObserverProxyIF&  observer)
     {
       bool found = false;
-      boost::ptr_deque<appl::IpccObserverProxyIF>::iterator  iter = theObservers.begin();
+      boost::ptr_deque<appl::IpccObserverProxyIF>::iterator  iter = m_Observers.begin();
       while (!found &&
-             iter != theObservers.end())
+             iter != m_Observers.end())
       {
         if (observer == *iter)
         {
-          theObservers.erase(iter);
+          m_Observers.erase(iter);
           found = true;
         }
         else
@@ -163,8 +210,8 @@ namespace lmp
     }
     bool IpccImpl::do_hasActiveSetupRole() const
     {
-      // std::cout << "activeSetupRole = " << (theIsActiveSetup ? "true" : "false") << std::endl;
-      return theIsActiveSetup;
+      // std::cout << "activeSetupRole = " << (m_isActiveSetup ? "true" : "false") << std::endl;
+      return m_isActiveSetup;
     }
     bool IpccImpl::do_isConntentionWinning(
       lmp::DWORD  remoteNodeId) const
@@ -184,6 +231,16 @@ namespace lmp
         isAcceptable = boost::apply_visitor(ConfigCTypes_IsAcceptableVisitor(), *iter);
       }
       return isAcceptable;
+    }
+    void IpccImpl::do_sendConfig()
+    {
+      std::cout << "IPCC[" << getLocalCCId() << "].sendConfig()" << std::endl;
+      // create and send Config
+      m_configSend_timer.start();
+    }
+    void IpccImpl::do_resendConfig()
+    {
+      std::cout << "IPCC[" << getLocalCCId() << "].resendConfig()" << std::endl;
     }
     void IpccImpl::do_sendConfigAck(
       const msg::ConfigMsg&  configMsg)
@@ -242,8 +299,8 @@ namespace lmp
       const appl::State&   targetState,
       const appl::Action&  action)
     {
-      for (IPCCObservers::iterator iter = theObservers.begin(),
-    		                   end_iter = theObservers.end();
+      for (IPCCObservers::iterator iter = m_Observers.begin(),
+    		                   end_iter = m_Observers.end();
            iter != end_iter;
            ++iter)
       {
@@ -254,13 +311,13 @@ namespace lmp
     }
     void IpccImpl::do_sendHelloMsg()
     {
-      if (theTxSeqNum == std::numeric_limits<lmp::DWORD>::max())
+      if (m_TxSeqNum == std::numeric_limits<lmp::DWORD>::max())
       {
-    	theTxSeqNum = 2;
+    	m_TxSeqNum = 2;
       }
       else
       {
-    	++theTxSeqNum;
+    	++m_TxSeqNum;
       }
       // create an send Hello message and schedule Hello retransmit timer
     }
@@ -271,48 +328,72 @@ namespace lmp
       {
       	if (isConfigAcceptable(configMsg))
       	{
-      	  theFSM.process_event(EvNewConfOK(configMsg));
+          {
+            boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+            m_FSM.process_event(EvNewConfOK(configMsg));
+          }
       	}
       	else
       	{
-      	  theFSM.process_event(EvNewConfErr());
+          {
+            boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+            m_FSM.process_event(EvNewConfErr());
+          }
       	}
       }
       else
       {
         if (isConntentionWinning(configMsg))
         {
-          theFSM.process_event(EvContenWin());
+          {
+            boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+            m_FSM.process_event(EvContenWin());
+          }
         }
         else
         {
-          theFSM.process_event(EvContenLost(configMsg));
+          {
+            boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+            m_FSM.process_event(EvContenLost(configMsg));
+          }
         }
       }
     }
     void IpccImpl::do_processReceivedMessage(
       const msg::ConfigAckMsg&               configAckMsg)
     {
-        theFSM.process_event(EvConfDone());
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvConfDone());
+      }
     }
     void IpccImpl::do_processReceivedMessage(
       const msg::ConfigNackMsg&              configNackMsg)
     {
-      theFSM.process_event(EvConfErr());
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvConfErr());
+      }
     }
     void IpccImpl::do_processReceivedMessage(
       const msg::HelloMsg&                   helloMsg)
     {
-//      std::cout << "processReceivedMessage helloMsg.theRcvSeqNum = " << helloMsg.theRcvSeqNum
-//    	        << ", theTxSeqNum = " << theTxSeqNum << std::endl;
-      if (helloMsg.m_data.m_hello.m_data.m_rcvSeqNum == theTxSeqNum)
+//      std::cout << "processReceivedMessage helloMsg.m_RcvSeqNum = " << helloMsg.m_RcvSeqNum
+//    	        << ", m_TxSeqNum = " << m_TxSeqNum << std::endl;
+      if (helloMsg.m_data.m_hello.m_data.m_rcvSeqNum == m_TxSeqNum)
       {
-        theFSM.process_event(EvHelloRcvd());
-        theRcvSeqNum = helloMsg.m_data.m_hello.m_data.m_txSeqNum;
+        {
+          boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+          m_FSM.process_event(EvHelloRcvd());
+        }
+        m_RcvSeqNum = helloMsg.m_data.m_hello.m_data.m_txSeqNum;
       }
       else
       {
-        theFSM.process_event(EvSeqNumErr());
+        {
+          boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+          m_FSM.process_event(EvSeqNumErr());
+        }
       }
     }
     void IpccImpl::do_processReceivedMessage(
@@ -336,6 +417,10 @@ namespace lmp
       const msg::ConfigMsg&  configMsg) const
     {
       return do_isConntentionWinning(configMsg.m_data.m_localNodeId.m_data.m_nodeId);
+    }
+    void IpccImpl::sendConfigScheduled()
+    {
+      std::cout << "IPCC[" << getLocalCCId() << "].sendConfigScheduled()" << std::endl;
     }
   } // namespace cc
 } // namespace lmp

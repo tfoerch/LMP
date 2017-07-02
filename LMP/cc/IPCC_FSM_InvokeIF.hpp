@@ -32,6 +32,10 @@ namespace lmp
       inline bool isConfigAcceptable(
         const msg::ConfigMsg&  configMsg) const
       { return do_isConfigAcceptable(configMsg); }
+      inline void sendConfig()
+      { do_sendConfig(); }
+      inline void resendConfig()
+      { do_resendConfig(); }
       inline void sendConfigAck(
         const msg::ConfigMsg&  configMsg)
       { do_sendConfigAck(configMsg); }
@@ -52,6 +56,8 @@ namespace lmp
         lmp::DWORD  remoteNodeId) const = 0;
       virtual bool do_isConfigAcceptable(
         const msg::ConfigMsg&  configMsg) const = 0;
+      virtual void do_sendConfig() = 0;
+      virtual void do_resendConfig() = 0;
       virtual void do_sendConfigAck(
         const msg::ConfigMsg&  configMsg) = 0;
       virtual void do_sendConfigNack(

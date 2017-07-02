@@ -1,12 +1,12 @@
 # Add executable called "LMP_T" that is built from the source files
 include_directories ("${PROJECT_SOURCE_DIR}/cc/test")
 
-find_package(Boost COMPONENTS system)
+find_package( Boost REQUIRED COMPONENTS program_options system chrono thread )
 #add_executable (LMP_T Test_IPCC_Observer.cpp TestMain.cpp)
 enable_testing()
 add_boost_test(CCUnitTest_T
-               SOURCES CCUnitTest.cpp Test_Wait.cpp Test_IPCC_Observer.cpp Test_IPCC_Msg_Receiver.cpp Test_NeighborDiscoveredCheckFtor.cpp
-               LIBRARIES lmp_cc lmp_msg lmp_obj lmp_base lmp_node lmp_neighbor ${Boost_LIBRARIES})
+               SOURCES CCUnitTest.cpp Test_Wait.cpp Test_IPCC_Observer.cpp Test_IPCC_Msg_Receiver.cpp Test_NeighborDiscoveredCheckFtor.cpp Test_EventCallbackCalledCheckFtor.cpp
+               LIBRARIES lmp_cc lmp_msg lmp_obj lmp_base lmp_node lmp_neighbor ${Boost_LIBRARIES} )
 #add_test(unitTest LMP_T)
 #include(CppcheckTargets)
 #add_cppcheck(LMP_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)

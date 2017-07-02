@@ -13,10 +13,13 @@
 #include "cc/IPCC_Msg_ReceiveIF.hpp"
 #include "obj/HelloConfig.hpp"
 #include "base/ProtocolTypes.hpp"             // for DWORD
+#include "base/RetransmitTimer.hpp"
 
 #include <boost/asio/ip/udp.hpp>
+#include <boost/asio/deadline_timer.hpp>
 #include <boost/optional/optional.hpp>        // for optional
 #include <boost/ptr_container/ptr_deque.hpp>  // for ptr_deque
+#include <boost/thread.hpp>
 
 namespace lmp
 {
@@ -78,6 +81,8 @@ namespace lmp
         lmp::DWORD  remoteNodeId) const;
       virtual bool do_isConfigAcceptable(
         const msg::ConfigMsg&  configMsg) const;
+      virtual void do_sendConfig();
+      virtual void do_resendConfig();
       virtual void do_sendConfigAck(
         const msg::ConfigMsg&  configMsg);
       virtual void do_sendConfigNack(
@@ -105,6 +110,9 @@ namespace lmp
     	const msg::ConfigMsg&  configMsg) const;
       void updateConfig(
         const msg::ConfigMsg&  configMsg);
+      void sendConfigScheduled();
+      IpccImpl(const IpccImpl&) = delete;
+      void operator=(const IpccImpl&) = delete;
 
       node::NodeApplicationIF&                          m_node;
       NetworkIFSocketIF&                                m_networkIFSocket;
@@ -112,12 +120,17 @@ namespace lmp
       boost::asio::ip::udp::endpoint                    m_remote_endpoint;
       lmp::DWORD                                        m_remoteNodeId;
       lmp::DWORD                                        m_remoteCCId;
-      bool                                              theIsActiveSetup;
-      FSM_IPCC                                          theFSM;
-      lmp::DWORD                                        theTxSeqNum;
-      lmp::DWORD                                        theRcvSeqNum;
-      IPCCObservers                                     theObservers;
+      bool                                              m_isActiveSetup;
+      FSM_IPCC                                          m_FSM;
+      base::RetransmitTimer                             m_configSend_timer;
+      boost::asio::deadline_timer                       m_hello_timer;
+      boost::asio::deadline_timer                       m_helloDead_timer;
+      boost::asio::deadline_timer                       m_goingDown_timer;
+      lmp::DWORD                                        m_TxSeqNum;
+      lmp::DWORD                                        m_RcvSeqNum;
+      IPCCObservers                                     m_Observers;
       NeighborAdjacencyObservers                        m_neighborAdjacencyObservers;
+      mutable boost::shared_mutex                       m_fsm_mutex;
     };
   } // namespace cc
 } // namespace lmp
