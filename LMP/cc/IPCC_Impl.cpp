@@ -61,6 +61,8 @@ namespace lmp
         m_FSM(*this),
         m_configSend_timer(m_io_service,
                            std::chrono::milliseconds(500),
+                           3,
+                           1,
                            boost::function<void()>(
                              boost::bind(&IpccImpl::evtConfRet,
                                          this))),

@@ -17,17 +17,21 @@ namespace lmp
   {
     RetransmitTimer::RetransmitTimer(
       boost::asio::io_service&          io_service,
-      const std::chrono::milliseconds&  expiry_time,
+      const std::chrono::milliseconds&  initialRetransmitIinterval,
+      lmp::DWORD                        retryLimit,
+      lmp::DWORD                        incrementValueDelta,
       boost::function<void()>           expiry_callback)
       : m_timer(io_service),
-        m_expiry_time(expiry_time),
+        m_initialRetransmitIinterval(initialRetransmitIinterval),
+        m_retryLimit(retryLimit),
+        m_incrementValueDelta(m_incrementValueDelta),
         m_expiry_callback(expiry_callback)
     {
     }
     void RetransmitTimer::start()
     {
       boost::system::error_code  error;
-      m_timer.expires_from_now(m_expiry_time, error);
+      m_timer.expires_from_now(m_initialRetransmitIinterval, error);
       m_timer.async_wait(boost::bind(&RetransmitTimer::handle_expired,
                                      this,
                                      boost::asio::placeholders::error));

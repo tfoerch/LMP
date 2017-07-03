@@ -7,6 +7,7 @@
  *      Author: tom
  */
 
+#include "base/ProtocolTypes.hpp"                  // for DWORD
 #include <boost/function.hpp>
 #include <boost/asio/high_resolution_timer.hpp>
 
@@ -21,7 +22,9 @@ namespace lmp
     public:
       RetransmitTimer(
     	boost::asio::io_service&          io_service,
-    	const std::chrono::milliseconds&  expiry_time,
+    	const std::chrono::milliseconds&  initialRetransmitIinterval,
+    	lmp::DWORD                        retryLimit,
+    	lmp::DWORD                        incrementValueDelta,
     	boost::function<void()>           expiry_callback);
       void start();
       void reschedule();
@@ -30,7 +33,9 @@ namespace lmp
       void handle_expired(
     	const boost::system::error_code&  error);
       boost::asio::high_resolution_timer        m_timer;
-      std::chrono::milliseconds                 m_expiry_time;
+      std::chrono::milliseconds                 m_initialRetransmitIinterval;
+      lmp::DWORD                                m_retryLimit;
+      lmp::DWORD                                m_incrementValueDelta;
       boost::function<void()>                   m_expiry_callback;
     };
   } // namespace base
