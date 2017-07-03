@@ -16,9 +16,9 @@ namespace lmp
   namespace base
   {
     RetransmitTimer::RetransmitTimer(
-      boost::asio::io_service&                 io_service,
-      const boost::posix_time::time_duration&  expiry_time,
-      boost::function<void()>                  expiry_callback)
+      boost::asio::io_service&          io_service,
+      const std::chrono::milliseconds&  expiry_time,
+      boost::function<void()>           expiry_callback)
       : m_timer(io_service),
         m_expiry_time(expiry_time),
         m_expiry_callback(expiry_callback)

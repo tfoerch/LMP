@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( test_RetransmitTimer )
   lmp::cc::test::EventCallbackCalledCheckFtor  eventCallbackCalledCheckFtor;
   lmp::base::RetransmitTimer
     retransmitTimer(io_service,
-                    boost::posix_time::seconds(1),
+                    std::chrono::milliseconds(500),
                     boost::function<void()>(boost::bind(&lmp::cc::test::EventCallbackCalledCheckFtor::eventOccurred,
                                                         &eventCallbackCalledCheckFtor)));
   retransmitTimer.start();

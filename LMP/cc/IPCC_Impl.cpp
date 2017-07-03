@@ -60,7 +60,7 @@ namespace lmp
         m_isActiveSetup(isActiveSetup),
         m_FSM(*this),
         m_configSend_timer(m_io_service,
-                           boost::posix_time::seconds(1),
+                           std::chrono::milliseconds(500),
                            boost::function<void()>(
                              boost::bind(&IpccImpl::evtConfRet,
                                          this))),
