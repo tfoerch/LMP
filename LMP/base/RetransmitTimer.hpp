@@ -25,10 +25,12 @@ namespace lmp
     	const std::chrono::milliseconds&  initialRetransmitIinterval,
     	lmp::DWORD                        retryLimit,
     	lmp::DWORD                        incrementValueDelta,
-    	boost::function<void()>           expiry_callback);
+    	boost::function<bool (bool)>      expiry_callback);
       void start();
       void reschedule();
       void stop();
+      bool isReltryLimitReached() const
+      { return ( m_retryCounter >= m_retryLimit ); }
     private:
       void handle_expired(
     	const boost::system::error_code&  error);
@@ -36,7 +38,9 @@ namespace lmp
       std::chrono::milliseconds                 m_initialRetransmitIinterval;
       lmp::DWORD                                m_retryLimit;
       lmp::DWORD                                m_incrementValueDelta;
-      boost::function<void()>                   m_expiry_callback;
+      boost::function<bool (bool)>              m_expiry_callback;
+      std::chrono::milliseconds                 m_currentRetransmitIinterval;
+      lmp::DWORD                                m_retryCounter;
     };
   } // namespace base
 } // namespace lmp

@@ -15,17 +15,30 @@ namespace lmp
 {
   namespace base
   {
-    RetransmitTimer::RetransmitTimer(
+    //      Prior to initial transmission, initialize Rk = Ri and Rn = 0.
+    //
+    //      while (Rn++ < Rl) {
+    //        transmit the message;
+    //        wake up after Rk milliseconds;
+    //        Rk = Rk * (1 + Delta);
+    //      }
+    //      /* acknowledged message or no reply from receiver and Rl
+    //         reached */
+    //      do any needed clean up;
+    //      exit;
+   RetransmitTimer::RetransmitTimer(
       boost::asio::io_service&          io_service,
       const std::chrono::milliseconds&  initialRetransmitIinterval,
       lmp::DWORD                        retryLimit,
       lmp::DWORD                        incrementValueDelta,
-      boost::function<void()>           expiry_callback)
+      boost::function<bool(bool)>           expiry_callback)
       : m_timer(io_service),
         m_initialRetransmitIinterval(initialRetransmitIinterval),
         m_retryLimit(retryLimit),
         m_incrementValueDelta(m_incrementValueDelta),
-        m_expiry_callback(expiry_callback)
+        m_expiry_callback(expiry_callback),
+        m_currentRetransmitIinterval(m_initialRetransmitIinterval),
+        m_retryCounter(0)
     {
     }
     void RetransmitTimer::start()
@@ -51,7 +64,8 @@ namespace lmp
       std::cout << "RetransmitTimer::handle_expired called" << std::endl;
       if (!error)
       {
-        m_expiry_callback();
+        //bool reschedule =
+          m_expiry_callback(m_retryCounter >= m_retryLimit);
       }
     }
   } // namespace cc

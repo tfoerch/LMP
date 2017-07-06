@@ -21,11 +21,16 @@ namespace lmp
         EventCallbackCalledCheckFtor();
         EventCallbackCalledCheckFtor(
           const EventCallbackCalledCheckFtor&  other);
-        void eventOccurred();
+        bool eventOccurred(
+          bool retryLimitReached);
+        inline bool isRetryLimitReached() const
+        { return m_retryLimitReached; }
+        void reset();
       private:
         virtual bool do_check() const;
         virtual CheckFtorIF* do_clone() const;
         bool m_callbackWasCalled;
+        bool m_retryLimitReached;
       };
     };
   } // namespace cc

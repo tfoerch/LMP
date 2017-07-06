@@ -55,8 +55,9 @@ BOOST_AUTO_TEST_CASE( test_RetransmitTimer )
                     std::chrono::milliseconds(500),
                     3,
                     1,
-                    boost::function<void()>(boost::bind(&lmp::cc::test::EventCallbackCalledCheckFtor::eventOccurred,
-                                                        &eventCallbackCalledCheckFtor)));
+                    boost::function<bool (bool)>(boost::bind(&lmp::cc::test::EventCallbackCalledCheckFtor::eventOccurred,
+                                                             &eventCallbackCalledCheckFtor,
+                                                             _1)));
   retransmitTimer.start();
   BOOST_CHECK(lmp::test::util::wait(eventCallbackCalledCheckFtor, io_service, boost::posix_time::seconds(2)));
 
@@ -520,7 +521,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfRet )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
       }
     }
-    activeIPCC.evtConfRet();
+    activeIPCC.evtConfRet(false);
     {
       const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
       BOOST_CHECK(activeState);

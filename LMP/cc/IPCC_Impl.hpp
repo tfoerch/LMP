@@ -52,7 +52,8 @@ namespace lmp
       void reconfigure(
         const obj::config::HelloConfigBody&  helloConfig);
       void evtCCDown();
-      void evtConfRet();
+      bool evtConfRet(
+        bool  retryLimitReached);
       void evtHelloRet();
       void evtDownTimer();
       boost::optional<const lmp::cc::appl::State&> getActiveState() const;

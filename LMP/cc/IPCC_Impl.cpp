@@ -63,9 +63,10 @@ namespace lmp
                            std::chrono::milliseconds(500),
                            3,
                            1,
-                           boost::function<void()>(
+                           boost::function<bool (bool)>(
                              boost::bind(&IpccImpl::evtConfRet,
-                                         this))),
+                                         this,
+                                         _1))),
         m_hello_timer(m_io_service),
         m_helloDead_timer(m_io_service),
         m_goingDown_timer(m_io_service),
@@ -150,12 +151,14 @@ namespace lmp
         m_FSM.stop();
       }
     }
-    void IpccImpl::evtConfRet()
+    bool IpccImpl::evtConfRet(
+      bool  retryLimitReached)
     {
       {
         boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
         m_FSM.process_event(EvConfRet());
       }
+      return !retryLimitReached;
     }
     void IpccImpl::evtHelloRet()
     {
