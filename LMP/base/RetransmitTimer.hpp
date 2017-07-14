@@ -27,20 +27,19 @@ namespace lmp
     	lmp::DWORD                        incrementValueDelta,
     	boost::function<bool (bool)>      expiry_callback);
       void start();
-      void reschedule();
       void stop();
       bool isReltryLimitReached() const
       { return ( m_retryCounter >= m_retryLimit ); }
     private:
       void handle_expired(
     	const boost::system::error_code&  error);
-      boost::asio::high_resolution_timer        m_timer;
-      std::chrono::milliseconds                 m_initialRetransmitIinterval;
-      lmp::DWORD                                m_retryLimit;
-      lmp::DWORD                                m_incrementValueDelta;
-      boost::function<bool (bool)>              m_expiry_callback;
-      std::chrono::milliseconds                 m_currentRetransmitIinterval;
-      lmp::DWORD                                m_retryCounter;
+      boost::asio::high_resolution_timer      m_timer;
+      std::chrono::milliseconds               m_initialRetransmitIinterval;
+      lmp::DWORD                              m_retryLimit;
+      lmp::DWORD                              m_incrementValueDelta;
+      boost::function<bool (bool)>            m_expiry_callback;
+      std::chrono::milliseconds               m_currentRetransmitIinterval;
+      lmp::DWORD                              m_retryCounter;
     };
   } // namespace base
 } // namespace lmp

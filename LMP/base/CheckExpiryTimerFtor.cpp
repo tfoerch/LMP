@@ -38,7 +38,10 @@ namespace lmp
 
       }
     }
-
+    CheckExpiryTimerFtor::~CheckExpiryTimerFtor()
+    {
+      m_timer.cancel();
+    }
     bool CheckExpiryTimerFtor::do_check() const
     {
       return m_hasExpired;

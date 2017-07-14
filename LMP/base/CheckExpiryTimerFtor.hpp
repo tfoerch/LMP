@@ -22,6 +22,7 @@ namespace lmp
     	const boost::posix_time::time_duration&  expiry_time);
       CheckExpiryTimerFtor(
         const CheckExpiryTimerFtor&      other);
+      virtual ~CheckExpiryTimerFtor();
     private:
       virtual bool do_check() const;
       virtual CheckFtorIF* do_clone() const;

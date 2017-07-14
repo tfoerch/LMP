@@ -31,32 +31,32 @@ namespace lmp
       const std::chrono::milliseconds&  initialRetransmitIinterval,
       lmp::DWORD                        retryLimit,
       lmp::DWORD                        incrementValueDelta,
-      boost::function<bool(bool)>           expiry_callback)
+      boost::function<bool (bool)>      expiry_callback)
       : m_timer(io_service),
         m_initialRetransmitIinterval(initialRetransmitIinterval),
         m_retryLimit(retryLimit),
-        m_incrementValueDelta(m_incrementValueDelta),
+        m_incrementValueDelta(incrementValueDelta),
         m_expiry_callback(expiry_callback),
         m_currentRetransmitIinterval(m_initialRetransmitIinterval),
-        m_retryCounter(0)
+        m_retryCounter(1)
     {
     }
     void RetransmitTimer::start()
     {
+      m_currentRetransmitIinterval = m_initialRetransmitIinterval;
+      m_retryCounter = 1;
       boost::system::error_code  error;
       m_timer.expires_from_now(m_initialRetransmitIinterval, error);
       m_timer.async_wait(boost::bind(&RetransmitTimer::handle_expired,
                                      this,
                                      boost::asio::placeholders::error));
-
-    }
-    void RetransmitTimer::reschedule()
-    {
-
     }
     void RetransmitTimer::stop()
     {
-
+      boost::system::error_code  error;
+      m_timer.cancel(error);
+      m_currentRetransmitIinterval = m_initialRetransmitIinterval;
+      m_retryCounter = 1;
     }
     void RetransmitTimer::handle_expired(
       const boost::system::error_code&  error)
@@ -64,8 +64,30 @@ namespace lmp
       std::cout << "RetransmitTimer::handle_expired called" << std::endl;
       if (!error)
       {
-        //bool reschedule =
+        bool reschedule =
           m_expiry_callback(m_retryCounter >= m_retryLimit);
+        if (reschedule &&
+            m_retryCounter++ < m_retryLimit)
+        {
+          m_currentRetransmitIinterval *= (1 + m_incrementValueDelta);
+          boost::system::error_code  error_code;
+          m_timer.expires_from_now(m_currentRetransmitIinterval, error_code);
+          if (!error_code)
+          {
+            std::cout << "RetransmitTimer::handle_expired reschedule in " << m_currentRetransmitIinterval.count() <<  " milliseconds" << std::endl;
+          }
+          else
+          {
+            std::cout << "RetransmitTimer::handle_expired reschedule caused an error" << std::endl;
+          }
+          m_timer.async_wait(boost::bind(&RetransmitTimer::handle_expired,
+                                         this,
+                                         boost::asio::placeholders::error));
+        }
+      }
+      else
+      {
+        std::cout << "RetransmitTimer::handle_expired call with error" << std::endl;
       }
     }
   } // namespace cc

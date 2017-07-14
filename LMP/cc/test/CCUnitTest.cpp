@@ -5,6 +5,7 @@
  *      Author: tom
  */
 
+#include "base/CheckExpiryTimerFtor.hpp"
 #include "node/Node.hpp"
 #include "cc/IPCC_Impl.hpp"
 #include "cc/IPCC_NetIFSocket.hpp"
@@ -23,6 +24,8 @@
 #include "Test_Wait.hpp"
 
 #include <boost/asio/io_service.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
@@ -49,18 +52,99 @@ BOOST_AUTO_TEST_SUITE( lmp_socket )
 BOOST_AUTO_TEST_CASE( test_RetransmitTimer )
 {
   boost::asio::io_service io_service;
-  lmp::cc::test::EventCallbackCalledCheckFtor  eventCallbackCalledCheckFtor;
+  boost::thread_group threadpool;
+  boost::asio::io_service::work  work(io_service);
+  threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &io_service));
+  //threadpool.create_thread(boost::bind(&boost::asio::io_service::run, &io_service));
+  lmp::base::CheckExpiryTimerFtor  expiryTimer(io_service, boost::posix_time::seconds(4));
+  std::chrono::milliseconds  initialRetransmitIinterval = std::chrono::milliseconds(50);
+  lmp::DWORD   retryLimit = 3;
+  lmp::DWORD   incrementValueDelta = 1;
+  lmp::cc::test::EventCallbackCalledCheckFtor  eventCallbackCalledCheckFtor(retryLimit);
   lmp::base::RetransmitTimer
     retransmitTimer(io_service,
-                    std::chrono::milliseconds(500),
-                    3,
-                    1,
+                    initialRetransmitIinterval,
+                    retryLimit,
+                    incrementValueDelta,
                     boost::function<bool (bool)>(boost::bind(&lmp::cc::test::EventCallbackCalledCheckFtor::eventOccurred,
                                                              &eventCallbackCalledCheckFtor,
                                                              _1)));
-  retransmitTimer.start();
-  BOOST_CHECK(lmp::test::util::wait(eventCallbackCalledCheckFtor, io_service, boost::posix_time::seconds(2)));
+  std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
+  io_service.post(boost::bind(&lmp::base::RetransmitTimer::start,
+                              &retransmitTimer));
+  //retransmitTimer.start();
+  BOOST_CHECK(lmp::test::util::wait(eventCallbackCalledCheckFtor, io_service, boost::posix_time::seconds(1)));
+  {
+    std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
+    std::chrono::milliseconds timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "test_RetransmitTimer 1st time-out: " << timeout.count() << std::endl;
+  }
+  BOOST_CHECK(eventCallbackCalledCheckFtor());
+  {
+    const lmp::cc::test::EventCallbackCalledCheckFtor::TimeoutEventSequence&  timeoutEventSequence =
+      eventCallbackCalledCheckFtor.getTimeouts();
+    //      Prior to initial transmission, initialize Rk = Ri and Rn = 0.
+    std::chrono::milliseconds  currentRetransmitIinterval = initialRetransmitIinterval;
+    std::chrono::system_clock::time_point interval_start_time = start_time;
+    lmp::DWORD                 retryCounter = 0;
+    lmp::cc::test::EventCallbackCalledCheckFtor::TimeoutEventSequence::const_iterator toIter =
+      timeoutEventSequence.begin();
+    //
+    //      while (Rn++ < Rl) {
+    while (retryCounter++ < retryLimit)
+    {
+    //        transmit the message;
+    //        wake up after Rk milliseconds;
+      BOOST_CHECK(toIter != timeoutEventSequence.end());
+      if (toIter != timeoutEventSequence.end())
+      {
+        const lmp::cc::test::EventCallbackCalledCheckFtor::TimeoutEvent& timeoutEvent = *toIter;
+        std::chrono::milliseconds timeout =
+          std::chrono::duration_cast<std::chrono::milliseconds>(timeoutEvent.timePoint - interval_start_time);
+        BOOST_CHECK_EQUAL(timeout.count(), currentRetransmitIinterval.count());
+        BOOST_CHECK_EQUAL(timeoutEvent.retryLimitReached, !(retryCounter < retryLimit));
+        interval_start_time = timeoutEvent.timePoint;
+        ++toIter;
+      }
+      currentRetransmitIinterval *= (1 + incrementValueDelta);
+    //        Rk = Rk * (1 + Delta);
+    }
 
+  }
+#if 0
+  eventCallbackCalledCheckFtor.reset();
+  BOOST_CHECK(lmp::test::util::wait(eventCallbackCalledCheckFtor, io_service, boost::posix_time::seconds(1)));
+  {
+    std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
+    std::chrono::milliseconds timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "test_RetransmitTimer 2nd time-out: " << timeout.count() << std::endl;
+  }
+  BOOST_CHECK(eventCallbackCalledCheckFtor());
+  //BOOST_CHECK(!eventCallbackCalledCheckFtor.isRetryLimitReached());
+
+  eventCallbackCalledCheckFtor.reset();
+  BOOST_CHECK(lmp::test::util::wait(eventCallbackCalledCheckFtor, io_service, boost::posix_time::seconds(1)));
+  {
+    std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
+    std::chrono::milliseconds timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "test_RetransmitTimer 3rd time-out: " << timeout.count() << std::endl;
+  }
+  BOOST_CHECK(eventCallbackCalledCheckFtor());
+  //BOOST_CHECK(!eventCallbackCalledCheckFtor.isRetryLimitReached());
+
+  eventCallbackCalledCheckFtor.reset();
+  BOOST_CHECK(lmp::test::util::wait(eventCallbackCalledCheckFtor, io_service, boost::posix_time::seconds(1)));
+  {
+    std::chrono::system_clock::time_point end_time = std::chrono::system_clock::now();
+    std::chrono::milliseconds timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "test_RetransmitTimer 4th time-out: " << timeout.count() << std::endl;
+  }
+  BOOST_CHECK(!eventCallbackCalledCheckFtor());
+  //BOOST_CHECK(eventCallbackCalledCheckFtor.isRetryLimitReached());
+#endif
+
+  io_service.stop();
+  threadpool.join_all();
 }
 
 BOOST_AUTO_TEST_CASE( getIfAddress )

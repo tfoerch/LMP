@@ -8,6 +8,7 @@
 #include "Test_EventCallbackCalledCheckFtor.hpp"
 #include "neighbor/NeighborAdjacencyObserverIF.hpp"
 
+#include <boost/chrono.hpp>
 #include <iostream>
 
 namespace lmp
@@ -16,24 +17,42 @@ namespace lmp
   {
     namespace test
     {
-      EventCallbackCalledCheckFtor::EventCallbackCalledCheckFtor()
-      : m_callbackWasCalled(false),
-        m_retryLimitReached(false)
+      EventCallbackCalledCheckFtor::EventCallbackCalledCheckFtor(
+        lmp::DWORD                        numberOfCalls)
+      : m_numberOfCalls(numberOfCalls),
+        m_timeouts()
       {}
       EventCallbackCalledCheckFtor::EventCallbackCalledCheckFtor(
         const EventCallbackCalledCheckFtor&  other)
-      : m_callbackWasCalled(other.m_callbackWasCalled)
+      : m_numberOfCalls(other.m_numberOfCalls),
+        m_timeouts(other.m_timeouts)
       {}
       bool EventCallbackCalledCheckFtor::eventOccurred(
         bool retryLimitReached)
       {
-        m_callbackWasCalled = true;
-        m_retryLimitReached = retryLimitReached;
-        return !m_retryLimitReached;
+        TimeoutEvent  timeoutEvent =
+          { std::chrono::system_clock::now(), retryLimitReached };
+        boost::unique_lock<boost::shared_mutex> guard(m_flags_mutex);
+        std::cout << "EventCallbackCalledCheckFtor::eventOccurred(retryLimitReached = "
+                  << retryLimitReached << ")" << std::endl;
+        m_timeouts.push_back(timeoutEvent);
+        return !retryLimitReached;
+      }
+      const EventCallbackCalledCheckFtor::TimeoutEventSequence&
+      EventCallbackCalledCheckFtor::getTimeouts() const
+      {
+        return m_timeouts;
+      }
+      void EventCallbackCalledCheckFtor::reset()
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_flags_mutex);
+        m_timeouts.clear();
       }
       bool EventCallbackCalledCheckFtor::do_check() const
       {
-        return m_callbackWasCalled;
+        boost::shared_lock<boost::shared_mutex> guard(m_flags_mutex);
+        std::cout << "EventCallbackCalledCheckFtor::do_check() called at " << boost::chrono::steady_clock::now() << std::endl;
+        return (m_timeouts.size() == m_numberOfCalls);
       }
       base::CheckFtorIF* EventCallbackCalledCheckFtor::do_clone() const
       {

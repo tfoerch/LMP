@@ -19,12 +19,12 @@ namespace lmp
     	boost::asio::io_service&                 io_service,
         const boost::posix_time::time_duration&  expiry_time)
       {
-    	 lmp::base::CheckExpiryTimerFtor  expiryTimer(io_service, expiry_time);
-    	 while (!checkFtor() && !expiryTimer())
-    	 {
-    	   io_service.run_one();
-    	 }
-    	 return checkFtor();
+        lmp::base::CheckExpiryTimerFtor  expiryTimer(io_service, expiry_time);
+        while (!checkFtor() && !expiryTimer())
+        {
+          io_service.run_one();
+        }
+        return checkFtor();
       }
     } // namespace util
   } // namespace test
