@@ -7,10 +7,11 @@
  *      Author: tom
  */
 
+#include <chrono>
+
 namespace boost
 {
   namespace asio { class io_service; }
-  namespace posix_time { class time_duration; }
 }
 namespace lmp
 {
@@ -20,9 +21,9 @@ namespace lmp
     namespace util
     {
       bool wait(
-    	const lmp::base::CheckFtorIF&            checkFtor,
-    	boost::asio::io_service&                 io_service,
-        const boost::posix_time::time_duration&  expiry_time);
+    	const lmp::base::CheckFtorIF&     checkFtor,
+    	boost::asio::io_service&          io_service,
+        const std::chrono::milliseconds&  expiry_time);
     } // namespace util
   } // namespace test
 } // namespace lmp

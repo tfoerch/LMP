@@ -8,7 +8,9 @@
  */
 
 #include <CheckFtorIF.hpp>
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/steady_timer.hpp>
+
+#include <chrono>
 
 namespace lmp
 {
@@ -18,8 +20,8 @@ namespace lmp
     {
     public:
       CheckExpiryTimerFtor(
-    	boost::asio::io_service&                 io_service,
-    	const boost::posix_time::time_duration&  expiry_time);
+    	boost::asio::io_service&          io_service,
+    	const std::chrono::milliseconds&  expiry_time);
       CheckExpiryTimerFtor(
         const CheckExpiryTimerFtor&      other);
       virtual ~CheckExpiryTimerFtor();
@@ -28,7 +30,7 @@ namespace lmp
       virtual CheckFtorIF* do_clone() const;
       void handle_expired(
     	const boost::system::error_code& /*error*/);
-      boost::asio::deadline_timer      m_timer;
+      boost::asio::steady_timer        m_timer;
       bool                             m_hasExpired;
     };
   } // namespace base

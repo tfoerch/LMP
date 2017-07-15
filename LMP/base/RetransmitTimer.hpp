@@ -9,7 +9,7 @@
 
 #include "base/ProtocolTypes.hpp"                  // for DWORD
 #include <boost/function.hpp>
-#include <boost/asio/high_resolution_timer.hpp>
+#include <boost/asio/steady_timer.hpp>
 
 #include <chrono>
 
@@ -22,7 +22,7 @@ namespace lmp
     public:
       RetransmitTimer(
     	boost::asio::io_service&          io_service,
-    	const std::chrono::milliseconds&  initialRetransmitIinterval,
+    	const std::chrono::milliseconds&  initialRetransmitInterval,
     	lmp::DWORD                        retryLimit,
     	lmp::DWORD                        incrementValueDelta,
     	boost::function<bool (bool)>      expiry_callback);
@@ -33,13 +33,13 @@ namespace lmp
     private:
       void handle_expired(
     	const boost::system::error_code&  error);
-      boost::asio::high_resolution_timer      m_timer;
-      std::chrono::milliseconds               m_initialRetransmitIinterval;
-      lmp::DWORD                              m_retryLimit;
-      lmp::DWORD                              m_incrementValueDelta;
-      boost::function<bool (bool)>            m_expiry_callback;
-      std::chrono::milliseconds               m_currentRetransmitIinterval;
-      lmp::DWORD                              m_retryCounter;
+      boost::asio::steady_timer         m_timer;
+      std::chrono::milliseconds         m_initialRetransmitInterval;
+      lmp::DWORD                        m_retryLimit;
+      lmp::DWORD                        m_incrementValueDelta;
+      boost::function<bool (bool)>      m_expiry_callback;
+      std::chrono::milliseconds         m_currentRetransmitIinterval;
+      lmp::DWORD                        m_retryCounter;
     };
   } // namespace base
 } // namespace lmp

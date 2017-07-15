@@ -10,15 +10,13 @@
 #include <boost/test/unit_test_suite.hpp>
 // #include <boost/test/included/unit_test.hpp>
 
-#include <boost/chrono/duration.hpp>              // for duration, etc
-#include <boost/chrono/io_v1/chrono_io.hpp>       // for operator<<
-#include <boost/chrono/system_clocks.hpp>         // for steady_clock, etc
-#include <boost/chrono/time_point.hpp>            // for operator+, etc
-// #include <boost/chrono/chrono_io.hpp>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
+#include <ctime>
+#include <chrono>
 #include <unistd.h>                               // for execve, fork
 #include <sys/wait.h>
 // #include <sys/socket.h>
@@ -86,20 +84,48 @@ LaunchServer::LaunchServer()
         }
         else if (m_2ndChildPid > 0)
         {
-          boost::chrono::steady_clock::time_point expireTime =
-            boost::chrono::steady_clock::now() + boost::chrono::milliseconds(500);
-          std::cout << boost::chrono::steady_clock::now() << ": enter while" << std::endl;
-          while (boost::chrono::steady_clock::now() < expireTime)
+          std::chrono::system_clock::time_point expireTime =
+            std::chrono::system_clock::now() + std::chrono::milliseconds(500);
           {
-            // std::cout << boost::chrono::steady_clock::now() << ": checking work_pending()" << std::endl;
+            std::chrono::system_clock::time_point  now  = std::chrono::system_clock::now();
+            std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+            std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
+            std::time_t now_c = s.count();
+            std::size_t fractional_seconds = ms.count() % 1000;
+            std::cout << std::put_time(std::localtime(&now_c), "%T.") << fractional_seconds << ": enter while" << std::endl;
+          }
+          while (std::chrono::system_clock::now() < expireTime)
+          {
+            // std::cout << std::chrono::system_clock::now() << ": checking work_pending()" << std::endl;
             if (orb->work_pending())
             {
-              std::cout << boost::chrono::steady_clock::now() << ": enter perform_work()" << std::endl;
+              {
+                std::chrono::system_clock::time_point  now  = std::chrono::system_clock::now();
+                std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+                std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
+                std::time_t now_c = s.count();
+                std::size_t fractional_seconds = ms.count() % 1000;
+                std::cout << std::put_time(std::localtime(&now_c), "%T.") << fractional_seconds << ": enter perform_work()" << std::endl;
+              }
               orb->perform_work();
-              std::cout << boost::chrono::steady_clock::now() << ": leaving perform_work()" << std::endl;
+              {
+                std::chrono::system_clock::time_point  now  = std::chrono::system_clock::now();
+                std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+                std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
+                std::time_t now_c = s.count();
+                std::size_t fractional_seconds = ms.count() % 1000;
+                std::cout << std::put_time(std::localtime(&now_c), "%T.") << fractional_seconds << ": leaving perform_work()" << std::endl;
+              }
             };
           }
-          std::cout << boost::chrono::steady_clock::now() << ": leaving while" << std::endl;
+          {
+            std::chrono::system_clock::time_point  now  = std::chrono::system_clock::now();
+            std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+            std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
+            std::time_t now_c = s.count();
+            std::size_t fractional_seconds = ms.count() % 1000;
+            std::cout << std::put_time(std::localtime(&now_c), "%T.") << fractional_seconds << ": leaving while" << std::endl;
+          }
           //theNodeRegistry->isNodeRegistered(m_1stNodeId;);
         }
         else

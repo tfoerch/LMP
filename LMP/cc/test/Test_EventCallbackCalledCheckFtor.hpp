@@ -25,7 +25,7 @@ namespace lmp
       public:
         struct TimeoutEvent
         {
-          std::chrono::system_clock::time_point   timePoint;
+          std::chrono::steady_clock::time_point   timePoint;
           bool                                    retryLimitReached;
         };
         typedef std::deque<TimeoutEvent>   TimeoutEventSequence;

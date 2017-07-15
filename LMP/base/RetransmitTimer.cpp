@@ -28,25 +28,25 @@ namespace lmp
     //      exit;
    RetransmitTimer::RetransmitTimer(
       boost::asio::io_service&          io_service,
-      const std::chrono::milliseconds&  initialRetransmitIinterval,
+      const std::chrono::milliseconds&  initialRetransmitInterval,
       lmp::DWORD                        retryLimit,
       lmp::DWORD                        incrementValueDelta,
       boost::function<bool (bool)>      expiry_callback)
       : m_timer(io_service),
-        m_initialRetransmitIinterval(initialRetransmitIinterval),
+        m_initialRetransmitInterval(initialRetransmitInterval),
         m_retryLimit(retryLimit),
         m_incrementValueDelta(incrementValueDelta),
         m_expiry_callback(expiry_callback),
-        m_currentRetransmitIinterval(m_initialRetransmitIinterval),
+        m_currentRetransmitIinterval(m_initialRetransmitInterval),
         m_retryCounter(1)
     {
     }
     void RetransmitTimer::start()
     {
-      m_currentRetransmitIinterval = m_initialRetransmitIinterval;
+      m_currentRetransmitIinterval = m_initialRetransmitInterval;
       m_retryCounter = 1;
       boost::system::error_code  error;
-      m_timer.expires_from_now(m_initialRetransmitIinterval, error);
+      m_timer.expires_from_now(m_initialRetransmitInterval, error);
       m_timer.async_wait(boost::bind(&RetransmitTimer::handle_expired,
                                      this,
                                      boost::asio::placeholders::error));
@@ -55,7 +55,7 @@ namespace lmp
     {
       boost::system::error_code  error;
       m_timer.cancel(error);
-      m_currentRetransmitIinterval = m_initialRetransmitIinterval;
+      m_currentRetransmitIinterval = m_initialRetransmitInterval;
       m_retryCounter = 1;
     }
     void RetransmitTimer::handle_expired(

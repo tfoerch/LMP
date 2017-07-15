@@ -15,9 +15,9 @@ namespace lmp
     namespace util
     {
       bool wait(
-    	const lmp::base::CheckFtorIF&            checkFtor,
-    	boost::asio::io_service&                 io_service,
-        const boost::posix_time::time_duration&  expiry_time)
+    	const lmp::base::CheckFtorIF&     checkFtor,
+    	boost::asio::io_service&          io_service,
+        const std::chrono::milliseconds&  expiry_time)
       {
         lmp::base::CheckExpiryTimerFtor  expiryTimer(io_service, expiry_time);
         while (!checkFtor() && !expiryTimer())
