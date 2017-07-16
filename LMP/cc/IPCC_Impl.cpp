@@ -11,6 +11,7 @@
 #include "IPCC_ObserverIF.hpp"
 #include "IPCC_State.hpp"
 #include "IPCC_Action.hpp"
+#include "UDP_Msg_Handler.hpp"
 #include "neighbor/NeighborAdjacencyObserverIF.hpp"
 #include "msg/Config.hpp"
 #include "msg/ConfigAck.hpp"
@@ -72,7 +73,11 @@ namespace lmp
         m_goingDown_timer(m_io_service),
         m_TxSeqNum(0),
         m_RcvSeqNum(0),
-        m_Observers()
+        m_Observers(),
+        m_neighborAdjacencyObservers(),
+        m_fsm_mutex(),
+        m_messageId(0),
+        m_configMsg()
     {
       std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIFSocket.getLocalCCId()
                 << ", remoteAddress = " << m_remote_endpoint.address().to_v4().to_ulong()
@@ -241,6 +246,26 @@ namespace lmp
     {
       std::cout << "IPCC[" << getLocalCCId() << "].sendConfig()" << std::endl;
       // create and send Config
+      {
+        lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+        {
+          lmp::obj::config::HelloConfigData  helloConfig = { true, { 0x009A, 0x01CF } };
+          configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+        }
+        lmp::msg::ConfigMsg  configMsg =
+          { isGoingDown(),
+            isLMPRestart(),
+            { { false, { getLocalCCId() } },      // localCCId
+              { false, { ++m_messageId } },      // messageId
+              { false, { getLocalNodeId() } },      // localNodeId
+              configObjectSequence } // configObjectss
+          };
+        m_configMsg = std::make_unique<lmp::msg::ConfigMsg>(configMsg);
+        lmp::msg::Message sendMessage = configMsg;
+        lmp::cc::UDPMsgHandler::sendMessage(m_networkIFSocket,
+                                            m_remote_endpoint,
+                                            sendMessage);
+      }
       m_configSend_timer.start();
     }
     void IpccImpl::do_resendConfig()
@@ -423,9 +448,13 @@ namespace lmp
     {
       return do_isConntentionWinning(configMsg.m_data.m_localNodeId.m_data.m_nodeId);
     }
-    void IpccImpl::sendConfigScheduled()
+    bool IpccImpl::isGoingDown() const
     {
-      std::cout << "IPCC[" << getLocalCCId() << "].sendConfigScheduled()" << std::endl;
+      return false;
+    }
+    bool IpccImpl::isLMPRestart() const
+    {
+      return false;
     }
   } // namespace cc
 } // namespace lmp

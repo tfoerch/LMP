@@ -12,6 +12,7 @@
 #include "cc/IPCC_FSM_InvokeIF.hpp"
 #include "cc/IPCC_Msg_ReceiveIF.hpp"
 #include "obj/HelloConfig.hpp"
+#include "msg/Config.hpp"
 #include "base/ProtocolTypes.hpp"             // for DWORD
 #include "base/RetransmitTimer.hpp"
 
@@ -20,6 +21,8 @@
 #include <boost/optional/optional.hpp>        // for optional
 #include <boost/ptr_container/ptr_deque.hpp>  // for ptr_deque
 #include <boost/thread.hpp>
+
+#include <memory>
 
 namespace lmp
 {
@@ -111,7 +114,8 @@ namespace lmp
     	const msg::ConfigMsg&  configMsg) const;
       void updateConfig(
         const msg::ConfigMsg&  configMsg);
-      void sendConfigScheduled();
+      bool isGoingDown() const;
+      bool isLMPRestart() const;
       IpccImpl(const IpccImpl&) = delete;
       void operator=(const IpccImpl&) = delete;
 
@@ -132,6 +136,8 @@ namespace lmp
       IPCCObservers                                     m_Observers;
       NeighborAdjacencyObservers                        m_neighborAdjacencyObservers;
       mutable boost::shared_mutex                       m_fsm_mutex;
+      lmp::DWORD                                        m_messageId;
+      std::unique_ptr<lmp::msg::ConfigMsg>              m_configMsg;
     };
   } // namespace cc
 } // namespace lmp
