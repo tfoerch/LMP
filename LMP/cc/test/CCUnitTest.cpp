@@ -6,6 +6,7 @@
  */
 
 #include "base/CheckExpiryTimerFtor.hpp"
+#include "base/CheckCompositeFtor.hpp"
 #include "base/IntervalTimer.hpp"
 #include "node/Node.hpp"
 #include "cc/IPCC_Impl.hpp"
@@ -22,6 +23,7 @@
 #include "Test_IPCC_Msg_Receiver.hpp"
 #include "Test_NeighborDiscoveredCheckFtor.hpp"
 #include "Test_EventCallbackCalledCheckFtor.hpp"
+#include "Test_NoTimeoutScheduledCheckFtor.hpp"
 #include "Test_Wait.hpp"
 
 #include <boost/asio/io_service.hpp>
@@ -220,7 +222,9 @@ BOOST_AUTO_TEST_CASE( retransmitTimer_stop )
   io_service.post(boost::bind(&lmp::base::RetransmitTimer::start,
                               &retransmitTimer));
   //retransmitTimer.start();
-  BOOST_CHECK(!lmp::test::util::wait(eventCallbackCalledCheckFtor, io_service, std::chrono::milliseconds(180)));
+  lmp::cc::test::NoTimeoutScheduledCheckFtor  noTimeoutScheduledCheckFtor(retransmitTimer, eventCallbackCalledCheckFtor);
+  lmp::base::CheckOrCompositeFtor  checkOrCompositeFtor(eventCallbackCalledCheckFtor, noTimeoutScheduledCheckFtor);
+  BOOST_CHECK(lmp::test::util::wait(checkOrCompositeFtor, io_service, std::chrono::milliseconds(180)));
   {
     std::chrono::steady_clock::time_point end_time = std::chrono::steady_clock::now();
     std::chrono::milliseconds timeout = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);

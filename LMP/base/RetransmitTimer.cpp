@@ -38,7 +38,7 @@ namespace lmp
         m_incrementValueDelta(incrementValueDelta),
         m_expiry_callback(expiry_callback),
         m_currentRetransmitIinterval(m_initialRetransmitInterval),
-        m_retryCounter(1)
+        m_retryCounter(0)
     {
     }
     void RetransmitTimer::start()
@@ -56,7 +56,7 @@ namespace lmp
       boost::system::error_code  error;
       m_timer.cancel(error);
       m_currentRetransmitIinterval = m_initialRetransmitInterval;
-      m_retryCounter = 1;
+      m_retryCounter = 0;
     }
     void RetransmitTimer::handle_expired(
       const boost::system::error_code&  error)

@@ -28,6 +28,8 @@ namespace lmp
     	boost::function<bool (bool)>      expiry_callback);
       void start();
       void stop();
+      lmp::DWORD getRetryCounter() const
+      { return m_retryCounter; }
       bool isReltryLimitReached() const
       { return ( m_retryCounter >= m_retryLimit ); }
     private:
