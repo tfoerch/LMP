@@ -49,6 +49,7 @@ namespace lmp
       virtual void do_send(
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
         boost::asio::mutable_buffers_1&        messageBuffer);
+      void start_receive();
       void handle_received_msg(
     	const boost::system::error_code&  error,
         size_t                            bytes_recvd);

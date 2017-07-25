@@ -53,6 +53,7 @@ namespace lmp
     }
     void RetransmitTimer::stop()
     {
+      std::cout << "RetransmitTimer::stop called" << std::endl;
       boost::system::error_code  error;
       m_timer.cancel(error);
       m_currentRetransmitIinterval = m_initialRetransmitInterval;

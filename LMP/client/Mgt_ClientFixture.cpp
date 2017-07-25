@@ -116,7 +116,7 @@ LaunchServer::LaunchServer()
                 std::size_t fractional_seconds = ms.count() % 1000;
                 std::cout << std::put_time(std::localtime(&now_c), "%T.") << fractional_seconds << ": leaving perform_work()" << std::endl;
               }
-            };
+            }
           }
           {
             std::chrono::system_clock::time_point  now  = std::chrono::system_clock::now();

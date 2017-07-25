@@ -108,12 +108,7 @@ namespace lmp
             m_socket.set_option(boost::asio::ip::multicast::join_group(c_multicast_address.to_v4(),
                                                                        if_address.to_v4()));
           }
-          m_socket.async_receive_from(boost::asio::buffer(m_buffer, max_buffer_length),
-                                    m_sender_endpoint,
-                                    boost::bind(&NetworkIFSocket::handle_received_msg,
-                                                this,
-                                                boost::asio::placeholders::error,
-                                                boost::asio::placeholders::bytes_transferred));
+          start_receive();
         }
         catch (std::exception& e)
         {
@@ -142,6 +137,15 @@ namespace lmp
                                          this,
                                          boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred));
+    }
+    void NetworkIFSocket::start_receive()
+    {
+      m_socket.async_receive_from(boost::asio::buffer(m_buffer, max_buffer_length),
+                                m_sender_endpoint,
+                                boost::bind(&NetworkIFSocket::handle_received_msg,
+                                            this,
+                                            boost::asio::placeholders::error,
+                                            boost::asio::placeholders::bytes_transferred));
     }
     NetworkIFSocket::OptAddresses NetworkIFSocket::getIfAddress(
       const std::string&        ifName)
@@ -218,19 +222,20 @@ namespace lmp
     {
       if (!error || error == boost::asio::error::message_size)
       {
+        std::cout << "NetworkIFSocket['" << m_ifName << "', " << m_port << "].handle_received_msg(" << bytes_recvd << ")" << std::endl;
         boost::asio::const_buffers_1  messageBuffer(m_buffer, bytes_recvd);
         m_udpMsgHandler.processReceivedMessage(*this,
                                                m_io_service,
                                                m_sender_endpoint,
                                                messageBuffer);
-        std::cout << "NetworkIFSocket::handle_received_msg(" << bytes_recvd << ")" << std::endl;
       }
+      start_receive();
     }
     void NetworkIFSocket::handle_send_msg(
   	  const boost::system::error_code&  error,
 	  size_t                            bytes_sent)
     {
-      std::cout << "NetworkIFSocket::handle_send_msg(" << bytes_sent << ")" << std::endl;
+      std::cout << "NetworkIFSocket['" << m_ifName << "', " << m_port << "].handle_send_msg(" << bytes_sent << ")" << std::endl;
     }
   } // namespace cc
 } // namespace lmp

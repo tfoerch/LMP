@@ -36,6 +36,8 @@ namespace lmp
       { do_sendConfig(); }
       inline void resendConfig()
       { do_resendConfig(); }
+      inline void stopSendConfig()
+      { do_stopSendConfig(); }
       inline void sendConfigAck(
         const msg::ConfigMsg&  configMsg)
       { do_sendConfigAck(configMsg); }
@@ -48,7 +50,10 @@ namespace lmp
         const appl::State&   targetState,
         const appl::Action&  action)
       {  do_reportTransition(sourceState, event, targetState, action); }
-      inline void sendHelloMsg() { do_sendHelloMsg(); }
+      inline void sendHello()
+      { do_sendHello(); }
+      inline void stopSendHello()
+      { do_stopSendHello(); }
       virtual ~IpccFsmInvokeIF(){}
     private:
       virtual bool do_hasActiveSetupRole() const = 0;
@@ -58,6 +63,7 @@ namespace lmp
         const msg::ConfigMsg&  configMsg) const = 0;
       virtual void do_sendConfig() = 0;
       virtual void do_resendConfig() = 0;
+      virtual void do_stopSendConfig() = 0;
       virtual void do_sendConfigAck(
         const msg::ConfigMsg&  configMsg) = 0;
       virtual void do_sendConfigNack(
@@ -67,7 +73,8 @@ namespace lmp
     	const appl::Event&   event,
     	const appl::State&   targetState,
     	const appl::Action&  action) = 0;
-      virtual void do_sendHelloMsg() = 0;
+      virtual void do_sendHello() = 0;
+      virtual void do_stopSendHello() = 0;
     };
   } // namespace cc
 } // namespace lmp

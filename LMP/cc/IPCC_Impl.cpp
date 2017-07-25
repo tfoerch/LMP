@@ -60,6 +60,8 @@ namespace lmp
         m_remoteCCId(0),
         m_isActiveSetup(isActiveSetup),
         m_FSM(*this),
+        m_helloInterval(std::chrono::milliseconds(150)),
+        m_helloDeadInterval(std::chrono::milliseconds(500)),
         m_configSend_timer(m_io_service,
                            std::chrono::milliseconds(500),
                            3,
@@ -68,9 +70,21 @@ namespace lmp
                              boost::bind(&IpccImpl::evtConfRet,
                                          this,
                                          _1))),
-        m_hello_timer(m_io_service),
-        m_helloDead_timer(m_io_service),
-        m_goingDown_timer(m_io_service),
+        m_hello_timer(m_io_service,
+                      m_helloInterval,
+                      boost::function<bool (void)>(
+                        boost::bind(&IpccImpl::evtHelloRet,
+                                    this))),
+        m_helloDead_timer(m_io_service,
+                          m_helloDeadInterval,
+                          boost::function<bool (void)>(
+                            boost::bind(&IpccImpl::evtHoldTimer,
+                                        this))),
+        m_goingDown_timer(m_io_service,
+                          m_helloDeadInterval,
+                          boost::function<bool (void)>(
+                            boost::bind(&IpccImpl::evtDownTimer,
+                                        this))),
         m_TxSeqNum(0),
         m_RcvSeqNum(0),
         m_Observers(),
@@ -165,19 +179,29 @@ namespace lmp
       }
       return !retryLimitReached;
     }
-    void IpccImpl::evtHelloRet()
+    bool IpccImpl::evtHelloRet()
     {
       {
         boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
         m_FSM.process_event(EvHelloRet());
       }
+      return false;
     }
-    void IpccImpl::evtDownTimer()
+    bool IpccImpl::evtHoldTimer()
+    {
+      {
+        boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
+        m_FSM.process_event(EvHoldTimer());
+      }
+      return false;
+    }
+    bool IpccImpl::evtDownTimer()
     {
       {
         boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
         m_FSM.process_event(EvDownTimer());
       }
+      return false;
     }
     boost::optional<const lmp::cc::appl::State&> IpccImpl::getActiveState() const
     {
@@ -272,10 +296,36 @@ namespace lmp
     {
       std::cout << "IPCC[" << getLocalCCId() << "].resendConfig()" << std::endl;
     }
+    void IpccImpl::do_stopSendConfig()
+    {
+      std::cout << "IPCC[" << getLocalCCId() << "].stopSendConfig()" << std::endl;
+      m_configSend_timer.stop();
+      if (m_configMsg)
+      {
+        m_configMsg.release();
+      }
+    }
     void IpccImpl::do_sendConfigAck(
       const msg::ConfigMsg&  configMsg)
     {
+      std::cout << "IPCC[" << getLocalCCId() << "].sendConfigAck()" << std::endl;
       updateConfig(configMsg);
+      // create and send ConfigAck
+      {
+        lmp::msg::ConfigAckMsg configAckMsg =
+          { isGoingDown(),
+            isLMPRestart(),
+            { { false, { getLocalCCId() } },      // localCCId
+              { false, { getLocalNodeId() } },    // localNodeId
+              { false, { configMsg.m_data.m_localCCId.m_data } },      // remoteCCId
+              { false, { configMsg.m_data.m_messageId.m_data } },     // messageId
+              { false, { configMsg.m_data.m_localNodeId.m_data } } }   // remoteNodeId
+          };
+        lmp::msg::Message sendMessage = configAckMsg;
+        lmp::cc::UDPMsgHandler::sendMessage(m_networkIFSocket,
+                                            m_remote_endpoint,
+                                            sendMessage);
+      }
     }
     void IpccImpl::do_sendConfigNack(
       const msg::ConfigMsg&  configMsg)
@@ -339,8 +389,9 @@ namespace lmp
 //      std::cout << "IPCC[" << m_localCCId << "]." << event << ": " << sourceState << " -> " << targetState
 //                << " executing " << action << std::endl;
     }
-    void IpccImpl::do_sendHelloMsg()
+    void IpccImpl::do_sendHello()
     {
+      std::cout << "IPCC[" << getLocalCCId() << "].sendHello()" << std::endl;
       if (m_TxSeqNum == std::numeric_limits<lmp::DWORD>::max())
       {
     	m_TxSeqNum = 2;
@@ -349,7 +400,23 @@ namespace lmp
       {
     	++m_TxSeqNum;
       }
-      // create an send Hello message and schedule Hello retransmit timer
+      // create and send Hello message and schedule Hello interval timer
+      lmp::msg::HelloMsg  helloMsg =
+        { isGoingDown(),
+          isLMPRestart(),
+          { { false, { m_TxSeqNum, m_RcvSeqNum } } }     // hello
+        };
+      lmp::msg::Message sendMessage = helloMsg;
+      lmp::cc::UDPMsgHandler::sendMessage(m_networkIFSocket,
+                                          m_remote_endpoint,
+                                          sendMessage);
+      m_hello_timer.start();
+    }
+    void IpccImpl::do_stopSendHello()
+    {
+      std::cout << "IPCC[" << getLocalCCId() << "].stopSendHello()" << std::endl;
+      m_hello_timer.stop();
+      m_helloDead_timer.stop();
     }
     void IpccImpl::do_processReceivedMessage(
       const msg::ConfigMsg&                  configMsg)
@@ -394,7 +461,7 @@ namespace lmp
     {
       {
         boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
-        m_FSM.process_event(EvConfDone());
+        m_FSM.process_event(EvConfDone(configAckMsg));
       }
     }
     void IpccImpl::do_processReceivedMessage(
@@ -408,15 +475,23 @@ namespace lmp
     void IpccImpl::do_processReceivedMessage(
       const msg::HelloMsg&                   helloMsg)
     {
+      std::cout << "IPCC[" << getLocalCCId() << "].processReceivedMessage(" << helloMsg << ")" << std::endl;
 //      std::cout << "processReceivedMessage helloMsg.m_RcvSeqNum = " << helloMsg.m_RcvSeqNum
 //    	        << ", m_TxSeqNum = " << m_TxSeqNum << std::endl;
+//      If ((int) old_id - (int) new_id > 0) {
+//            New value is less than old value;
+//         }
+      if (!( (boost::int32_t) m_RcvSeqNum -
+             (boost::int32_t) helloMsg.m_data.m_hello.m_data.m_txSeqNum > 0))
+      {
+        m_RcvSeqNum = helloMsg.m_data.m_hello.m_data.m_txSeqNum;
+      }
       if (helloMsg.m_data.m_hello.m_data.m_rcvSeqNum == m_TxSeqNum)
       {
         {
           boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
           m_FSM.process_event(EvHelloRcvd());
         }
-        m_RcvSeqNum = helloMsg.m_data.m_hello.m_data.m_txSeqNum;
       }
       else
       {

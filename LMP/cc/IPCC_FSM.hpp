@@ -9,6 +9,7 @@
 
 #include "cc/IPCC_Event.hpp"
 #include "msg/Config.hpp"
+#include "msg/ConfigAck.hpp"
 
 #include <boost/optional/optional.hpp>     // for optional
 #include <boost/smart_ptr/shared_ptr.hpp>  // for shared_ptr
@@ -45,6 +46,11 @@ namespace lmp
     class EvConfDone
     {
     public:
+      explicit EvConfDone(
+        const msg::ConfigAckMsg&  configAckMsg)
+      : m_ConfigAckMsg(configAckMsg)
+      {}
+      const msg::ConfigAckMsg&  m_ConfigAckMsg;
       static lmp::cc::appl::EvConfDone  theApplEvent;
     };
     class EvConfErr

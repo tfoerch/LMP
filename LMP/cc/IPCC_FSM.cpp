@@ -359,7 +359,8 @@ namespace lmp
                                                   <mpl::vector<StopSendConfig,
                                                                SendHello> >      , none                 >,
       Row < ConfSnd   , EvContenLost, Active    , ActionSequence_
-                                                  <mpl::vector<SendConfigAck,
+                                                  <mpl::vector<StopSendConfig,
+                                                               SendConfigAck,
                                                                SendHello> >      , AcceptableConfig     >,
       //  +-----------+-------------+-----------+--------------------------------+----------------------+
       Row < ConfRcv   , EvCCDn      , Down      , NoAction                       , none                 >,
@@ -509,6 +510,7 @@ namespace lmp
     void cc_fsm_::StopSendConfig::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
+      fsm.theIPCC.stopSendConfig();
     }
 
     template <class EVT,class FSM,class SourceState,class TargetState>
@@ -543,13 +545,14 @@ namespace lmp
     void cc_fsm_::SendHello::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
-      fsm.theIPCC.sendHelloMsg();
+      fsm.theIPCC.sendHello();
     }
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::StopSendHello::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
-    }
+      fsm.theIPCC.stopSendHello();
+      }
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::SetCCDownFlag::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {

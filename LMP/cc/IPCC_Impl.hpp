@@ -15,6 +15,7 @@
 #include "msg/Config.hpp"
 #include "base/ProtocolTypes.hpp"             // for DWORD
 #include "base/RetransmitTimer.hpp"
+#include "base/IntervalTimer.hpp"
 
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/deadline_timer.hpp>
@@ -23,6 +24,7 @@
 #include <boost/thread.hpp>
 
 #include <memory>
+#include <chrono>
 
 namespace lmp
 {
@@ -57,8 +59,9 @@ namespace lmp
       void evtCCDown();
       bool evtConfRet(
         bool  retryLimitReached);
-      void evtHelloRet();
-      void evtDownTimer();
+      bool evtHelloRet();
+      bool evtHoldTimer();
+      bool evtDownTimer();
       boost::optional<const lmp::cc::appl::State&> getActiveState() const;
     private:
       typedef boost::ptr_deque<appl::IpccObserverProxyIF>       IPCCObservers;
@@ -87,6 +90,7 @@ namespace lmp
         const msg::ConfigMsg&  configMsg) const;
       virtual void do_sendConfig();
       virtual void do_resendConfig();
+      virtual void do_stopSendConfig();
       virtual void do_sendConfigAck(
         const msg::ConfigMsg&  configMsg);
       virtual void do_sendConfigNack(
@@ -96,7 +100,8 @@ namespace lmp
     	const appl::Event&   event,
     	const appl::State&   targetState,
     	const appl::Action&  action);
-      virtual void do_sendHelloMsg();
+      virtual void do_sendHello();
+      virtual void do_stopSendHello();
       // implement IpccMsgReceiveIF
       virtual void do_processReceivedMessage(
     	const msg::ConfigMsg&                  configMsg);
@@ -127,10 +132,12 @@ namespace lmp
       lmp::DWORD                                        m_remoteCCId;
       bool                                              m_isActiveSetup;
       FSM_IPCC                                          m_FSM;
+      std::chrono::milliseconds                         m_helloInterval;
+      std::chrono::milliseconds                         m_helloDeadInterval;
       base::RetransmitTimer                             m_configSend_timer;
-      boost::asio::deadline_timer                       m_hello_timer;
-      boost::asio::deadline_timer                       m_helloDead_timer;
-      boost::asio::deadline_timer                       m_goingDown_timer;
+      base::IntervalTimer                               m_hello_timer;
+      base::IntervalTimer                               m_helloDead_timer;
+      base::IntervalTimer                               m_goingDown_timer;
       lmp::DWORD                                        m_TxSeqNum;
       lmp::DWORD                                        m_RcvSeqNum;
       IPCCObservers                                     m_Observers;
