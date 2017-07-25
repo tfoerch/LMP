@@ -1,6 +1,6 @@
 
 #include <IPCCObserverProxy.hpp>
-#include <IPCC_Impl.hpp>
+#include <IPCCApplicationIF.hpp>
 #include "lmp_mgtif_ipcc_observer.hpp"  // for IPCCObserver_var, etc
 #include <iostream>                     // for operator<<, ostream, etc
 #include <typeinfo>                     // for bad_cast
@@ -13,7 +13,7 @@ namespace lmp
     namespace appl
     {
       IpccObserverProxy::IpccObserverProxy(
-        IpccImpl&                              ipcc,
+        IpccApplicationIF&                     ipcc,
         ::lmp_ipcc_observer::IPCCObserver_ptr  observer)
       : theIpcc(ipcc),
         thePeerIPCCObserver(::lmp_ipcc_observer::IPCCObserver::_duplicate(observer)),

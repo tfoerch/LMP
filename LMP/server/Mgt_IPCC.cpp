@@ -72,18 +72,16 @@ void IPCC_i::registerObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIf.getLocalCCId() << ").registerObserver()" << std::endl;
-  // std::cout << "registerObserver" << std::endl;
-  //lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
-  //theIPCCImpl.registerObserver(observerProxy);
-  // std::cout << "registerObserver finished" << std::endl;
+  lmp::cc::appl::IpccObserverProxy  observerProxy(m_ipcc, observer);
+  m_ipcc.registerObserver(observerProxy);
 }
 
 void IPCC_i::deregisterObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIf.getLocalCCId() << ").deregisterObserver()" << std::endl;
-  //lmp::cc::appl::IpccObserverProxy  observerProxy(theIPCCImpl, observer);
-  //theIPCCImpl.deregisterObserver(observerProxy);
+  lmp::cc::appl::IpccObserverProxy  observerProxy(m_ipcc, observer);
+  m_ipcc.deregisterObserver(observerProxy);
 }
 
 } // end namespace lmp_ipcc

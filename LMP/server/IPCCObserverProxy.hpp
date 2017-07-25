@@ -21,7 +21,7 @@ namespace lmp
 {
   namespace cc
   {
-    class IpccImpl;
+    class IpccApplicationIF;
     namespace appl
     {
       class IpccObserverProxy : public IpccObserverProxyIF
@@ -43,7 +43,7 @@ namespace lmp
     	};
     	typedef  std::deque<TransRecord>  TransistionSequence;
     	IpccObserverProxy(
-    	  IpccImpl&                              ipcc,
+    	  IpccApplicationIF&                     ipcc,
     	  ::lmp_ipcc_observer::IPCCObserver_ptr  observer);
     	virtual ~IpccObserverProxy();
     	const TransistionSequence& getTransistions() const;
@@ -59,7 +59,7 @@ namespace lmp
           const IpccObserverProxyIF& other) const;
         virtual IpccObserverProxyIF* do_clone() const;
 
-        IpccImpl&                            theIpcc;
+        IpccApplicationIF&                   theIpcc;
         lmp_ipcc_observer::IPCCObserver_var  thePeerIPCCObserver;
         TransistionSequence                  theTransitions;
       };
