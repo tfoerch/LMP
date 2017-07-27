@@ -57,25 +57,6 @@ namespace lmp
         IpccImpl&            theIpcc;
         TransistionSequence  theTransitions;
       };
-      class TestIpccObserverProxy : public IpccObserverProxyIF
-      {
-      public:
-    	explicit TestIpccObserverProxy(
-    	  IpccObserverIF&      observer);
-    	virtual ~TestIpccObserverProxy();
-	  private:
-        virtual void do_notifyTransition(
-          const cc::IpccApplicationIF&  ipcc,
-     	  const appl::State&            sourceState,
-      	  const appl::Event&            event,
-      	  const appl::State&            targetState,
-      	  const appl::Action&           action);
-        virtual bool is_equal(
-          const IpccObserverProxyIF& other) const;
-        virtual IpccObserverProxyIF* do_clone() const;
-
-        IpccObserverIF&  theObserver;
-      };
       std::ostream& operator<<(
         std::ostream&                                 os,
         const TestIpccObserver::TransistionSequence&  transitions);

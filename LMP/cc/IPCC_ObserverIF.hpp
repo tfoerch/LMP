@@ -37,25 +37,6 @@ namespace lmp
           const appl::State&        targetState,
           const appl::Action&       action) = 0;
       };
-      class IpccObserverProxyIF : public IpccObserverIF
-      {
-      public:
-        inline bool operator==(
-          const IpccObserverProxyIF& other) const
-          { return is_equal(other); }
-        IpccObserverProxyIF* clone() const
-        { return do_clone(); }
-        virtual ~IpccObserverProxyIF(){}
-      private:
-        virtual bool is_equal(
-          const IpccObserverProxyIF& other) const = 0;
-        virtual IpccObserverProxyIF* do_clone() const = 0;
-      };
-      inline IpccObserverProxyIF* new_clone(
-        const IpccObserverProxyIF& observer)
-      {
-        return observer.clone();
-      }
     } // namespace appl
   } // namespace cc
 } // namespace lmp

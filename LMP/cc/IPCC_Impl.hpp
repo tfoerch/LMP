@@ -39,7 +39,7 @@ namespace lmp
     {
       class Action;
       class Event;
-      class IpccObserverProxyIF;
+      class IpccObserverIF;
       class State;
     }
     class IpccImpl : public IpccApplicationIF,
@@ -64,7 +64,7 @@ namespace lmp
       bool evtDownTimer();
       boost::optional<const lmp::cc::appl::State&> getActiveState() const;
     private:
-      typedef boost::ptr_deque<appl::IpccObserverProxyIF>       IPCCObservers;
+      typedef std::set<appl::IpccObserverIF*>                IPCCObservers;
       typedef std::set<neighbor::NeighborAdjacencyObserverIF*>  NeighborAdjacencyObservers;
       // implement IpccApplicationIF
       virtual void do_enable();
@@ -75,9 +75,9 @@ namespace lmp
       virtual lmp::DWORD do_getRemoteCCId() const;
       virtual const boost::asio::ip::udp::endpoint& do_getRemoteEndpoint() const;
       virtual void do_registerObserver(
-        appl::IpccObserverProxyIF&  observer);
+        appl::IpccObserverIF&  observer);
       virtual void do_deregisterObserver(
-        appl::IpccObserverProxyIF&  observer);
+        appl::IpccObserverIF&  observer);
       virtual void do_registerObserver(
         neighbor::NeighborAdjacencyObserverIF&  observer);
       virtual void do_deregisterObserver(

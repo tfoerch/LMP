@@ -36,16 +36,14 @@ namespace lmp
     {
       std::cout << "Neighbor[" << m_nodeId << "].ipccAdjacencyAdded("
                 << ipcc.getLocalCCId() << ")" << std::endl;
-      NeighborIpccObserveProxy  observerProxy(*this);
-      ipcc.registerObserver(observerProxy);
+      ipcc.registerObserver(*this);
     }
     void Neighbor::do_ipccAdjacencyRemoved(
       cc::IpccApplicationIF&   ipcc)
     {
       std::cout << "Neighbor[" << m_nodeId << "].ipccAdjacencyRemoved("
                 << ipcc.getLocalCCId() << ")" << std::endl;
-      NeighborIpccObserveProxy  observerProxy(*this);
-      ipcc.deregisterObserver(observerProxy);
+      ipcc.deregisterObserver(*this);
     }
     void Neighbor::do_notifyTransition(
       const cc::IpccApplicationIF&  ipcc,
@@ -58,37 +56,6 @@ namespace lmp
                 << event << ": " << sourceState << " -> " << targetState
                 << " executing " << action << std::endl;
 
-    }
-    Neighbor::NeighborIpccObserveProxy::NeighborIpccObserveProxy(
-      cc::appl::IpccObserverIF&  ipccbserver)
-    : m_ipccbserver(ipccbserver)
-    {
-    }
-    void Neighbor::NeighborIpccObserveProxy::do_notifyTransition(
-      const cc::IpccApplicationIF&  ipcc,
-      const cc::appl::State&        sourceState,
-      const cc::appl::Event&        event,
-      const cc::appl::State&        targetState,
-      const cc::appl::Action&       action)
-    {
-      m_ipccbserver.notifyTransition(ipcc, sourceState, event, targetState, action);
-    }
-    bool Neighbor::NeighborIpccObserveProxy::is_equal(
-      const IpccObserverProxyIF& other) const
-    {
-      try
-      {
-        const NeighborIpccObserveProxy&  otherProxy = dynamic_cast<const NeighborIpccObserveProxy&>(other);
-        return (&m_ipccbserver == &otherProxy.m_ipccbserver);
-      }
-      catch  (std::bad_cast&)
-      {
-        return false;
-      }
-    }
-    cc::appl::IpccObserverProxyIF* Neighbor::NeighborIpccObserveProxy::do_clone() const
-    {
-      return new NeighborIpccObserveProxy(*this);
     }
   } // namespace neighbor
 } // namespace lmp

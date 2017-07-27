@@ -209,28 +209,14 @@ namespace lmp
       return m_FSM.getActiveState();
     }
     void IpccImpl::do_registerObserver(
-      appl::IpccObserverProxyIF&  observer)
+      appl::IpccObserverIF&  observer)
     {
-      m_Observers.push_back(new_clone(observer));
+      m_Observers.insert(&observer);
     }
     void IpccImpl::do_deregisterObserver(
-  	appl::IpccObserverProxyIF&  observer)
+  	appl::IpccObserverIF&  observer)
     {
-      bool found = false;
-      boost::ptr_deque<appl::IpccObserverProxyIF>::iterator  iter = m_Observers.begin();
-      while (!found &&
-             iter != m_Observers.end())
-      {
-        if (observer == *iter)
-        {
-          m_Observers.erase(iter);
-          found = true;
-        }
-        else
-        {
-          ++iter;
-        }
-      }
+      m_Observers.erase(&observer);
     }
     void IpccImpl::do_registerObserver(
       neighbor::NeighborAdjacencyObserverIF&  observer)
@@ -384,10 +370,11 @@ namespace lmp
            iter != end_iter;
            ++iter)
       {
-    	iter->notifyTransition(*this, sourceState, event, targetState, action);
+        if (*iter)
+        {
+    	  (*iter)->notifyTransition(*this, sourceState, event, targetState, action);
+        }
       }
-//      std::cout << "IPCC[" << m_localCCId << "]." << event << ": " << sourceState << " -> " << targetState
-//                << " executing " << action << std::endl;
     }
     void IpccImpl::do_sendHello()
     {

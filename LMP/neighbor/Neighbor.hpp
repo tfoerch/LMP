@@ -24,24 +24,6 @@ namespace lmp
         lmp::DWORD                       nodeId);
       virtual ~Neighbor(){}
     private:
-      class NeighborIpccObserveProxy : public cc::appl::IpccObserverProxyIF
-      {
-      public:
-        NeighborIpccObserveProxy(
-          cc::appl::IpccObserverIF&  ipccbserver);
-        virtual ~NeighborIpccObserveProxy(){}
-      private:
-        virtual void do_notifyTransition(
-          const cc::IpccApplicationIF&  ipcc,
-          const cc::appl::State&        sourceState,
-          const cc::appl::Event&        event,
-          const cc::appl::State&        targetState,
-          const cc::appl::Action&       action);
-        virtual bool is_equal(
-          const IpccObserverProxyIF& other) const;
-        virtual IpccObserverProxyIF* do_clone() const;
-        cc::appl::IpccObserverIF&  m_ipccbserver;
-      };
       // implement NeighborApplicationIF
       virtual void do_enable();
       virtual void do_disable();

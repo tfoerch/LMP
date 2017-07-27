@@ -17,17 +17,22 @@ IPCC_i::IPCC_i(
     m_node(node),
     m_networkIf(networkIf),
     m_ipcc(ipcc),
+    m_ipccObservers(),
+    m_ipccObserverProxy(m_ipcc,
+                        m_ipccObservers),
     m_ipccInDestructionFtor(ipccInDestructionFtor)
 {
   std::cout << "IPCC(localCCId = " << m_networkIf.getLocalCCId()
 //	   << ", localAddress = " << localAddress
 //	   << ", localPortNumber = " << localPortNumber
 	   << ')' << std::endl;
+  m_ipcc.registerObserver(m_ipccObserverProxy);
 }
 
 IPCC_i::~IPCC_i()
 {
   std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIf.getLocalCCId() << ") destructor" << std::endl;
+  m_ipcc.deregisterObserver(m_ipccObserverProxy);
 }
 
 ::CORBA::Long IPCC_i::getLocalCCId()
@@ -72,16 +77,14 @@ void IPCC_i::registerObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIf.getLocalCCId() << ").registerObserver()" << std::endl;
-  lmp::cc::appl::IpccObserverProxy  observerProxy(m_ipcc, observer);
-  m_ipcc.registerObserver(observerProxy);
+  m_ipccObservers.insert(lmp_ipcc_observer::IPCCObserver::_duplicate(observer));
 }
 
 void IPCC_i::deregisterObserver(
   ::lmp_ipcc_observer::IPCCObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIf.getLocalCCId() << ").deregisterObserver()" << std::endl;
-  lmp::cc::appl::IpccObserverProxy  observerProxy(m_ipcc, observer);
-  m_ipcc.deregisterObserver(observerProxy);
+  m_ipccObservers.erase(lmp_ipcc_observer::IPCCObserver::_duplicate(observer));
 }
 
 } // end namespace lmp_ipcc

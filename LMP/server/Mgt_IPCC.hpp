@@ -3,8 +3,10 @@
 #include <lmp_mgtif_node.hpp>
 #include <Mgt_NodeApplProxy.hpp>
 #include <Mgt_NetworkIFProxy.hpp>
+#include <IPCCObserverProxy.hpp>
 #include "cc/UDP_Msg_Handler.hpp"
 #include "cc/IPCC_Impl.hpp"
+#include "cc/IPCC_ObserverIF.hpp"
 
 #include <omniORB4/CORBA.h>  // for Long, Short
 #include <omniORB4/poa.h>    // for POA_ptr
@@ -41,10 +43,13 @@ namespace lmp_ipcc
     virtual void deregisterObserver(
       ::lmp_ipcc_observer::IPCCObserver_ptr  observer);
   private:
+    typedef  std::set<::lmp_ipcc_observer::IPCCObserver_var>   IPCCObserverContainer;
     PortableServer::POA_ptr              thePOA;
     lmp_node::NodeApplProxy&             m_node;
     lmp_netif::NetworkIFProxy&           m_networkIf;
     lmp::cc::IpccApplicationIF&          m_ipcc;
+    IPCCObserverContainer                m_ipccObservers;
+    IpccObserverProxy                    m_ipccObserverProxy;
     lmp_netif::IPCCInDestructionFtorIF&  m_ipccInDestructionFtor;
   };
 
