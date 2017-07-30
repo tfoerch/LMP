@@ -86,6 +86,7 @@ lmp_ipcc::IPCC_ptr NetworkIF_i::createIPCC(
           new lmp_ipcc::IPCC_i(m_POA, m_node, m_networkIfProxy, *ipccApplPtr, m_ipccInDestructionFtor);
         PortableServer::ObjectId *oid = m_POA->activate_object(servant);  delete oid;
         lmp_ipcc::IPCC_ptr ipcc = servant->_this();
+        // servant->_remove_ref();
         ipccIter = m_IPCCs.insert(IPCCByRemoteEndPointMap::value_type(remote_endpoint, lmp_ipcc::IPCC::_duplicate(ipcc))).first;
         if (ipccIter != m_IPCCs.end())
         {

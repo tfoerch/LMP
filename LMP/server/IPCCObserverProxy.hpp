@@ -17,16 +17,9 @@
 #include <set>
 #include <iosfwd>                       // for ostream
 
-namespace lmp
-{
-  namespace cc
-  {
-    class IpccApplicationIF;
-  }
-}
-
 namespace lmp_ipcc
 {
+  class IPCC_i;
   class IpccObserverProxy : public lmp::cc::appl::IpccObserverIF
   {
   public:
@@ -47,7 +40,7 @@ namespace lmp_ipcc
     typedef  std::deque<TransRecord>  TransistionSequence;
     typedef  std::set<::lmp_ipcc_observer::IPCCObserver_var>   IPCCObserverContainer;
     IpccObserverProxy(
-      const lmp::cc::IpccApplicationIF&  ipcc,
+      lmp_ipcc::IPCC_i&                  ipcc,
       const IPCCObserverContainer&       ipccObserverContainer);
     const TransistionSequence& getTransistions() const;
     void reset();
@@ -58,8 +51,13 @@ namespace lmp_ipcc
       const lmp::cc::appl::Event&        event,
       const lmp::cc::appl::State&        targetState,
       const lmp::cc::appl::Action&       action);
-
-    const lmp::cc::IpccApplicationIF&  m_ipcc;
+   static ::lmp_ipcc_observer::IPCC_State convert(
+     const lmp::cc::appl::State&         state);
+   static ::lmp_ipcc_observer::IPCC_Event convert(
+     const lmp::cc::appl::Event&         event);
+   static ::lmp_ipcc_observer::IPCC_Action convert(
+     const lmp::cc::appl::Action&        action);
+    lmp_ipcc::IPCC_i&                  m_ipcc;
     const IPCCObserverContainer&       m_ipccObserverContainer;
     TransistionSequence                m_transitions;
   };

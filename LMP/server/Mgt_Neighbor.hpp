@@ -12,7 +12,7 @@ class Neighbor_i : public POA_lmp_neighbor::Neighbor
 public:
   Neighbor_i(
     PortableServer::POA_ptr  poa,
-	::lmp_node::Node_ptr     nodePtr,
+    ::lmp_node::Node_ptr     nodePtr,
     ::CORBA::Long            remoteNodeId);
   virtual ~Neighbor_i();
   virtual void destroy();

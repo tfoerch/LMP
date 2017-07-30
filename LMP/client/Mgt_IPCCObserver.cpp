@@ -1,5 +1,5 @@
 #include <Mgt_IPCCObserver.hpp>
-#include <iostream>
+#include <lmp_mgtif_ipcc.hpp>
 
 namespace lmp_ipcc_observer
 {
@@ -28,12 +28,96 @@ void IPCCObserver_i::destroy()
   // _remove_ref(); // delete this;
 }
 
-void IPCCObserver_i::stateHasChanged(
-  ::CORBA::Long                    localCCId,
-  ::lmp_ipcc_observer::IPCC_State  newState)
+void IPCCObserver_i::eventProcessed(
+  ::lmp_ipcc::IPCC_ptr              aIPCC,
+  ::lmp_ipcc_observer::IPCC_Event   event,
+  ::lmp_ipcc_observer::IPCC_State   sourceState,
+  ::lmp_ipcc_observer::IPCC_State   targetState,
+  ::lmp_ipcc_observer::IPCC_Action  action)
 {
-  std::cout << "ipcc[" << localCCId << "].stateChanged(";
-  switch(newState)
+  ::CORBA::Long    localCCId =  aIPCC->getLocalCCId();
+  std::cout << "Ipcc[" << localCCId << "].eventProcessed("
+            << event << ", "
+            << sourceState << " -> "
+            << targetState << ", "
+            << action << ")" << std::endl;
+}
+
+void IPCCObserver_i::peerIpccDiscovered(
+  ::lmp_ipcc::IPCC_ptr              aIPCC,
+  ::CORBA::Long                     remoteCCId,
+  ::CORBA::Long                     remoteNodeId)
+{
+  ::CORBA::Long    localCCId =  aIPCC->getLocalCCId();
+  std::cout << "Ipcc[" << localCCId << "].peerIpccDiscovered()";
+}
+
+std::ostream& operator<<(
+  std::ostream&                     os,
+  ::lmp_ipcc_observer::IPCC_Event   event)
+{
+  switch(event)
+  {
+    case ::lmp_ipcc_observer::EvBringUp:
+      std::cout << "EvBringUp";
+      break;
+    case ::lmp_ipcc_observer::EvCCDn:
+      std::cout << "EvCCDn";
+      break;
+    case ::lmp_ipcc_observer::EvConfDone:
+      std::cout << "EvConfDone";
+      break;
+    case ::lmp_ipcc_observer::EvConfErr:
+      std::cout << "EvConfErr";
+      break;
+    case ::lmp_ipcc_observer::EvNewConfOK:
+      std::cout << "EvNewConfOK";
+      break;
+    case ::lmp_ipcc_observer::EvNewConfErr:
+      std::cout << "EvNewConfErr";
+      break;
+    case ::lmp_ipcc_observer::EvContenWin:
+      std::cout << "EvContenWin";
+      break;
+    case ::lmp_ipcc_observer::EvContenLost:
+      std::cout << "EvContenLost";
+      break;
+    case ::lmp_ipcc_observer::EvAdminDown:
+      std::cout << "EvAdminDown";
+      break;
+    case ::lmp_ipcc_observer::EvNbrGoesDn:
+      std::cout << "EvNbrGoesDn";
+      break;
+    case ::lmp_ipcc_observer::EvHelloRcvd:
+      std::cout << "EvHelloRcvd";
+      break;
+    case ::lmp_ipcc_observer::EvHoldTimer:
+      std::cout << "EvHoldTimer";
+      break;
+    case ::lmp_ipcc_observer::EvSeqNumErr:
+      std::cout << "EvSeqNumErr";
+      break;
+    case ::lmp_ipcc_observer::EvReconfig:
+      std::cout << "EvReconfig";
+      break;
+    case ::lmp_ipcc_observer::EvConfRet:
+      std::cout << "EvConfRet";
+      break;
+    case ::lmp_ipcc_observer::EvHelloRet:
+      std::cout << "EvHelloRet";
+      break;
+    case ::lmp_ipcc_observer::EvDownTimer:
+      std::cout << "EvDownTimer";
+      break;
+  }
+  return os;
+}
+
+std::ostream& operator<<(
+  std::ostream&                     os,
+  ::lmp_ipcc_observer::IPCC_State   state)
+{
+  switch(state)
   {
     case ::lmp_ipcc_observer::IPCC_Down:
       std::cout << "Down";
@@ -54,15 +138,47 @@ void IPCCObserver_i::stateHasChanged(
       std::cout << "GoingDown";
       break;
   }
-  std::cout << ")" << std::endl;
+  return os;
 }
 
-void IPCCObserver_i::peerIpccDiscovered(
-  ::CORBA::Long    localCCId,
-  ::CORBA::Long    remoteCCId,
-  ::CORBA::Long    remoteNodeId)
+std::ostream& operator<<(
+  std::ostream&                     os,
+  ::lmp_ipcc_observer::IPCC_Action  action)
 {
-  // std::cout << "deregisterNode begin" << std::endl;
+  switch(action)
+  {
+    case ::lmp_ipcc_observer::ActionSendConfig:
+      std::cout << "ActionSendConfig";
+      break;
+    case ::lmp_ipcc_observer::ActionStopSendConfig:
+      std::cout << "ActionStopSendConfig";
+      break;
+    case ::lmp_ipcc_observer::ActionResendConfig:
+      std::cout << "ActionResendConfig";
+      break;
+    case ::lmp_ipcc_observer::ActionSendConfigAck:
+      std::cout << "ActionSendConfigAck";
+      break;
+    case ::lmp_ipcc_observer::ActionSendConfigNack:
+      std::cout << "ActionSendConfigNack";
+      break;
+    case ::lmp_ipcc_observer::ActionSendHello:
+      std::cout << "ActionSendHello";
+      break;
+    case ::lmp_ipcc_observer::ActionStopSendHello:
+      std::cout << "ActionStopSendHello";
+      break;
+    case ::lmp_ipcc_observer::ActionSetCCDownFlag:
+      std::cout << "ActionSetCCDownFlag";
+      break;
+    case ::lmp_ipcc_observer::ActionClearCCDownFlag:
+      std::cout << "ActionClearCCDownFlag";
+      break;
+    case ::lmp_ipcc_observer::ActionNoAction:
+      std::cout << "ActionNoAction";
+      break;
+  }
+  return os;
 }
 
 } // end namespace LMP

@@ -197,6 +197,9 @@ void Node_i::NeighborAdjAddedFtor::do_process(
   lmp::DWORD                   neighborNodeId,
   lmp::cc::IpccApplicationIF&  ipcc)
 {
+//  std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIf.getLocalCCId()
+//            << ", remoteAddress = " << getRemoteAddress()
+//            << ", remotePortNumber = " << getRemotePortNumber() << ") enable" << std::endl;
 }
 
 Node_i::NeighborAdjRemovedFtor::NeighborAdjRemovedFtor(

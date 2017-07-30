@@ -18,7 +18,7 @@ IPCC_i::IPCC_i(
     m_networkIf(networkIf),
     m_ipcc(ipcc),
     m_ipccObservers(),
-    m_ipccObserverProxy(m_ipcc,
+    m_ipccObserverProxy(*this,
                         m_ipccObservers),
     m_ipccInDestructionFtor(ipccInDestructionFtor)
 {

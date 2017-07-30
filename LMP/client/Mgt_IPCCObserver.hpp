@@ -1,7 +1,8 @@
 #include <lmp_mgtif_ipcc_observer.hpp>
 
 #include <omniORB4/CORBA.h>              // for ORB_ptr
-#include <omniORB4/poa.h>                    // for POA_ptr, etc
+#include <omniORB4/poa.h>                // for POA_ptr, etc
+#include <iostream>
 
 namespace lmp_ipcc_observer
 {
@@ -15,17 +16,30 @@ public:
     PortableServer::POA_ptr  poa);
   virtual ~IPCCObserver_i();
   virtual void destroy();
-  virtual void stateHasChanged(
-    ::CORBA::Long                   localCCId,
-    ::lmp_ipcc_observer::IPCC_State newState);
+  virtual void eventProcessed(
+    ::lmp_ipcc::IPCC_ptr              aIPCC,
+    ::lmp_ipcc_observer::IPCC_Event   event,
+    ::lmp_ipcc_observer::IPCC_State   sourceState,
+    ::lmp_ipcc_observer::IPCC_State   targetState,
+    ::lmp_ipcc_observer::IPCC_Action  action);
   virtual void peerIpccDiscovered(
-    ::CORBA::Long    localCCId,
-    ::CORBA::Long    remoteCCId,
-    ::CORBA::Long    remoteNodeId);
+    ::lmp_ipcc::IPCC_ptr              aIPCC,
+    ::CORBA::Long                     remoteCCId,
+    ::CORBA::Long                     remoteNodeId);
 private:
 
   CORBA::ORB_ptr           theORB;
   PortableServer::POA_ptr  thePOA;
 };
+
+std::ostream& operator<<(
+  std::ostream&                     os,
+  ::lmp_ipcc_observer::IPCC_Event   event);
+std::ostream& operator<<(
+  std::ostream&                     os,
+  ::lmp_ipcc_observer::IPCC_State   state);
+std::ostream& operator<<(
+  std::ostream&                     os,
+  ::lmp_ipcc_observer::IPCC_Action  action);
 
 } // end namespace lmp_ipcc_observer
