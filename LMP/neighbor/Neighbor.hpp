@@ -40,6 +40,10 @@ namespace lmp
         const cc::appl::Event&        event,
         const cc::appl::State&        targetState,
         const cc::appl::Action&       action);
+      virtual void do_notifyPeerIpccDiscovered(
+        const cc::IpccApplicationIF&  ipcc,
+        lmp::DWORD                    remoteNodeId,
+        lmp::DWORD                    remoteCCId);
       lmp::DWORD                    m_nodeId;
     };
   } // namespace neighbor

@@ -1,5 +1,5 @@
 
-#include <IPCCObserverProxy.hpp>
+#include <Mgt_IPCCObserverProxy.hpp>
 #include <Mgt_IPCC.hpp>
 #include <iostream>                     // for operator<<, ostream, etc
 #include <typeinfo>                     // for bad_cast
@@ -30,7 +30,7 @@ namespace lmp_ipcc
     const lmp::cc::appl::State&        targetState,
     const lmp::cc::appl::Action&       action)
   {
-    std::cout << "IPCC[" << m_ipcc.getLocalCCId() << "]." << event << ": "
+    std::cout << "IPCC[" << m_ipcc.getLocalCCId() << "].notifyTransition: " << event << ": "
               << sourceState << " -> " << targetState
               << " executing " << action << std::endl;
     TransRecord  transRecord(sourceState.getType(),
@@ -38,20 +38,35 @@ namespace lmp_ipcc
                              targetState.getType(),
                              action.getType());
     m_transitions.push_back(transRecord);
-    if (sourceState != targetState)
+    lmp_ipcc::IPCC_var ipccRef = m_ipcc._this();
+    for (IPCCObserverContainer::const_iterator iter = m_ipccObserverContainer.begin(),
+                                               end_iter = m_ipccObserverContainer.end();
+         iter != end_iter;
+         ++iter)
     {
-      lmp_ipcc::IPCC_var ipcc = m_ipcc._this();
-      for (IPCCObserverContainer::const_iterator iter = m_ipccObserverContainer.begin(),
-                                                 end_iter = m_ipccObserverContainer.end();
-           iter != end_iter;
-           ++iter)
-      {
-        (*iter)->eventProcessed(ipcc,
-                                convert(event),
-                                convert(sourceState),
-                                convert(targetState),
-                                convert(action));
-      }
+      (*iter)->eventProcessed(ipccRef,
+                              convert(event),
+                              convert(sourceState),
+                              convert(targetState),
+                              convert(action));
+    }
+  }
+  void IpccObserverProxy::do_notifyPeerIpccDiscovered(
+    const lmp::cc::IpccApplicationIF&  ipcc,
+    lmp::DWORD                         remoteNodeId,
+    lmp::DWORD                         remoteCCId)
+  {
+    std::cout << "IPCC[" << m_ipcc.getLocalCCId() << "].notifyPeerIpccDiscovered("
+              << remoteNodeId << ", " << remoteCCId << ")" << std::endl;
+    lmp_ipcc::IPCC_var ipccRef = m_ipcc._this();
+    for (IPCCObserverContainer::const_iterator iter = m_ipccObserverContainer.begin(),
+                                               end_iter = m_ipccObserverContainer.end();
+         iter != end_iter;
+         ++iter)
+    {
+      (*iter)->peerIpccDiscovered(ipccRef,
+                                  remoteNodeId,
+                                  remoteCCId);
     }
   }
 

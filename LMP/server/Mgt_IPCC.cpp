@@ -1,5 +1,4 @@
 #include <Mgt_IPCC.hpp>
-#include <IPCCObserverProxy.hpp>
 #include <Mgt_IPCCInDestructionFtorIF.hpp>
 
 #include <iostream>                     // for operator<<, etc

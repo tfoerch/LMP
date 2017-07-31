@@ -1,7 +1,7 @@
 #ifndef IPCC_OBSERVER_PROXY_HPP_
 #define IPCC_OBSERVER_PROXY_HPP_
 /*
- * IPCCObserverProxy.hpp
+ * Mgt_IPCCObserverProxy.hpp
  *
  *  Created on: 19.02.2015
  *      Author: tom
@@ -51,6 +51,10 @@ namespace lmp_ipcc
       const lmp::cc::appl::Event&        event,
       const lmp::cc::appl::State&        targetState,
       const lmp::cc::appl::Action&       action);
+    virtual void do_notifyPeerIpccDiscovered(
+      const lmp::cc::IpccApplicationIF&  ipcc,
+      lmp::DWORD                         remoteNodeId,
+      lmp::DWORD                         remoteCCId);
    static ::lmp_ipcc_observer::IPCC_State convert(
      const lmp::cc::appl::State&         state);
    static ::lmp_ipcc_observer::IPCC_Event convert(

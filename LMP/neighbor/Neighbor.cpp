@@ -57,5 +57,15 @@ namespace lmp
                 << " executing " << action << std::endl;
 
     }
+    void Neighbor::do_notifyPeerIpccDiscovered(
+      const cc::IpccApplicationIF&  ipcc,
+      lmp::DWORD                    remoteNodeId,
+      lmp::DWORD                    remoteCCId)
+    {
+      std::cout << "Neighbor[" << m_nodeId << "].IPCC[" << ipcc.getLocalCCId() << "].notifyPeerIpccDiscovered("
+                << remoteNodeId << ", " << remoteCCId << ")" << std::endl;
+
+    }
+
   } // namespace neighbor
 } // namespace lmp

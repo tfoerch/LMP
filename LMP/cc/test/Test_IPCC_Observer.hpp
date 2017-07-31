@@ -53,6 +53,10 @@ namespace lmp
       	  const appl::Event&            event,
       	  const appl::State&            targetState,
       	  const appl::Action&           action);
+        virtual void do_notifyPeerIpccDiscovered(
+          const lmp::cc::IpccApplicationIF&  ipcc,
+          lmp::DWORD                         remoteNodeId,
+          lmp::DWORD                         remoteCCId);
 
         IpccImpl&            theIpcc;
         TransistionSequence  theTransitions;

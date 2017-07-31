@@ -51,6 +51,15 @@ namespace lmp
     	                         action.getType());
     	theTransitions.push_back(transRecord);
       }
+      void TestIpccObserver::do_notifyPeerIpccDiscovered(
+        const cc::IpccApplicationIF&  ipcc,
+        lmp::DWORD                    remoteNodeId,
+        lmp::DWORD                    remoteCCId)
+      {
+        std::cout << "IPCC[" << ipcc.getLocalCCId() << "].notifyPeerIpccDiscovered("
+                  << remoteNodeId << ", " << remoteCCId << ")" << std::endl;
+
+      }
 
       TestIpccObserver::TransRecord::TransRecord(
         appl::State::Type         sourceState,

@@ -3,7 +3,7 @@
 #include <lmp_mgtif_node.hpp>
 #include <Mgt_NodeApplProxy.hpp>
 #include <Mgt_NetworkIFProxy.hpp>
-#include <IPCCObserverProxy.hpp>
+#include <Mgt_IPCCObserverProxy.hpp>
 #include "cc/UDP_Msg_Handler.hpp"
 #include "cc/IPCC_Impl.hpp"
 #include "cc/IPCC_ObserverIF.hpp"
