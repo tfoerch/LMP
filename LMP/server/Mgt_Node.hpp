@@ -61,22 +61,26 @@ private:
   {
   public:
     NeighborAdjAddedFtor(
+      Node_i&                              node,
       NeighborAdjacencyObserverContainer&  observers);
   private:
     virtual void do_process(
       lmp::DWORD                   neighborNodeId,
       lmp::cc::IpccApplicationIF&  ipcc);
+    Node_i&                              m_node;
     NeighborAdjacencyObserverContainer&  m_observers;
   };
   class NeighborAdjRemovedFtor : public NeighborAdjacencyChangeFtorIF
   {
   public:
-    explicit NeighborAdjRemovedFtor(
+    NeighborAdjRemovedFtor(
+      Node_i&                              node,
       NeighborAdjacencyObserverContainer&  observers);
   private:
     virtual void do_process(
       lmp::DWORD                   neighborNodeId,
       lmp::cc::IpccApplicationIF&  ipcc);
+    Node_i&                              m_node;
     NeighborAdjacencyObserverContainer&  m_observers;
   };
   class NetworkIFInDestructionFtor : public NetworkIFInDestructionFtorIF
@@ -99,7 +103,7 @@ private:
   ::lmp_node_registry::NodeRegistry_var  theNodeRegistry;
   NetworkIFByLocalCCIdMap                m_netIFByLocalCCI;
   NeighborAdjacencyObserverContainer     m_neighborAdjacencyObserver;
-  NeighborByNodeIdMap                    theNeighborByNodeIdMap;
+  NeighborByNodeIdMap                    m_neighborByNodeIdMap;
   NeighborAdjAddedFtor                   m_neighborAdjAddedFtor;
   NeighborAdjRemovedFtor                 m_neighborAdjRemovedFtor;
   NetworkIFInDestructionFtor             m_networkIFInDestructionFtor;

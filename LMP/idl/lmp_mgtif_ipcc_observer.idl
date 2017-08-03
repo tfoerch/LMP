@@ -59,7 +59,7 @@ module lmp_ipcc_observer
       in IPCC_Action     action);
     void peerIpccDiscovered(
       in lmp_ipcc::IPCC  anIPCC,
-      in long            remoteCCId,
-      in long            remoteNodeId);
+      in long            remoteNodeId,
+      in long            remoteCCId);
   };
 };

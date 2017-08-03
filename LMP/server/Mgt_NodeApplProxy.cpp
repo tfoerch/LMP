@@ -1,4 +1,6 @@
 #include <Mgt_NodeApplProxy.hpp>
+#include "cc/IPCCAdjacencyObserverIF.hpp"
+#include "neighbor/NeighborApplicationIF.hpp"
 #include <iostream>
 
 namespace lmp_node
@@ -30,18 +32,46 @@ namespace lmp_node
   {
     return m_node.getNeighbor(neighborNodeId);
   }
+  lmp::neighbor::NeighborApplicationIF* NodeApplProxy::do_accessNeighbor(
+    lmp::DWORD  neighborNodeId)
+  {
+    return m_node.accessNeighbor(neighborNodeId);
+  }
+  lmp::neighbor::NeighborApplicationIF* NodeApplProxy::do_createNeighbor(
+    lmp::DWORD                   neighborNodeId)
+  {
+    return m_node.createNeighbor(neighborNodeId);
+  }
+  bool NodeApplProxy::do_removeNeighbor(
+    lmp::DWORD                   neighborNodeId)
+  {
+    return m_node.removeNeighbor(neighborNodeId);
+  }
   void NodeApplProxy::do_neighborAdjacencyAdded(
     lmp::DWORD                   neighborNodeId,
     lmp::cc::IpccApplicationIF&  ipcc)
   {
-    m_node.neighborAdjacencyAdded(neighborNodeId, ipcc);
     m_neighborAdjAddedFtor(neighborNodeId, ipcc);
+    lmp::neighbor::NeighborApplicationIF* neighborPtr = accessNeighbor(neighborNodeId);
+    if (neighborPtr)
+    {
+      lmp::cc::IpccAdjacencyObserverIF* ipccAdjObservPtr =
+        dynamic_cast<lmp::cc::IpccAdjacencyObserverIF*>(neighborPtr);
+      if (ipccAdjObservPtr)
+      {
+        ipccAdjObservPtr->ipccAdjacencyAdded(ipcc);
+      }
+      else
+      {
+        std::cout << "Node::do_neighborAdjacencyAdded() dynamic_cast failed" << std::endl;
+      }
+    }
+
   }
   void NodeApplProxy::do_neighborAdjacencyRemoved(
     lmp::DWORD                   neighborNodeId,
     lmp::cc::IpccApplicationIF&  ipcc)
   {
-    m_node.neighborAdjacencyRemoved(neighborNodeId, ipcc);
     m_neighborAdjRemovedFtor(neighborNodeId, ipcc);
   }
 

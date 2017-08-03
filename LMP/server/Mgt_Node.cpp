@@ -3,6 +3,7 @@
 #include <Mgt_NetworkIF.hpp>
 #include "lmp_mgtif_node.hpp"           // for No_Such_Entity, etc
 #include "lmp_mgtif_node_registry.hpp"  // for NodeRegistry_var, etc
+#include "lmp_mgtif_neighbor_adjacency_observer.hpp"
 
 #include <boost/bind.hpp>
 #include <iostream>
@@ -24,9 +25,11 @@ Node_i::Node_i(
   theNodeRegistry(::lmp_node_registry::NodeRegistry::_duplicate(aNodeRegistry)),
   m_netIFByLocalCCI(),
   m_neighborAdjacencyObserver(),
-  theNeighborByNodeIdMap(),
-  m_neighborAdjAddedFtor(m_neighborAdjacencyObserver),
-  m_neighborAdjRemovedFtor(m_neighborAdjacencyObserver),
+  m_neighborByNodeIdMap(),
+  m_neighborAdjAddedFtor(*this,
+                         m_neighborAdjacencyObserver),
+  m_neighborAdjRemovedFtor(*this,
+                           m_neighborAdjacencyObserver),
   m_networkIFInDestructionFtor(*this),
   m_nodeProxy(m_node,
               m_neighborAdjAddedFtor,
@@ -126,12 +129,19 @@ void Node_i::deregisterNeighborAdjacencyObserver(
 lmp_neighbor::Neighbor_ptr Node_i::createNeighbor(
   ::CORBA::Long remoteNodeId)
 {
-  if (theNeighborByNodeIdMap.find(remoteNodeId) == theNeighborByNodeIdMap.end())
+  NeighborByNodeIdMap::iterator neighborIter = m_neighborByNodeIdMap.find(remoteNodeId);
+  if (neighborIter == m_neighborByNodeIdMap.end())
   {
-    lmp_neighbor::Neighbor_i* servant = new lmp_neighbor::Neighbor_i(m_POA, this->_this(), remoteNodeId);
-    PortableServer::ObjectId *oid = m_POA->activate_object(servant);  delete oid;
-    lmp_neighbor::Neighbor_ptr neighbor = servant->_this();
-    return theNeighborByNodeIdMap.insert(NeighborByNodeIdMap::value_type(remoteNodeId, lmp_neighbor::Neighbor::_duplicate(neighbor))).first->second;
+    lmp::neighbor::NeighborApplicationIF* neighborPtr = m_node.createNeighbor(remoteNodeId);
+    if (neighborPtr)
+    {
+      lmp_neighbor::Neighbor_i* servant = new lmp_neighbor::Neighbor_i(m_POA, m_nodeProxy, *neighborPtr);
+      PortableServer::ObjectId *oid = m_POA->activate_object(servant);  delete oid;
+      lmp_neighbor::Neighbor_ptr neighbor = servant->_this();
+      neighborIter = m_neighborByNodeIdMap.insert(NeighborByNodeIdMap::value_type(remoteNodeId,
+                                                                                  lmp_neighbor::Neighbor::_duplicate(neighbor))).first;
+      return neighborIter->second;
+    }
   }
   throw lmp_node::Entity_Already_Exists();
 }
@@ -139,8 +149,8 @@ lmp_neighbor::Neighbor_ptr Node_i::createNeighbor(
 lmp_neighbor::Neighbor_ptr Node_i::getNeighbor(
   ::CORBA::Long remoteNodeId)
 {
-  NeighborByNodeIdMap::const_iterator neighborIter = theNeighborByNodeIdMap.find(remoteNodeId);
-  if (neighborIter != theNeighborByNodeIdMap.end())
+  NeighborByNodeIdMap::const_iterator neighborIter = m_neighborByNodeIdMap.find(remoteNodeId);
+  if (neighborIter != m_neighborByNodeIdMap.end())
   {
     return neighborIter->second;
   }
@@ -150,10 +160,10 @@ lmp_neighbor::Neighbor_ptr Node_i::getNeighbor(
 void Node_i::deleteNeighbor(
  ::CORBA::Long remoteNodeId)
 {
-  NeighborByNodeIdMap::iterator neighborIter = theNeighborByNodeIdMap.find(remoteNodeId);
-  if (neighborIter != theNeighborByNodeIdMap.end())
+  NeighborByNodeIdMap::iterator neighborIter = m_neighborByNodeIdMap.find(remoteNodeId);
+  if (neighborIter != m_neighborByNodeIdMap.end())
   {
-    theNeighborByNodeIdMap.erase(neighborIter);
+    m_neighborByNodeIdMap.erase(neighborIter);
   }
   throw lmp_node::No_Such_Entity();
 }
@@ -188,8 +198,10 @@ void Node_i::destroy()
 }
 
 Node_i::NeighborAdjAddedFtor::NeighborAdjAddedFtor(
+  Node_i&                              node,
   NeighborAdjacencyObserverContainer&  observers)
-: m_observers(observers)
+: m_node(node),
+  m_observers(observers)
 {
 }
 
@@ -197,14 +209,23 @@ void Node_i::NeighborAdjAddedFtor::do_process(
   lmp::DWORD                   neighborNodeId,
   lmp::cc::IpccApplicationIF&  ipcc)
 {
-//  std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIf.getLocalCCId()
-//            << ", remoteAddress = " << getRemoteAddress()
-//            << ", remotePortNumber = " << getRemotePortNumber() << ") enable" << std::endl;
+  std::cout << "Node[" << m_node.getNodeId() << "]::NeighborAdjAddedFtor("
+            << neighborNodeId << ") called" << std::endl;
+  ::lmp_neighbor::Neighbor_var neighborRef = lmp_neighbor::Neighbor::_duplicate(m_node.createNeighbor(neighborNodeId));
+  for (NeighborAdjacencyObserverContainer::const_iterator iter = m_observers.begin(),
+                                                          end_iter = m_observers.end();
+       iter != end_iter;
+       ++iter)
+  {
+    (*iter)->neighborAdjacencyAdded(neighborRef);
+  }
 }
 
 Node_i::NeighborAdjRemovedFtor::NeighborAdjRemovedFtor(
+    Node_i&                            node,
   NeighborAdjacencyObserverContainer&  observers)
-: m_observers(observers)
+: m_node(node),
+  m_observers(observers)
 {
 }
 

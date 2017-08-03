@@ -38,11 +38,19 @@ namespace lmp
           iter->second :
           0 );
     }
-    void Node::do_neighborAdjacencyAdded(
-      lmp::DWORD              neighborNodeId,
-      cc::IpccApplicationIF&  ipcc)
+    neighbor::NeighborApplicationIF* Node::do_accessNeighbor(
+      lmp::DWORD  neighborNodeId)
     {
-      std::cout << "Node::do_neighborAdjacencyAdded(" << neighborNodeId << ")" << std::endl;
+      NeighborNodes::iterator iter = m_neighborNodes.find(neighborNodeId);
+      return
+        ( iter != m_neighborNodes.end() ?
+          iter->second :
+          0 );
+    }
+    neighbor::NeighborApplicationIF* Node::do_createNeighbor(
+      lmp::DWORD              neighborNodeId)
+    {
+      std::cout << "Node[" << m_nodeId << "].createNeighbor(" << neighborNodeId << ")" << std::endl;
       NeighborNodes::iterator iter = m_neighborNodes.find(neighborNodeId);
       if (iter == m_neighborNodes.end())
       {
@@ -55,6 +63,30 @@ namespace lmp
         ( iter != m_neighborNodes.end() ?
           iter->second :
           0 );
+      return neighborPtr;
+    }
+    bool Node::do_removeNeighbor(
+      lmp::DWORD              neighborNodeId)
+    {
+      std::cout << "Node[" << m_nodeId << "].removeNeighbor(" << neighborNodeId << ")" << std::endl;
+      NeighborNodes::iterator iter = m_neighborNodes.find(neighborNodeId);
+      if (iter != m_neighborNodes.end())
+      {
+        if (iter->second)
+        {
+          delete iter->second;
+        }
+        m_neighborNodes.erase(iter);
+        return true;
+      }
+      return false;
+    }
+    void Node::do_neighborAdjacencyAdded(
+      lmp::DWORD              neighborNodeId,
+      cc::IpccApplicationIF&  ipcc)
+    {
+      std::cout << "Node::do_neighborAdjacencyAdded(" << neighborNodeId << ")" << std::endl;
+      neighbor::NeighborApplicationIF* neighborPtr = createNeighbor(neighborNodeId);
       if (neighborPtr)
       {
         cc::IpccAdjacencyObserverIF* ipccAdjObservPtr =
@@ -74,6 +106,29 @@ namespace lmp
       cc::IpccApplicationIF&  ipcc)
     {
       std::cout << "Node::do_neighborAdjacencyRemoved(" << neighborNodeId << ")" << std::endl;
+      neighbor::NeighborApplicationIF* neighborPtr = accessNeighbor(neighborNodeId);
+      if (neighborPtr)
+      {
+        cc::IpccAdjacencyObserverIF* ipccAdjObservPtr =
+          dynamic_cast<cc::IpccAdjacencyObserverIF*>(neighborPtr);
+        if (ipccAdjObservPtr)
+        {
+          ipccAdjObservPtr->ipccAdjacencyRemoved(ipcc);
+        }
+        else
+        {
+          std::cout << "Node::do_neighborAdjacencyRemoved() dynamic_cast failed" << std::endl;
+        }
+      }
+      NeighborNodes::iterator iter = m_neighborNodes.find(neighborNodeId);
+      if (iter != m_neighborNodes.end())
+      {
+        if (iter->second)
+        {
+          delete iter->second;
+        }
+        m_neighborNodes.erase(iter);
+      }
     }
   } // namespace node
 } // namespace lmp

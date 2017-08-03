@@ -14,7 +14,7 @@ namespace lmp
 {
   namespace neighbor
   {
-    class NeighborAdjacencyObserverIF;
+    class NeighborFactoryIF;
   }
   namespace cc
   {
@@ -24,15 +24,15 @@ namespace lmp
       {
       public:
         NeighborDiscoveredCheckFtor(
-          const neighbor::NeighborAdjacencyObserverIF&  node,
-          lmp::DWORD                                    neighborNodeId);
+          const neighbor::NeighborFactoryIF&  node,
+          lmp::DWORD                          neighborNodeId);
         NeighborDiscoveredCheckFtor(
           const NeighborDiscoveredCheckFtor&  other);
       private:
         virtual bool do_check() const;
         virtual CheckFtorIF* do_clone() const;
-        const neighbor::NeighborAdjacencyObserverIF&  m_node;
-        lmp::DWORD                                    m_neighborNodeId;
+        const neighbor::NeighborFactoryIF&  m_node;
+        lmp::DWORD                          m_neighborNodeId;
       };
     };
   } // namespace cc

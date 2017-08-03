@@ -45,11 +45,13 @@ void IPCCObserver_i::eventProcessed(
 
 void IPCCObserver_i::peerIpccDiscovered(
   ::lmp_ipcc::IPCC_ptr              aIPCC,
-  ::CORBA::Long                     remoteCCId,
-  ::CORBA::Long                     remoteNodeId)
+  ::CORBA::Long                     remoteNodeId,
+  ::CORBA::Long                     remoteCCId)
 {
   ::CORBA::Long    localCCId =  aIPCC->getLocalCCId();
-  std::cout << "Ipcc[" << localCCId << "].peerIpccDiscovered()";
+  std::cout << "Ipcc[" << localCCId << "].peerIpccDiscovered("
+            << remoteNodeId << ", "
+            << remoteCCId << ")" << std::endl;
 }
 
 std::ostream& operator<<(

@@ -7,13 +7,15 @@
  *      Author: tom
  */
 
+#include "neighbor/NeighborFactoryIF.hpp"
 #include "neighbor/NeighborAdjacencyObserverIF.hpp"
 
 namespace lmp
 {
   namespace node
   {
-    class NodeApplicationIF : public neighbor::NeighborAdjacencyObserverIF
+    class NodeApplicationIF : public neighbor::NeighborFactoryIF,
+                              public neighbor::NeighborAdjacencyObserverIF
     {
     public:
       inline void enable()

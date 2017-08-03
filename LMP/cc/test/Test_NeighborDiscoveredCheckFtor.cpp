@@ -6,7 +6,7 @@
  */
 
 #include "Test_NeighborDiscoveredCheckFtor.hpp"
-#include "neighbor/NeighborAdjacencyObserverIF.hpp"
+#include "neighbor/NeighborFactoryIF.hpp"
 
 #include <iostream>
 
@@ -17,8 +17,8 @@ namespace lmp
     namespace test
     {
       NeighborDiscoveredCheckFtor::NeighborDiscoveredCheckFtor(
-        const neighbor::NeighborAdjacencyObserverIF&  node,
-        lmp::DWORD                                    neighborNodeId)
+        const neighbor::NeighborFactoryIF&  node,
+        lmp::DWORD                          neighborNodeId)
       : m_node(node),
         m_neighborNodeId(neighborNodeId)
       {}

@@ -29,6 +29,12 @@ namespace lmp_node
     // implement NeighbordjacencyObserverIF
     virtual lmp::neighbor::NeighborApplicationIF const* do_getNeighbor(
       lmp::DWORD  neighborNodeId) const;
+    virtual lmp::neighbor::NeighborApplicationIF* do_accessNeighbor(
+      lmp::DWORD  neighborNodeId);
+    virtual lmp::neighbor::NeighborApplicationIF* do_createNeighbor(
+      lmp::DWORD                   neighborNodeId);
+    virtual bool do_removeNeighbor(
+      lmp::DWORD                   neighborNodeId);
     virtual void do_neighborAdjacencyAdded(
       lmp::DWORD                   neighborNodeId,
       lmp::cc::IpccApplicationIF&  ipcc);

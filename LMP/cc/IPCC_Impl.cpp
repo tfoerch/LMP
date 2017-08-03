@@ -338,6 +338,16 @@ namespace lmp
         }
         m_remoteNodeId = configMsg.m_data.m_localNodeId.m_data.m_nodeId;
         m_remoteCCId = configMsg.m_data.m_localCCId.m_data.m_CCId;
+        for (IPCCObservers::iterator iter = m_Observers.begin(),
+                                     end_iter = m_Observers.end();
+             iter != end_iter;
+             ++iter)
+        {
+          if (*iter)
+          {
+            (*iter)->notifyPeerIpccDiscovered(*this, m_remoteNodeId, m_remoteCCId);
+          }
+        }
         if (m_remoteNodeId)
         {
           for (NeighborAdjacencyObservers::iterator iter = m_neighborAdjacencyObservers.begin(),

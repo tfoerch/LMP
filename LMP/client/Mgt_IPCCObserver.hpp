@@ -24,8 +24,8 @@ public:
     ::lmp_ipcc_observer::IPCC_Action  action);
   virtual void peerIpccDiscovered(
     ::lmp_ipcc::IPCC_ptr              aIPCC,
-    ::CORBA::Long                     remoteCCId,
-    ::CORBA::Long                     remoteNodeId);
+    ::CORBA::Long                     remoteNodeId,
+    ::CORBA::Long                     remoteCCId);
 private:
 
   CORBA::ORB_ptr           theORB;
