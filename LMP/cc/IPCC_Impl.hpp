@@ -48,6 +48,7 @@ namespace lmp
     {
     public:
       IpccImpl(
+        lmp::DWORD                             localCCId,
         node::NodeApplicationIF&               node,
         NetworkIFSocketIF&                     networkIFSocket,
         boost::asio::io_service&               io_service,
@@ -124,6 +125,7 @@ namespace lmp
       IpccImpl(const IpccImpl&) = delete;
       void operator=(const IpccImpl&) = delete;
 
+      lmp::DWORD                                        m_localCCId;
       node::NodeApplicationIF&                          m_node;
       NetworkIFSocketIF&                                m_networkIFSocket;
       boost::asio::io_service&                          m_io_service;

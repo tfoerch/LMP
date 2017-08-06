@@ -26,7 +26,7 @@ namespace lmp_node
     inline lmp::node::NodeApplicationIF& getNode()
     { return m_node; }
   private:
-    // implement NeighbordjacencyObserverIF
+    // implement NeighborFactoryIF
     virtual lmp::neighbor::NeighborApplicationIF const* do_getNeighbor(
       lmp::DWORD  neighborNodeId) const;
     virtual lmp::neighbor::NeighborApplicationIF* do_accessNeighbor(
@@ -35,12 +35,21 @@ namespace lmp_node
       lmp::DWORD                   neighborNodeId);
     virtual bool do_removeNeighbor(
       lmp::DWORD                   neighborNodeId);
+    // implement NeighbordjacencyObserverIF
     virtual void do_neighborAdjacencyAdded(
       lmp::DWORD                   neighborNodeId,
       lmp::cc::IpccApplicationIF&  ipcc);
     virtual void do_neighborAdjacencyRemoved(
       lmp::DWORD                   neighborNodeId,
       lmp::cc::IpccApplicationIF&  ipcc);
+    // implement NodeLocalCCIdPoolIF
+    virtual lmp::DWORD do_registerFreeLocalCCId();
+    virtual bool do_checkLocalCCId(
+      lmp::DWORD localCCId) const;
+    virtual bool do_registerLocalCCId(
+      lmp::DWORD localCCId);
+    virtual bool do_releaseLocalCCId(
+      lmp::DWORD localCCId);
     // implement NodeApplicationIF
     virtual void do_enable();
     virtual void do_disable();

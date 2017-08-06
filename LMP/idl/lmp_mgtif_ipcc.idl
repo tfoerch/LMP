@@ -8,6 +8,7 @@ module lmp_ipcc
   interface IPCC
   {
  	long getLocalCCId();
+    long getNodeId();
  	long getRemoteAddress();
  	short getRemotePortNumber();
     void destroy();

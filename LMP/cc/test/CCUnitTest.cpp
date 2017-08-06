@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 1;
     // lmp::cc::TestIpccMsgReceiver node1_msgReceiver;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     node1_lmpSocket.enable();
 
     lmp::DWORD  node2_nodeId = 2;
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
     // boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
     lmp::DWORD  node2_1stCCId = 1;
     // lmp::cc::TestIpccMsgReceiver node2_msgReceiver;
-    lmp::cc::NetworkIFSocket  node2_lmpSocket(io_service, node2_1stCCId, ifName, node2_port, node2_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node2_lmpSocket(io_service, ifName, node2_port, node2_MsgHandler, false);
     node2_lmpSocket.enable();
 
     lmp::obj::config::ConfigObjectSequence  configObjectSequence;
@@ -368,7 +368,7 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_netif)
 
   boost::asio::io_service io_service;
   // lmp::cc::IpccImpl  activeIPCC(123, port, true);
-  lmp::cc::NetworkIFSocket  lmpSocket(io_service, node1_1stCCId, ifName, port, node1_MsgHandler, true);
+  lmp::cc::NetworkIFSocket  lmpSocket(io_service, ifName, port, node1_MsgHandler, true);
 
   boost::asio::ip::udp::endpoint remote_endpoint(boost::asio::ip::address::from_string("224.0.0.1"),
                                                  port);
@@ -411,7 +411,8 @@ BOOST_AUTO_TEST_CASE( activeIPCC_CCDown )
 {
   boost::asio::io_service io_service;
   std::string ifName = "lo";
-  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  lmp::cc::NetworkIFSocket::OptAddresses addr =
+    lmp::cc::NetworkIFSocket::getIfAddress(ifName);
   BOOST_CHECK(addr.first);
   if (addr.first)
   {
@@ -421,10 +422,10 @@ BOOST_AUTO_TEST_CASE( activeIPCC_CCDown )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 1;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     unsigned short node2_port = 9702;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -464,7 +465,8 @@ BOOST_AUTO_TEST_CASE( activeIPCC_AdminDown )
 {
   boost::asio::io_service io_service;
   std::string ifName = "lo";
-  lmp::cc::NetworkIFSocket::OptAddresses addr = lmp::cc::NetworkIFSocket::getIfAddress(ifName);
+  lmp::cc::NetworkIFSocket::OptAddresses addr =
+    lmp::cc::NetworkIFSocket::getIfAddress(ifName);
   BOOST_CHECK(addr.first);
   if (addr.first)
   {
@@ -474,10 +476,10 @@ BOOST_AUTO_TEST_CASE( activeIPCC_AdminDown )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 1;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     unsigned short node2_port = 9702;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -514,10 +516,10 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 1;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     unsigned short node2_port = 9702;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -580,12 +582,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 7001;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     lmp::DWORD  node2_nodeId = 115;
     unsigned short node2_port = 9702;
     lmp::DWORD  node2_1stCCId = 7002;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -652,12 +654,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_Reconfig )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 7001;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     lmp::DWORD  node2_nodeId = 115;
     unsigned short node2_port = 9702;
     lmp::DWORD  node2_1stCCId = 7002;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -703,12 +705,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfRet )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 7001;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     lmp::DWORD  node2_nodeId = 115;
     unsigned short node2_port = 9702;
     lmp::DWORD  node2_1stCCId = 7002;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -753,12 +755,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 7001;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     lmp::DWORD  node2_nodeId = 128;
     unsigned short node2_port = 9702;
     lmp::DWORD  node2_1stCCId = 7002;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -825,12 +827,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 7001;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     lmp::DWORD  node2_nodeId = 115;
     unsigned short node2_port = 9702;
     lmp::DWORD  node2_1stCCId = 7002;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -1012,12 +1014,12 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 7001;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     lmp::DWORD  node2_nodeId = 128;
     unsigned short node2_port = 9702;
     lmp::DWORD  node2_1stCCId = 7002;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  activeIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, true);
+    lmp::cc::IpccImpl  activeIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, true);
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
@@ -1091,12 +1093,12 @@ BOOST_AUTO_TEST_CASE( passiveIPCC )
     unsigned short node1_port = 9701;
     boost::asio::ip::udp::endpoint node1_endpoint(*addr.first, node1_port);
     lmp::DWORD  node1_1stCCId = 7001;
-    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, node1_1stCCId, ifName, node1_port, node1_MsgHandler, false);
+    lmp::cc::NetworkIFSocket  node1_lmpSocket(io_service, ifName, node1_port, node1_MsgHandler, false);
     lmp::DWORD  node2_nodeId = 128;
     unsigned short node2_port = 9702;
     lmp::DWORD  node2_1stCCId = 7002;
     boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
-    lmp::cc::IpccImpl  passiveIPCC(node1, node1_lmpSocket, io_service, node2_endpoint, false);
+    lmp::cc::IpccImpl  passiveIPCC(node1_1stCCId, node1, node1_lmpSocket, io_service, node2_endpoint, false);
     lmp::cc::appl::TestIpccObserver  ipccObserver(passiveIPCC);
     passiveIPCC.enable();
     {

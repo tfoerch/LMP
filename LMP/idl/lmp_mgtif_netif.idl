@@ -15,10 +15,13 @@ module lmp_netif
 
   interface NetworkIF
   {
-    long getLocalCCId();
+    string getInterfaceName();
+  	short getLocalPortNumber();
+    long getNodeId();
     void destroy();
     void enable();
     void disable();
+    // factory for IPCCs
     lmp_ipcc::IPCC createIPCC(
       in long  remoteAddress,
       in short remotePortNumber)

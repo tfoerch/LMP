@@ -11,7 +11,6 @@ NetworkIF_i::NetworkIF_i(
   PortableServer::POA_ptr                  poa,
   lmp_node::NodeApplProxy&                 node,
   boost::asio::io_service&                 io_service,
-  lmp::DWORD                               localCCId,
   const std::string&                       ifName,
   lmp::WORD                                port,
   lmp_node::NetworkIFInDestructionFtorIF&  networkIFInDestructionFtor)
@@ -21,44 +20,54 @@ NetworkIF_i::NetworkIF_i(
     m_ipccAdjDiscoveredFtor(*this),
     m_ipccInDestructionFtor(*this),
     m_msgHandler(m_node, m_ipccAdjDiscoveredFtor),
-    m_networkIfSocket(m_io_service, localCCId, ifName, port, m_msgHandler, false),
+    m_networkIfSocket(m_io_service, ifName, port, m_msgHandler, false),
     m_networkIfProxy(m_networkIfSocket),
     m_networkIFInDestructionFtor(networkIFInDestructionFtor)
 {
-  std::cout << "NetworkIF(localCCId = " << localCCId << ')' << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ')' << std::endl;
 }
 
 NetworkIF_i::~NetworkIF_i()
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") destructor" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") destructor" << std::endl;
 }
 
-::CORBA::Long NetworkIF_i::getLocalCCId()
+char* NetworkIF_i::getInterfaceName()
 {
-  return m_networkIfSocket.getLocalCCId();
+  return CORBA::string_dup(m_networkIfSocket.getIfName().c_str());
+}
+
+::CORBA::Short NetworkIF_i::getLocalPortNumber()
+{
+  return m_networkIfSocket.getLocalPortNumber();
+}
+
+::CORBA::Long NetworkIF_i::getNodeId()
+{
+  return m_node.getNodeId();
 }
 
 void NetworkIF_i::destroy()
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") destroy" << std::endl;
-  m_networkIFInDestructionFtor(getLocalCCId());
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") destroy" << std::endl;
+  m_networkIFInDestructionFtor(m_networkIfSocket.getIfName(), m_networkIfSocket.getLocalPortNumber());
   // TODO theNodePtr->deleteNetworkIF(m_localCCId);
   PortableServer::ObjectId *oid = m_POA->servant_to_id(this);
   m_POA->deactivate_object(*oid);  delete oid;
   _remove_ref(); // delete this;
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") destroy finished" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") destroy finished" << std::endl;
 }
 
 void NetworkIF_i::enable()
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") enable" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") enable" << std::endl;
   m_networkIfProxy.enable();
   // m_msgHandler.setNetworkIFObjRef(this->_this());
 }
 
 void NetworkIF_i::disable()
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(localCCId = " << getLocalCCId() << ") disable" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") disable" << std::endl;
   m_networkIfProxy.disable();
   // m_msgHandler.clearNetworkIFObjRef();
 }
@@ -159,7 +168,7 @@ void NetworkIF_i::registerIPCCAdjacencyObserver(
   ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId()
-            << ").NetworkIF(localCCId = " << getLocalCCId() << ").registerIPCCAdjacencyObserver()" << std::endl;
+            << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ").registerIPCCAdjacencyObserver()" << std::endl;
   m_ipccAdjacencyObservers.insert(lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver::_duplicate(observer));
 }
 
@@ -167,7 +176,7 @@ void NetworkIF_i::deregisterIPCCAdjacencyObserver(
   ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId()
-            << ").NetworkIF(localCCId = " << getLocalCCId() << ").deregisterIPCCAdjacencyObserver()" << std::endl;
+            << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ").deregisterIPCCAdjacencyObserver()" << std::endl;
   m_ipccAdjacencyObservers.erase(lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver::_duplicate(observer));
 }
 

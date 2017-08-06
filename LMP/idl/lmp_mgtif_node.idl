@@ -21,17 +21,18 @@ module lmp_node
   interface Node
   {
     long getNodeId();
-    // factory for IPCCs
+    // factory for NetworkIFs
     lmp_netif::NetworkIF createNetworkIF(
-      in long    localCCId,
       in string  interfaceName,
       in short   localPortNumber)
       raises (Entity_Already_Exists);
     lmp_netif::NetworkIF getNetworkIF(
-      in long    localCCId)
+      in string  interfaceName,
+      in short   localPortNumber)
       raises (No_Such_Entity);
     void deleteNetworkIF(
-      in long    localCCId)
+      in string  interfaceName,
+      in short   localPortNumber)
       raises (No_Such_Entity);
     void registerNeighborAdjacencyObserver(
       in lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver   observer);

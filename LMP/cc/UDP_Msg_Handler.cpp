@@ -79,35 +79,22 @@ namespace lmp
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
       boost::asio::const_buffers_1&          messageBuffer)
     {
-      IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
-      if (ipccIter == m_IPCCs.end())
+      IpccMsgReceiveIF* ipccPtr =
+        createIpcc(sender_endpoint, networkIFSocket, io_service);
+      if (ipccPtr)
       {
-        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, io_service, sender_endpoint, true);
-        if (ipccPtr)
+        using boost::spirit::qi::parse;
+        typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+        BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+        BufIterType last = boost::asio::buffers_end(messageBuffer);
+        lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
+        lmp::msg::Message parsedMessage;
+        if (parse(begin,
+                  last,
+                  msgGrammar,
+                  parsedMessage))
         {
-          ipccPtr->enable();
-          ipccIter = m_IPCCs.insert(IPCCMap::value_type(sender_endpoint,
-                                                        ipccPtr)).first;
-        }
-      }
-      if (ipccIter != m_IPCCs.end())
-      {
-        IpccMsgReceiveIF*  ipccPtr = ipccIter->second;
-        if (ipccPtr)
-        {
-          using boost::spirit::qi::parse;
-          typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
-          BufIterType begin = boost::asio::buffers_begin(messageBuffer);
-          BufIterType last = boost::asio::buffers_end(messageBuffer);
-          lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-          lmp::msg::Message parsedMessage;
-          if (parse(begin,
-                    last,
-                    msgGrammar,
-                    parsedMessage))
-          {
-            boost::apply_visitor(msg_variants_processor(*ipccPtr), parsedMessage);
-          }
+          boost::apply_visitor(msg_variants_processor(*ipccPtr), parsedMessage);
         }
       }
     }
@@ -140,7 +127,13 @@ namespace lmp
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter == m_IPCCs.end())
       {
-        IpccImpl*  ipccPtr = new IpccImpl(m_node, networkIFSocket, io_service, sender_endpoint, true);
+        IpccImpl*  ipccPtr =
+          new IpccImpl(m_node.registerFreeLocalCCId(),
+                       m_node,
+                       networkIFSocket,
+                       io_service,
+                       sender_endpoint,
+                       true);
         if (ipccPtr)
         {
           // ipccPtr->enable();
@@ -160,9 +153,16 @@ namespace lmp
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter != m_IPCCs.end())
       {
-        if (ipccIter->second)
+        IpccMsgReceiveIF* ipccPtr = ipccIter->second;
+        if (ipccPtr)
         {
-          delete ipccIter->second;
+          IpccApplicationIF* ipccApplPtr =
+            dynamic_cast<IpccApplicationIF*>(ipccPtr);
+          if (ipccApplPtr)
+          {
+            m_node.releaseLocalCCId(ipccApplPtr->getLocalCCId());
+          }
+          delete ipccPtr;
         }
         m_IPCCs.erase(ipccIter);
         return true;

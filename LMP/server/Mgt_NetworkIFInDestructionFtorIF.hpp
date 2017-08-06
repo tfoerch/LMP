@@ -8,6 +8,7 @@
  */
 
 #include "base/ProtocolTypes.hpp"                  // for DWORD
+#include <string>
 
 namespace lmp_node
 {
@@ -16,12 +17,14 @@ namespace lmp_node
   {
   public:
     inline void operator()(
-      lmp::DWORD                   localCCId)
-    { do_process(localCCId); }
+      const std::string&  ifName,
+      lmp::WORD           localPortNumber)
+    { do_process(ifName, localPortNumber); }
     virtual ~NetworkIFInDestructionFtorIF(){}
   private:
     virtual void do_process(
-      lmp::DWORD                   localCCId) = 0;
+      const std::string&  ifName,
+      lmp::WORD           localPortNumber) = 0;
   };
 
 } // end namespace lmp_node

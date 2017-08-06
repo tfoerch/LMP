@@ -23,7 +23,7 @@ Node_i::Node_i(
   m_threadPool(),
   m_node(nodeId),
   theNodeRegistry(::lmp_node_registry::NodeRegistry::_duplicate(aNodeRegistry)),
-  m_netIFByLocalCCI(),
+  m_networkIFsByIfName(),
   m_neighborAdjacencyObserver(),
   m_neighborByNodeIdMap(),
   m_neighborAdjAddedFtor(*this,
@@ -67,31 +67,43 @@ Node_i::~Node_i()
 }
 
 lmp_netif::NetworkIF_ptr Node_i::createNetworkIF(
-  ::CORBA::Long   localCCId,
   const char*     interfaceName,
   ::CORBA::Short  localPortNumber)
 {
   std::cout << "Node(" << m_node.getNodeId()
-            << ").createNetworkIF(localCCId = "
-            << localCCId << ")" << std::endl;
-  if (m_netIFByLocalCCI.find(localCCId) == m_netIFByLocalCCI.end())
+            << ").createNetworkIF(ifName = " << interfaceName
+            << ", localPortNumber = " << localPortNumber << ')' << std::endl;
+  std::string  ifName(interfaceName);
+  NetworkIFKey  networkIFKey(ifName, localPortNumber);
+  NetworkIFByIfNameMap::iterator netIfIter = m_networkIFsByIfName.find(networkIFKey);
+      if (m_networkIFsByIfName.find(networkIFKey) == m_networkIFsByIfName.end())
   {
-    std::string  ifName(interfaceName);
     lmp_netif::NetworkIF_i* servant =
-      new lmp_netif::NetworkIF_i(m_POA, m_nodeProxy, m_io_service, localCCId, ifName, localPortNumber, m_networkIFInDestructionFtor);
+      new lmp_netif::NetworkIF_i(m_POA,
+                                 m_nodeProxy,
+                                 m_io_service,
+                                 ifName,
+                                 localPortNumber,
+                                 m_networkIFInDestructionFtor);
     PortableServer::ObjectId *oid = m_POA->activate_object(servant);  delete oid;
     lmp_netif::NetworkIF_ptr netif = servant->_this();
-    return m_netIFByLocalCCI.insert(NetworkIFByLocalCCIdMap::value_type(localCCId, lmp_netif::NetworkIF::_duplicate(netif))).first->second;
+    netIfIter =
+      m_networkIFsByIfName.insert(NetworkIFByIfNameMap::value_type(networkIFKey,
+                                                                      lmp_netif::NetworkIF::_duplicate(netif))).first;
+    return netIfIter->second;
   }
   throw lmp_node::Entity_Already_Exists();
 
 }
 
 lmp_netif::NetworkIF_ptr Node_i::getNetworkIF(
-  ::CORBA::Long localCCId)
+  const char*     interfaceName,
+  ::CORBA::Short  localPortNumber)
 {
-  NetworkIFByLocalCCIdMap::const_iterator netIfIter = m_netIFByLocalCCI.find(localCCId);
-  if (netIfIter != m_netIFByLocalCCI.end())
+  std::string  ifName(interfaceName);
+  NetworkIFKey  networkIFKey(ifName, localPortNumber);
+  NetworkIFByIfNameMap::const_iterator netIfIter = m_networkIFsByIfName.find(networkIFKey);
+  if (netIfIter != m_networkIFsByIfName.end())
   {
     return netIfIter->second;
   }
@@ -99,12 +111,15 @@ lmp_netif::NetworkIF_ptr Node_i::getNetworkIF(
 }
 
 void Node_i::deleteNetworkIF(
- ::CORBA::Long localCCId)
+  const char*     interfaceName,
+  ::CORBA::Short  localPortNumber)
 {
-  NetworkIFByLocalCCIdMap::iterator netIfIter = m_netIFByLocalCCI.find(localCCId);
-  if (netIfIter != m_netIFByLocalCCI.end())
+  std::string  ifName(interfaceName);
+  NetworkIFKey  networkIFKey(ifName, localPortNumber);
+  NetworkIFByIfNameMap::iterator netIfIter = m_networkIFsByIfName.find(networkIFKey);
+  if (netIfIter != m_networkIFsByIfName.end())
   {
-    m_netIFByLocalCCI.erase(netIfIter);
+    m_networkIFsByIfName.erase(netIfIter);
     return;
   }
   throw lmp_node::No_Such_Entity();
@@ -242,11 +257,12 @@ Node_i::NetworkIFInDestructionFtor::NetworkIFInDestructionFtor(
 }
 
 void Node_i::NetworkIFInDestructionFtor::do_process(
-  lmp::DWORD                   localCCId)
+    const std::string&  ifName,
+    lmp::WORD           localPortNumber)
 {
   try
   {
-    m_node.deleteNetworkIF(localCCId);
+    m_node.deleteNetworkIF(ifName.c_str(), localPortNumber);
   }
   catch(lmp_node::No_Such_Entity& nsE)
   {

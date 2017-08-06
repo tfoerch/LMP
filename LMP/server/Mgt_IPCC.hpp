@@ -33,6 +33,7 @@ namespace lmp_ipcc
       lmp_netif::IPCCInDestructionFtorIF&  ipccInDestructionFtor);
     virtual ~IPCC_i();
     virtual ::CORBA::Long getLocalCCId();
+    virtual ::CORBA::Long getNodeId();
     virtual ::CORBA::Long getRemoteAddress();
     virtual ::CORBA::Short getRemotePortNumber();
     virtual void destroy();

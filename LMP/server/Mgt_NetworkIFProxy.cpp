@@ -9,9 +9,13 @@ namespace lmp_netif
   {
   }
 
-  lmp::DWORD NetworkIFProxy::do_getLocalCCId() const
+  const std::string& NetworkIFProxy::do_getIfName() const
   {
-    return m_networkIf.getLocalCCId();
+    return m_networkIf.getIfName();
+  }
+  lmp::WORD NetworkIFProxy::do_getLocalPortNumber() const
+  {
+    return m_networkIf.getLocalPortNumber();
   }
 
   void NetworkIFProxy::do_enable()

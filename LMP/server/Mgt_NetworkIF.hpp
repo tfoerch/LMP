@@ -31,12 +31,13 @@ namespace lmp_netif
       PortableServer::POA_ptr                  poa,
       lmp_node::NodeApplProxy&                 node,
       boost::asio::io_service&                 io_service,
-      lmp::DWORD                               localCCId,
       const std::string&                       ifName,
       lmp::WORD                                port,
       lmp_node::NetworkIFInDestructionFtorIF&  networkIFInDestructionFtor);
     virtual ~NetworkIF_i();
-    virtual ::CORBA::Long getLocalCCId();
+    virtual char* getInterfaceName();
+    virtual ::CORBA::Short getLocalPortNumber();
+    virtual ::CORBA::Long getNodeId();
     virtual void destroy();
     virtual void enable();
     virtual void disable();

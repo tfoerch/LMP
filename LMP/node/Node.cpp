@@ -16,7 +16,9 @@ namespace lmp
   {
     Node::Node(
       lmp::DWORD                       nodeId)
-      : m_nodeId(nodeId)
+      : m_nodeId(nodeId),
+        m_neighborNodes(),
+        m_assignedLocalCCIds()
     {
     }
     void Node::do_enable()
@@ -129,6 +131,46 @@ namespace lmp
         }
         m_neighborNodes.erase(iter);
       }
+    }
+    lmp::DWORD Node::do_registerFreeLocalCCId()
+    {
+      SetOfIdentifiers::iterator iter = m_assignedLocalCCIds.begin();
+      lmp::DWORD localCCId =
+        ( iter == m_assignedLocalCCIds.end() ?
+          7011 :
+          *iter );
+      bool gapFound = false;
+      while ( iter != m_assignedLocalCCIds.end() &&
+              !gapFound)
+      {
+        ++iter;
+        ++localCCId;
+        if (iter == m_assignedLocalCCIds.end() ||
+            localCCId != *iter)
+        {
+          gapFound = true;
+        }
+      }
+      m_assignedLocalCCIds.insert(localCCId);
+      return localCCId;
+    }
+    bool Node::do_checkLocalCCId(
+      lmp::DWORD localCCId) const
+    {
+      return
+        ( m_assignedLocalCCIds.find(localCCId) == m_assignedLocalCCIds.end() );
+    }
+    bool Node::do_registerLocalCCId(
+      lmp::DWORD localCCId)
+    {
+      return
+        m_assignedLocalCCIds.insert(localCCId).second;
+    }
+    bool Node::do_releaseLocalCCId(
+      lmp::DWORD localCCId)
+    {
+      return
+        ( m_assignedLocalCCIds.erase(localCCId) == 1);
     }
   } // namespace node
 } // namespace lmp

@@ -68,9 +68,9 @@ BOOST_FIXTURE_TEST_CASE ( test_case1, LaunchServer )
     std::cout << "before register observer" << std::endl;
     node1->registerNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
     node2->registerNeighborAdjacencyObserver(neighborAdjacencyObserverPtr);
-    ::lmp_netif::NetworkIF_ptr loNetifOnNode1 = node1->createNetworkIF(7011, ifName, 7011);
+    ::lmp_netif::NetworkIF_ptr loNetifOnNode1 = node1->createNetworkIF(ifName, 7011);
     BOOST_CHECK(!CORBA::is_nil(loNetifOnNode1));
-    ::lmp_netif::NetworkIF_ptr loNetifOnNode2 = node2->createNetworkIF(7012, ifName, 7012);
+    ::lmp_netif::NetworkIF_ptr loNetifOnNode2 = node2->createNetworkIF(ifName, 7012);
     BOOST_CHECK(!CORBA::is_nil(loNetifOnNode2));
     if (!CORBA::is_nil(loNetifOnNode1) &&
         !CORBA::is_nil(loNetifOnNode2))

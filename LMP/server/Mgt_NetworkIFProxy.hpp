@@ -21,7 +21,8 @@ namespace lmp_netif
     virtual ~NetworkIFProxy(){}
   private:
     // implement NetworkIFSocketIF
-    virtual lmp::DWORD do_getLocalCCId() const;
+    virtual const std::string& do_getIfName() const;
+    virtual lmp::WORD do_getLocalPortNumber() const;
     virtual void do_enable();
     virtual void do_disable();
     virtual void do_send(

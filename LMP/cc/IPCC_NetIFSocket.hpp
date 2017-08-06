@@ -13,7 +13,6 @@
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/optional/optional.hpp>        // for optional
-#include <string>
 
 namespace boost { namespace asio { class io_service; } }
 
@@ -28,7 +27,6 @@ namespace lmp
     public:
       NetworkIFSocket(
     	boost::asio::io_service&          io_service,
-    	lmp::DWORD                        localCCId,
         const std::string&                ifName,
         lmp::WORD                         port,
         UDPMsgReceiveIF&                  udpMsgHandler,
@@ -43,7 +41,8 @@ namespace lmp
       NetworkIFSocket(
         NetworkIFSocket&&  other) = default;
       // implement NetworkIFSocketIF
-      virtual lmp::DWORD do_getLocalCCId() const;
+      virtual const std::string& do_getIfName() const;
+      virtual lmp::WORD do_getLocalPortNumber() const;
       virtual void do_enable();
       virtual void do_disable();
       virtual void do_send(
@@ -57,7 +56,6 @@ namespace lmp
     	const boost::system::error_code&  error,
     	size_t                            bytes_sent);
       boost::asio::io_service&                       m_io_service;
-      lmp::DWORD                                     m_localCCId;
       UDPMsgReceiveIF&                               m_udpMsgHandler;
       std::string                                    m_ifName;
       lmp::WORD                                      m_port;

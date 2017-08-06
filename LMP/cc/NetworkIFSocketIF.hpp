@@ -11,6 +11,7 @@
 
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/buffer.hpp>
+#include <string>
 
 namespace lmp
 {
@@ -19,8 +20,10 @@ namespace lmp
     class NetworkIFSocketIF
     {
     public:
-      inline lmp::DWORD getLocalCCId() const
-      { return do_getLocalCCId(); }
+      inline const std::string& getIfName() const
+      { return do_getIfName(); }
+      inline lmp::WORD getLocalPortNumber() const
+      { return do_getLocalPortNumber(); }
       inline void enable()
       { do_enable(); }
       inline void disable()
@@ -31,7 +34,8 @@ namespace lmp
       { do_send(destination_endpoint, messageBuffer); }
       virtual ~NetworkIFSocketIF(){}
     private:
-      virtual lmp::DWORD do_getLocalCCId() const = 0;
+      virtual const std::string& do_getIfName() const = 0;
+      virtual lmp::WORD do_getLocalPortNumber() const = 0;
       virtual void do_enable() = 0;
       virtual void do_disable() = 0;
       virtual void do_send(

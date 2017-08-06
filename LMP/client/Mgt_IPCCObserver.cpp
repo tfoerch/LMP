@@ -36,7 +36,8 @@ void IPCCObserver_i::eventProcessed(
   ::lmp_ipcc_observer::IPCC_Action  action)
 {
   ::CORBA::Long    localCCId =  aIPCC->getLocalCCId();
-  std::cout << "Ipcc[" << localCCId << "].eventProcessed("
+  ::CORBA::Long    nodeId =  aIPCC->getNodeId();
+  std::cout << "Node[" << nodeId << "].Ipcc[" << localCCId << "].eventProcessed("
             << event << ", "
             << sourceState << " -> "
             << targetState << ", "
@@ -49,7 +50,8 @@ void IPCCObserver_i::peerIpccDiscovered(
   ::CORBA::Long                     remoteCCId)
 {
   ::CORBA::Long    localCCId =  aIPCC->getLocalCCId();
-  std::cout << "Ipcc[" << localCCId << "].peerIpccDiscovered("
+  ::CORBA::Long    nodeId =  aIPCC->getNodeId();
+  std::cout << "Node[" << nodeId << "].Ipcc[" << localCCId << "].peerIpccDiscovered("
             << remoteNodeId << ", "
             << remoteCCId << ")" << std::endl;
 }

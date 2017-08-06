@@ -66,13 +66,33 @@ namespace lmp_node
         std::cout << "Node::do_neighborAdjacencyAdded() dynamic_cast failed" << std::endl;
       }
     }
-
   }
+
   void NodeApplProxy::do_neighborAdjacencyRemoved(
     lmp::DWORD                   neighborNodeId,
     lmp::cc::IpccApplicationIF&  ipcc)
   {
     m_neighborAdjRemovedFtor(neighborNodeId, ipcc);
+  }
+
+  lmp::DWORD NodeApplProxy::do_registerFreeLocalCCId()
+  {
+    return m_node.registerFreeLocalCCId();
+  }
+  bool NodeApplProxy::do_checkLocalCCId(
+    lmp::DWORD localCCId) const
+  {
+    return m_node.isLocalCCIdFree(localCCId);
+  }
+  bool NodeApplProxy::do_registerLocalCCId(
+    lmp::DWORD localCCId)
+  {
+    return m_node.registerLocalCCId(localCCId);
+  }
+  bool NodeApplProxy::do_releaseLocalCCId(
+    lmp::DWORD localCCId)
+  {
+    return m_node.releaseLocalCCId(localCCId);
   }
 
 

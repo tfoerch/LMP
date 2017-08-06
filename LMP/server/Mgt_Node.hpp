@@ -18,6 +18,7 @@
 #include <set>
 #include <vector>
 #include <thread>
+#include <string>
 
 
 namespace lmp_node
@@ -34,13 +35,14 @@ public:
   virtual ~Node_i();
   virtual ::CORBA::Long getNodeId();
   virtual lmp_netif::NetworkIF_ptr createNetworkIF(
-    ::CORBA::Long   localCCId,
     const char*     interfaceName,
     ::CORBA::Short  localPortNumber);
   virtual lmp_netif::NetworkIF_ptr getNetworkIF(
-    ::CORBA::Long   localCCId);
+    const char*     interfaceName,
+    ::CORBA::Short  localPortNumber);
   virtual void deleteNetworkIF(
-   ::CORBA::Long    localCCId);
+    const char*     interfaceName,
+    ::CORBA::Short  localPortNumber);
   virtual void registerNeighborAdjacencyObserver(
     ::lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_ptr observer);
   virtual void deregisterNeighborAdjacencyObserver(
@@ -53,9 +55,10 @@ public:
     ::CORBA::Long remoteNodeId);
   virtual void destroy();
 private:
-  typedef  std::map<CORBA::Long, ::lmp_netif::NetworkIF_var>    NetworkIFByLocalCCIdMap;
-  typedef  std::set<::lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_var>   NeighborAdjacencyObserverContainer;
-  typedef  std::map<CORBA::Long, ::lmp_neighbor::Neighbor_var>  NeighborByNodeIdMap;
+  typedef std::pair<std::string, lmp::WORD>                     NetworkIFKey;
+  typedef std::map<NetworkIFKey, ::lmp_netif::NetworkIF_var>    NetworkIFByIfNameMap;
+  typedef std::set<::lmp_neighbor_adjacency_observer::NeighborAdjacencyObserver_var>   NeighborAdjacencyObserverContainer;
+  typedef std::map<CORBA::Long, ::lmp_neighbor::Neighbor_var>  NeighborByNodeIdMap;
 
   class NeighborAdjAddedFtor : public NeighborAdjacencyChangeFtorIF
   {
@@ -90,7 +93,8 @@ private:
       Node_i&  node);
   private:
     virtual void do_process(
-      lmp::DWORD                   localCCId);
+      const std::string&  ifName,
+      lmp::WORD           localPortNumber);
     Node_i&                      m_node;
   };
 
@@ -101,7 +105,7 @@ private:
   std::vector<std::thread>               m_threadPool;
   lmp::node::Node                        m_node;
   ::lmp_node_registry::NodeRegistry_var  theNodeRegistry;
-  NetworkIFByLocalCCIdMap                m_netIFByLocalCCI;
+  NetworkIFByIfNameMap                   m_networkIFsByIfName;
   NeighborAdjacencyObserverContainer     m_neighborAdjacencyObserver;
   NeighborByNodeIdMap                    m_neighborByNodeIdMap;
   NeighborAdjAddedFtor                   m_neighborAdjAddedFtor;

@@ -9,13 +9,15 @@
 
 #include "neighbor/NeighborFactoryIF.hpp"
 #include "neighbor/NeighborAdjacencyObserverIF.hpp"
+#include "node/NodeLocalCCIdPoolIF.hpp"
 
 namespace lmp
 {
   namespace node
   {
     class NodeApplicationIF : public neighbor::NeighborFactoryIF,
-                              public neighbor::NeighborAdjacencyObserverIF
+                              public neighbor::NeighborAdjacencyObserverIF,
+                              public NodeLocalCCIdPoolIF
     {
     public:
       inline void enable()

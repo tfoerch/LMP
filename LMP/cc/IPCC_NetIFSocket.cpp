@@ -27,13 +27,11 @@ namespace lmp
 
     NetworkIFSocket::NetworkIFSocket(
       boost::asio::io_service&  io_service,
-      lmp::DWORD                localCCId,
       const std::string&        ifName,
       lmp::WORD                 port,
       UDPMsgReceiveIF&          udpMsgHandler,
       bool                      bind2Interface)
       : m_io_service(io_service),
-        m_localCCId(localCCId),
         m_udpMsgHandler(udpMsgHandler),
         m_ifName(ifName),
         m_port(port),
@@ -41,23 +39,28 @@ namespace lmp
         m_socket(m_io_service),
         m_sender_endpoint()
     {
-      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") ctor" << std::endl;
+      std::cout << "NetworkIFSocket(ifName = " << m_ifName << ") ctor" << std::endl;
     }
 
     NetworkIFSocket::~NetworkIFSocket()
     {
-      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") dtor" << std::endl;
+      std::cout << "NetworkIFSocket(ifName = " << m_ifName << ") dtor" << std::endl;
       if (m_socket.is_open())
       {
         m_socket.cancel();
         m_socket.close();
       }
-      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") dtor after cancel" << std::endl;
+      std::cout << "NetworkIFSocket(ifName = " << m_ifName << ") dtor after cancel" << std::endl;
     }
-    lmp::DWORD NetworkIFSocket::do_getLocalCCId() const
+    const std::string& NetworkIFSocket::do_getIfName() const
     {
-      return m_localCCId;
+      return m_ifName;
     }
+    lmp::WORD NetworkIFSocket::do_getLocalPortNumber() const
+    {
+      return m_port;
+    }
+
     void NetworkIFSocket::do_enable()
     {
       OptAddresses optAddr = lmp::cc::NetworkIFSocket::getIfAddress(m_ifName);
@@ -80,7 +83,7 @@ namespace lmp
                            m_port);
         try
         {
-          std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") socket created" << std::endl;
+          std::cout << "NetworkIFSocket(ifName = " << m_ifName << ") socket created" << std::endl;
           m_socket.open(boost::asio::ip::udp::v4());
           if (m_bind2Interface)
           {
@@ -94,7 +97,7 @@ namespace lmp
           // bind
           m_socket.set_option(boost::asio::ip::udp::socket::reuse_address(true));
           m_socket.bind(listen_endpoint);
-          std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ").enable after bind" << std::endl;
+          std::cout << "NetworkIFSocket(ifName = " << m_ifName << ").enable after bind" << std::endl;
 
           // disable loopback (no copies of our packets)
           m_socket.set_option(boost::asio::ip::multicast::enable_loopback(false));
@@ -112,20 +115,20 @@ namespace lmp
         }
         catch (std::exception& e)
         {
-          std::cerr << "NetworkIFSocket(localCCId = " << m_localCCId << ").enable exception '"
+          std::cerr << "NetworkIFSocket(ifName = " << m_ifName << ").enable exception '"
                     << e.what() << "' caught while creating socket" << std::endl;
         }
       }
     }
     void NetworkIFSocket::do_disable()
     {
-      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") disable" << std::endl;
+      std::cout << "NetworkIFSocket(ifName = " << m_ifName << ") disable" << std::endl;
       if (m_socket.is_open())
       {
         m_socket.cancel();
         m_socket.close();
       }
-      std::cout << "NetworkIFSocket(localCCId = " << m_localCCId << ") disable after cancel" << std::endl;
+      std::cout << "NetworkIFSocket(ifName = " << m_ifName << ") disable after cancel" << std::endl;
     }
     void NetworkIFSocket::do_send(
       const boost::asio::ip::udp::endpoint&  destination_endpoint,

@@ -47,12 +47,14 @@ namespace lmp
   namespace cc
   {
     IpccImpl::IpccImpl(
+      lmp::DWORD                             localCCId,
       node::NodeApplicationIF&               node,
       NetworkIFSocketIF&                     networkIFSocket,
       boost::asio::io_service&               io_service,
       const boost::asio::ip::udp::endpoint&  remote_endpoint,
       bool                                   isActiveSetup)
-      : m_node(node),
+      : m_localCCId(localCCId),
+        m_node(node),
         m_networkIFSocket(networkIFSocket),
         m_io_service(io_service),
         m_remote_endpoint(remote_endpoint),
@@ -93,7 +95,7 @@ namespace lmp
         m_messageId(0),
         m_configMsg()
     {
-      std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIFSocket.getLocalCCId()
+      std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << getLocalCCId()
                 << ", remoteAddress = " << m_remote_endpoint.address().to_v4().to_ulong()
                 << ", remotePortNumber = " << m_remote_endpoint.port() << ") ctor" << std::endl;
       {
@@ -122,7 +124,7 @@ namespace lmp
       if (activeState &&
           *activeState == stateConfSnd )
       {
-        std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << m_networkIFSocket.getLocalCCId()
+        std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << getLocalCCId()
                   << ", remoteAddress = " << m_remote_endpoint.address().to_v4().to_ulong()
                   << ", remotePortNumber = " << m_remote_endpoint.port() << ") enable changed to ConfSnd state" << std::endl;
       }
@@ -144,7 +146,7 @@ namespace lmp
     }
     lmp::DWORD  IpccImpl::do_getLocalCCId() const
     {
-      return m_networkIFSocket.getLocalCCId();
+      return m_localCCId;
     }
     lmp::DWORD  IpccImpl::do_getRemoteCCId() const
     {
