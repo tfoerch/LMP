@@ -9,6 +9,7 @@
 
 #include "base/ProtocolTypes.hpp"             // for DWORD
 #include <boost/asio/ip/udp.hpp>
+#include <boost/optional/optional.hpp>        // for optional
 #include <iostream>
 
 namespace lmp
@@ -22,6 +23,7 @@ namespace lmp
     namespace appl
     {
       class IpccObserverIF;
+      class State;
     }
     class IpccApplicationIF
     {
@@ -32,6 +34,8 @@ namespace lmp
       { do_disable(); }
       inline lmp::DWORD getLocalNodeId() const
       { return do_getLocalNodeId(); }
+      inline boost::optional<const appl::State&> getState() const
+      { return do_getState(); }
       inline lmp::DWORD getRemoteNodeId() const
       { return do_getRemoteNodeId(); }
       inline lmp::DWORD getLocalCCId() const
@@ -57,6 +61,7 @@ namespace lmp
       virtual void do_enable() = 0;
       virtual void do_disable() = 0;
       virtual lmp::DWORD do_getLocalNodeId() const = 0;
+      virtual boost::optional<const appl::State&> do_getState() const = 0;
       virtual lmp::DWORD do_getRemoteNodeId() const = 0;
       virtual lmp::DWORD do_getLocalCCId() const = 0;
       virtual lmp::DWORD do_getRemoteCCId() const = 0;

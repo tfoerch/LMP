@@ -44,6 +44,8 @@ namespace lmp_ipcc
       const IPCCObserverContainer&       ipccObserverContainer);
     const TransistionSequence& getTransistions() const;
     void reset();
+    static ::lmp_ipcc_common::IPCC_State convert(
+      const lmp::cc::appl::State&         state);
   private:
     virtual void do_notifyTransition(
       const lmp::cc::IpccApplicationIF&  ipcc,
@@ -55,8 +57,6 @@ namespace lmp_ipcc
       const lmp::cc::IpccApplicationIF&  ipcc,
       lmp::DWORD                         remoteNodeId,
       lmp::DWORD                         remoteCCId);
-   static ::lmp_ipcc_observer::IPCC_State convert(
-     const lmp::cc::appl::State&         state);
    static ::lmp_ipcc_observer::IPCC_Event convert(
      const lmp::cc::appl::Event&         event);
    static ::lmp_ipcc_observer::IPCC_Action convert(

@@ -19,8 +19,8 @@ public:
   virtual void eventProcessed(
     ::lmp_ipcc::IPCC_ptr              aIPCC,
     ::lmp_ipcc_observer::IPCC_Event   event,
-    ::lmp_ipcc_observer::IPCC_State   sourceState,
-    ::lmp_ipcc_observer::IPCC_State   targetState,
+    ::lmp_ipcc_common::IPCC_State     sourceState,
+    ::lmp_ipcc_common::IPCC_State     targetState,
     ::lmp_ipcc_observer::IPCC_Action  action);
   virtual void peerIpccDiscovered(
     ::lmp_ipcc::IPCC_ptr              aIPCC,
@@ -37,7 +37,7 @@ std::ostream& operator<<(
   ::lmp_ipcc_observer::IPCC_Event   event);
 std::ostream& operator<<(
   std::ostream&                     os,
-  ::lmp_ipcc_observer::IPCC_State   state);
+  ::lmp_ipcc_common::IPCC_State     state);
 std::ostream& operator<<(
   std::ostream&                     os,
   ::lmp_ipcc_observer::IPCC_Action  action);

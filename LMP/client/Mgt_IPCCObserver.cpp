@@ -31,8 +31,8 @@ void IPCCObserver_i::destroy()
 void IPCCObserver_i::eventProcessed(
   ::lmp_ipcc::IPCC_ptr              aIPCC,
   ::lmp_ipcc_observer::IPCC_Event   event,
-  ::lmp_ipcc_observer::IPCC_State   sourceState,
-  ::lmp_ipcc_observer::IPCC_State   targetState,
+  ::lmp_ipcc_common::IPCC_State     sourceState,
+  ::lmp_ipcc_common::IPCC_State     targetState,
   ::lmp_ipcc_observer::IPCC_Action  action)
 {
   ::CORBA::Long    localCCId =  aIPCC->getLocalCCId();
@@ -118,27 +118,27 @@ std::ostream& operator<<(
 }
 
 std::ostream& operator<<(
-  std::ostream&                     os,
-  ::lmp_ipcc_observer::IPCC_State   state)
+  std::ostream&                   os,
+  ::lmp_ipcc_common::IPCC_State   state)
 {
   switch(state)
   {
-    case ::lmp_ipcc_observer::IPCC_Down:
+    case ::lmp_ipcc_common::IPCC_Down:
       std::cout << "Down";
       break;
-    case ::lmp_ipcc_observer::IPCC_ConfSend:
+    case ::lmp_ipcc_common::IPCC_ConfSend:
       std::cout << "ConfSend";
       break;
-    case ::lmp_ipcc_observer::IPCC_ConfRecv:
+    case ::lmp_ipcc_common::IPCC_ConfRecv:
       std::cout << "onfRecv";
       break;
-    case ::lmp_ipcc_observer::IPCC_Active:
+    case ::lmp_ipcc_common::IPCC_Active:
       std::cout << "Active";
       break;
-    case ::lmp_ipcc_observer::IPCC_Up:
+    case ::lmp_ipcc_common::IPCC_Up:
       std::cout << "Up";
       break;
-    case ::lmp_ipcc_observer::IPCC_GoingDown:
+    case ::lmp_ipcc_common::IPCC_GoingDown:
       std::cout << "GoingDown";
       break;
   }

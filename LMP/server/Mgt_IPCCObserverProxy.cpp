@@ -70,29 +70,29 @@ namespace lmp_ipcc
     }
   }
 
-  ::lmp_ipcc_observer::IPCC_State IpccObserverProxy::convert(
+  ::lmp_ipcc_common::IPCC_State IpccObserverProxy::convert(
     const lmp::cc::appl::State&         state)
   {
-    ::lmp_ipcc_observer::IPCC_State observerState = ::lmp_ipcc_observer::IPCC_Down;
+    ::lmp_ipcc_common::IPCC_State observerState = ::lmp_ipcc_common::IPCC_Down;
     switch(state.getType())
     {
       case lmp::cc::appl::State::Down:
-        observerState = ::lmp_ipcc_observer::IPCC_Down;
+        observerState = ::lmp_ipcc_common::IPCC_Down;
         break;
       case lmp::cc::appl::State::ConfSnd:
-        observerState = ::lmp_ipcc_observer::IPCC_ConfSend;
+        observerState = ::lmp_ipcc_common::IPCC_ConfSend;
         break;
       case lmp::cc::appl::State::ConfRcv:
-        observerState = ::lmp_ipcc_observer::IPCC_ConfRecv;
+        observerState = ::lmp_ipcc_common::IPCC_ConfRecv;
         break;
       case lmp::cc::appl::State::Active:
-        observerState = ::lmp_ipcc_observer::IPCC_Active;
+        observerState = ::lmp_ipcc_common::IPCC_Active;
         break;
       case lmp::cc::appl::State::Up:
-        observerState = ::lmp_ipcc_observer::IPCC_Up;
+        observerState = ::lmp_ipcc_common::IPCC_Up;
         break;
       case lmp::cc::appl::State::GoingDown:
-        observerState = ::lmp_ipcc_observer::IPCC_GoingDown;
+        observerState = ::lmp_ipcc_common::IPCC_GoingDown;
         break;
     }
     return observerState;

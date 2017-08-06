@@ -44,6 +44,17 @@ IPCC_i::~IPCC_i()
   return m_node.getNodeId();
 }
 
+lmp_ipcc_common::IPCC_State IPCC_i::getState()
+{
+  lmp_ipcc_common::IPCC_State state = lmp_ipcc_common::IPCC_Down;
+  const boost::optional<const lmp::cc::appl::State&>& activeState = m_ipcc.getState();
+  if (activeState)
+  {
+    state = IpccObserverProxy::convert(*activeState);
+  }
+  return state;
+}
+
 ::CORBA::Long IPCC_i::getRemoteAddress()
 {
   return m_ipcc.getRemoteEndpoint().address().to_v4().to_ulong();

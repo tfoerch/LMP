@@ -436,7 +436,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_CCDown )
                                                                                  lmp::cc::appl::Action::ActionSendConfig));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -451,7 +451,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_CCDown )
                                                                                  lmp::cc::appl::State::Down,
                                                                                  lmp::cc::appl::Action::ActionStopSendConfig));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -483,7 +483,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_AdminDown )
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -492,7 +492,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_AdminDown )
     }
     activeIPCC.disable();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -530,7 +530,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
                                                                                  lmp::cc::appl::Action::ActionSendConfig));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -549,7 +549,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
       };
     activeIPCC.processReceivedMessage(configNackMsg);
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -558,7 +558,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
     }
     activeIPCC.disable();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -598,7 +598,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
                                                                                  lmp::cc::appl::Action::ActionSendConfig));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -621,7 +621,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
 
     activeIPCC.processReceivedMessage(configMsg);
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -630,7 +630,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
     }
     activeIPCC.disable();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -670,7 +670,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_Reconfig )
                                                                                  lmp::cc::appl::Action::ActionSendConfig));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -680,7 +680,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_Reconfig )
     lmp::obj::config::HelloConfigBody  helloConfig = { 150, 600 };
     activeIPCC.reconfigure(helloConfig);
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -721,7 +721,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfRet )
                                                                                  lmp::cc::appl::Action::ActionSendConfig));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -730,7 +730,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfRet )
     }
     activeIPCC.evtConfRet(false);
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -771,7 +771,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
                                                                                  lmp::cc::appl::Action::ActionSendConfig));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -792,9 +792,9 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
           configObjectSequence } // configObjectss
       };
     activeIPCC.processReceivedMessage(configMsg);
-    // BOOST_TEST_MESSAGE("getActiveState");
+    // BOOST_TEST_MESSAGE("getState");
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -803,7 +803,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
     }
     activeIPCC.disable();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -843,7 +843,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
                                                                                  lmp::cc::appl::Action::ActionSendConfig));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -872,7 +872,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
                                                                                  lmp::cc::appl::Action::ActionSendHello));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -894,7 +894,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
                                                                                  lmp::cc::appl::Action::ActionNoAction));
         BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
         ipccObserver.reset();
-        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
         BOOST_CHECK(activeState);
         if (activeState)
         {
@@ -917,7 +917,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
                                                                                    lmp::cc::appl::Action::ActionNoAction));
         BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
         ipccObserver.reset();
-        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
         BOOST_CHECK(activeState);
         if (activeState)
         {
@@ -934,7 +934,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
                                                                                  lmp::cc::appl::Action::ActionSendHello));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -956,7 +956,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
                                                                                    lmp::cc::appl::Action::ActionNoAction));
         BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
         ipccObserver.reset();
-        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+        const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
         BOOST_CHECK(activeState);
         if (activeState)
         {
@@ -973,7 +973,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
                                                                                  lmp::cc::appl::Action::ActionSetCCDownFlag));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -989,7 +989,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
                                                                                  lmp::cc::appl::Action::ActionStopSendHello));
       BOOST_CHECK_EQUAL(ipccObserver.getTransistions(), expectedTransitions);
       ipccObserver.reset();
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -1023,7 +1023,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
     lmp::cc::appl::TestIpccObserver  ipccObserver(activeIPCC);
     activeIPCC.enable();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -1044,9 +1044,9 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
           configObjectSequence } // configObjectss
       };
     activeIPCC.processReceivedMessage(configMsg);
-    // BOOST_TEST_MESSAGE("getActiveState");
+    // BOOST_TEST_MESSAGE("getState");
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -1055,7 +1055,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
     }
     activeIPCC.disable();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -1064,7 +1064,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
     }
     activeIPCC.evtDownTimer();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -1102,7 +1102,7 @@ BOOST_AUTO_TEST_CASE( passiveIPCC )
     lmp::cc::appl::TestIpccObserver  ipccObserver(passiveIPCC);
     passiveIPCC.enable();
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = passiveIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = passiveIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {
@@ -1124,7 +1124,7 @@ BOOST_AUTO_TEST_CASE( passiveIPCC )
       };
     passiveIPCC.processReceivedMessage(configMsg);
     {
-      const boost::optional<const lmp::cc::appl::State&>& activeState = passiveIPCC.getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = passiveIPCC.getState();
       BOOST_CHECK(activeState);
       if (activeState)
       {

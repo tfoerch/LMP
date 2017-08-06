@@ -120,7 +120,7 @@ namespace lmp
         m_FSM.process_event(EvBringUp());
       }
       static const lmp::cc::appl::ConfSnd stateConfSnd;
-      const boost::optional<const lmp::cc::appl::State&>& activeState = getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = getState();
       if (activeState &&
           *activeState == stateConfSnd )
       {
@@ -205,7 +205,7 @@ namespace lmp
       }
       return false;
     }
-    boost::optional<const lmp::cc::appl::State&> IpccImpl::getActiveState() const
+    boost::optional<const lmp::cc::appl::State&> IpccImpl::do_getState() const
     {
       boost::shared_lock<boost::shared_mutex> guard(m_fsm_mutex);
       return m_FSM.getActiveState();
@@ -474,7 +474,10 @@ namespace lmp
     void IpccImpl::do_processReceivedMessage(
       const msg::HelloMsg&                   helloMsg)
     {
-      std::cout << "IPCC[" << getLocalCCId() << "].processReceivedMessage(" << helloMsg << ")" << std::endl;
+      std::cout << "Node(" << m_node.getNodeId() << ").IPCC["
+                << getLocalCCId() << "].processReceivedMessage("
+                << helloMsg << "): m_TxSeqNum = "
+                << m_TxSeqNum << ", m_RcvSeqNum = " << m_RcvSeqNum << std::endl;
 //      std::cout << "processReceivedMessage helloMsg.m_RcvSeqNum = " << helloMsg.m_RcvSeqNum
 //    	        << ", m_TxSeqNum = " << m_TxSeqNum << std::endl;
 //      If ((int) old_id - (int) new_id > 0) {
@@ -510,7 +513,7 @@ namespace lmp
       static const lmp::cc::appl::ConfRcv stateConfRcv;
       static const lmp::cc::appl::Active stateActive;
       static const lmp::cc::appl::Up stateUp;
-      const boost::optional<const lmp::cc::appl::State&>& activeState = getActiveState();
+      const boost::optional<const lmp::cc::appl::State&>& activeState = getState();
       return
     	( activeState &&
     	  ( *activeState == stateConfRcv ||

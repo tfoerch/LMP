@@ -1,3 +1,5 @@
+#include "lmp_mgtif_ipcc_common.idl"
+
 module lmp_ipcc
 {
   interface IPCC;
@@ -5,15 +7,6 @@ module lmp_ipcc
 
 module lmp_ipcc_observer
 {
-  enum IPCC_State
-  {
-    IPCC_Down,
-    IPCC_ConfSend,
-    IPCC_ConfRecv,
-    IPCC_Active,
-    IPCC_Up,
-    IPCC_GoingDown
-  };
   enum IPCC_Event
   {
     EvBringUp,
@@ -52,14 +45,14 @@ module lmp_ipcc_observer
   {
     void destroy();
     void eventProcessed(
-      in lmp_ipcc::IPCC  anIPCC,
-      in IPCC_Event      event,
-      in IPCC_State      sourceState,
-      in IPCC_State      targetState,
-      in IPCC_Action     action);
+      in lmp_ipcc::IPCC               anIPCC,
+      in IPCC_Event                   event,
+      in lmp_ipcc_common::IPCC_State  sourceState,
+      in lmp_ipcc_common::IPCC_State  targetState,
+      in IPCC_Action                  action);
     void peerIpccDiscovered(
-      in lmp_ipcc::IPCC  anIPCC,
-      in long            remoteNodeId,
-      in long            remoteCCId);
+      in lmp_ipcc::IPCC               anIPCC,
+      in long                         remoteNodeId,
+      in long                         remoteCCId);
   };
 };

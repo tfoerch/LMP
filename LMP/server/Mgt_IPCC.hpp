@@ -34,6 +34,7 @@ namespace lmp_ipcc
     virtual ~IPCC_i();
     virtual ::CORBA::Long getLocalCCId();
     virtual ::CORBA::Long getNodeId();
+    virtual lmp_ipcc_common::IPCC_State getState();
     virtual ::CORBA::Long getRemoteAddress();
     virtual ::CORBA::Short getRemotePortNumber();
     virtual void destroy();

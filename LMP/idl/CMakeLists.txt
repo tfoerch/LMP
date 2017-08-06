@@ -29,6 +29,12 @@ add_custom_command(
 )
 
 add_custom_command(
+  OUTPUT ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc_common.hpp ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc_common.cpp
+  DEPENDS ${PROJECT_SOURCE_DIR}/idl/lmp_mgtif_ipcc_common.idl
+  COMMAND omniidl -bcxx -nf -Wbh=.hpp -Wbs=.cpp -I${PROJECT_SOURCE_DIR}/idl ${PROJECT_SOURCE_DIR}/idl/lmp_mgtif_ipcc_common.idl
+)
+
+add_custom_command(
   OUTPUT ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc_adjacency_observer.hpp ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc_adjacency_observer.cpp
   DEPENDS ${PROJECT_SOURCE_DIR}/idl/lmp_mgtif_ipcc_adjacency_observer.idl
   COMMAND omniidl -bcxx -nf -Wbh=.hpp -Wbs=.cpp -I${PROJECT_SOURCE_DIR}/idl ${PROJECT_SOURCE_DIR}/idl/lmp_mgtif_ipcc_adjacency_observer.idl
@@ -55,6 +61,7 @@ ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_node_registry.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_neighbor.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_neighbor_adjacency_observer.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc.cpp
+${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc_common.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc_adjacency_observer.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_ipcc_observer.cpp
 ${PROJECT_BINARY_DIR}/idl/lmp_mgtif_netif.cpp )

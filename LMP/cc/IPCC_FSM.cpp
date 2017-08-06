@@ -645,8 +645,8 @@ namespace lmp
     {
       if (theFSMImpl)
       {
-    	//std::cout << "visit active state" << std::endl;
-    	SomeVisitor  visitor;
+        //std::cout << "visit active state" << std::endl;
+        SomeVisitor  visitor;
         theFSMImpl->visit_current_states(boost::ref(visitor));
         return visitor.theActiveState;
       }

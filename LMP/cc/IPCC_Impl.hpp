@@ -19,7 +19,6 @@
 
 #include <boost/asio/ip/udp.hpp>
 #include <boost/asio/deadline_timer.hpp>
-#include <boost/optional/optional.hpp>        // for optional
 #include <boost/ptr_container/ptr_deque.hpp>  // for ptr_deque
 #include <boost/thread.hpp>
 
@@ -63,7 +62,6 @@ namespace lmp
       bool evtHelloRet();
       bool evtHoldTimer();
       bool evtDownTimer();
-      boost::optional<const lmp::cc::appl::State&> getActiveState() const;
     private:
       typedef std::set<appl::IpccObserverIF*>                IPCCObservers;
       typedef std::set<neighbor::NeighborAdjacencyObserverIF*>  NeighborAdjacencyObservers;
@@ -71,6 +69,7 @@ namespace lmp
       virtual void do_enable();
       virtual void do_disable();
       virtual lmp::DWORD do_getLocalNodeId() const;
+      virtual boost::optional<const appl::State&> do_getState() const;
       virtual lmp::DWORD do_getRemoteNodeId() const;
       virtual lmp::DWORD do_getLocalCCId() const;
       virtual lmp::DWORD do_getRemoteCCId() const;

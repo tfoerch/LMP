@@ -24,12 +24,12 @@ NetworkIF_i::NetworkIF_i(
     m_networkIfProxy(m_networkIfSocket),
     m_networkIFInDestructionFtor(networkIFInDestructionFtor)
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ')' << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = '" << m_networkIfSocket.getIfName() << "', portNumber = " << m_networkIfSocket.getLocalPortNumber() << ')' << std::endl;
 }
 
 NetworkIF_i::~NetworkIF_i()
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") destructor" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = '" << m_networkIfSocket.getIfName() << "', portNumber = " << m_networkIfSocket.getLocalPortNumber() << ") destructor" << std::endl;
 }
 
 char* NetworkIF_i::getInterfaceName()
@@ -49,25 +49,25 @@ char* NetworkIF_i::getInterfaceName()
 
 void NetworkIF_i::destroy()
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") destroy" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = '" << m_networkIfSocket.getIfName() << "', portNumber = " << m_networkIfSocket.getLocalPortNumber() << ") destroy" << std::endl;
   m_networkIFInDestructionFtor(m_networkIfSocket.getIfName(), m_networkIfSocket.getLocalPortNumber());
   // TODO theNodePtr->deleteNetworkIF(m_localCCId);
   PortableServer::ObjectId *oid = m_POA->servant_to_id(this);
   m_POA->deactivate_object(*oid);  delete oid;
   _remove_ref(); // delete this;
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") destroy finished" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = '" << m_networkIfSocket.getIfName() << "', portNumber = " << m_networkIfSocket.getLocalPortNumber() << ") destroy finished" << std::endl;
 }
 
 void NetworkIF_i::enable()
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") enable" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = '" << m_networkIfSocket.getIfName() << "', portNumber = " << m_networkIfSocket.getLocalPortNumber() << ") enable" << std::endl;
   m_networkIfProxy.enable();
   // m_msgHandler.setNetworkIFObjRef(this->_this());
 }
 
 void NetworkIF_i::disable()
 {
-  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ") disable" << std::endl;
+  std::cout << "Node(" << m_node.getNodeId() << ").NetworkIF(ifName = '" << m_networkIfSocket.getIfName() << "', portNumber = " << m_networkIfSocket.getLocalPortNumber() << ") disable" << std::endl;
   m_networkIfProxy.disable();
   // m_msgHandler.clearNetworkIFObjRef();
 }
@@ -168,7 +168,7 @@ void NetworkIF_i::registerIPCCAdjacencyObserver(
   ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId()
-            << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ").registerIPCCAdjacencyObserver()" << std::endl;
+            << ").NetworkIF(ifName = '" << m_networkIfSocket.getIfName() << "', portNumber = " << m_networkIfSocket.getLocalPortNumber() << ").registerIPCCAdjacencyObserver()" << std::endl;
   m_ipccAdjacencyObservers.insert(lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver::_duplicate(observer));
 }
 
@@ -176,7 +176,7 @@ void NetworkIF_i::deregisterIPCCAdjacencyObserver(
   ::lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver_ptr observer)
 {
   std::cout << "Node(" << m_node.getNodeId()
-            << ").NetworkIF(ifName = " << m_networkIfSocket.getIfName() << ").deregisterIPCCAdjacencyObserver()" << std::endl;
+            << ").NetworkIF(ifName = '" << m_networkIfSocket.getIfName() << "', portNumber = " << m_networkIfSocket.getLocalPortNumber() << ").deregisterIPCCAdjacencyObserver()" << std::endl;
   m_ipccAdjacencyObservers.erase(lmp_ipcc_adjacency_observer::IPCCAdjacencyObserver::_duplicate(observer));
 }
 

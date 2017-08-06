@@ -1,3 +1,5 @@
+#include "lmp_mgtif_ipcc_common.idl"
+
 module lmp_ipcc_observer
 {
   interface IPCCObserver;
@@ -9,6 +11,7 @@ module lmp_ipcc
   {
  	long getLocalCCId();
     long getNodeId();
+    lmp_ipcc_common::IPCC_State getState();
  	long getRemoteAddress();
  	short getRemotePortNumber();
     void destroy();
