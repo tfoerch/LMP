@@ -80,7 +80,20 @@ namespace lmp
       boost::asio::const_buffers_1&          messageBuffer)
     {
       IpccMsgReceiveIF* ipccPtr =
-        createIpcc(sender_endpoint, networkIFSocket, io_service);
+        accessIpcc(sender_endpoint);
+      if (!ipccPtr)
+      {
+        ipccPtr = createIpcc(sender_endpoint, networkIFSocket, io_service);
+        if (ipccPtr)
+        {
+          IpccApplicationIF* ipccApplPtr =
+            dynamic_cast<lmp::cc::IpccApplicationIF*>(ipccPtr);
+          if (ipccApplPtr)
+          {
+            ipccApplPtr->enable();
+          }
+        }
+      }
       if (ipccPtr)
       {
         using boost::spirit::qi::parse;
