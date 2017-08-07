@@ -31,7 +31,7 @@ namespace lmp
                           public IpccFactoryIF
     {
     public:
-      UDPMsgHandler(
+      explicit UDPMsgHandler(
         node::NodeApplicationIF&           node);
       virtual ~UDPMsgHandler(){}
       inline const node::NodeApplicationIF& getNode() const

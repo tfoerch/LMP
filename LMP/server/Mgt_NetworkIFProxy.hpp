@@ -16,7 +16,7 @@ namespace lmp_netif
   class NetworkIFProxy : public lmp::cc::NetworkIFSocketIF
   {
   public:
-    NetworkIFProxy(
+    explicit NetworkIFProxy(
       lmp::cc::NetworkIFSocketIF&    networkIf);
     virtual ~NetworkIFProxy(){}
   private:

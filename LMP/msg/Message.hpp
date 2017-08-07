@@ -42,7 +42,9 @@ namespace lmp
       namespace qi = boost::spirit::qi;
 
       template <typename Iterator>
-      struct message_grammar : qi::grammar<Iterator, Message(), qi::locals<lmp::msg::CommonHeader>>
+      struct message_grammar : qi::grammar<Iterator,
+                                           Message(),
+                                           qi::locals<lmp::msg::CommonHeader> >
       {
         message_grammar();
 

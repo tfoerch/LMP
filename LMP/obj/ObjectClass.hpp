@@ -123,8 +123,8 @@ namespace lmp
       namespace qi = boost::spirit::qi;
       template <typename Iterator, typename ClassType, ClassType ctype>
       struct object_class_grammar : qi::grammar<Iterator,
-                                                ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>(),
-                                                qi::locals<lmp::WORD>>
+                                                ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype> >(),
+                                                qi::locals<lmp::WORD> >
       {
         object_class_grammar();
 
@@ -135,8 +135,8 @@ namespace lmp
       };
       template <typename Iterator, ObjectClass objClass>
       struct object_class_unknown_ctype_grammar : qi::grammar<Iterator,
-                                                              ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>(),
-                                                              qi::locals<lmp::WORD>>
+                                                              ObjectClassUnknownCTypeData<ObjectClassTraits<objClass> >(),
+                                                              qi::locals<lmp::WORD> >
       {
         object_class_unknown_ctype_grammar();
 

@@ -52,7 +52,7 @@
 
 struct WrapFunc
 {
-  WrapFunc(
+  explicit WrapFunc(
     boost::function<void (void)>      callback)
   : m_callback(callback)
   {}

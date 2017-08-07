@@ -16,7 +16,7 @@ namespace
 {
   struct msg_variants_processor : boost::static_visitor<void>
   {
-    msg_variants_processor(
+    explicit msg_variants_processor(
       lmp::cc::IpccMsgReceiveIF&           ipcc)
     : m_ipcc(ipcc)
     {}

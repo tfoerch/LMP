@@ -31,7 +31,7 @@ namespace lmp
         template <typename Iterator>
         struct config_object_sequence_grammar : qi::grammar<Iterator,
                                                             ConfigObjectSequence(lmp::WORD),
-                                                            qi::locals<lmp::WORD>>
+                                                            qi::locals<lmp::WORD> >
         {
           config_object_sequence_grammar();
 

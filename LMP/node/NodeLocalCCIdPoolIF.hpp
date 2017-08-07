@@ -26,7 +26,7 @@ namespace lmp
       { return do_registerLocalCCId(localCCId); }
       inline bool releaseLocalCCId(
         lmp::DWORD localCCId)
-      { return releaseLocalCCId(localCCId); }
+      { return do_releaseLocalCCId(localCCId); }
       virtual ~NodeLocalCCIdPoolIF(){}
    private:
       virtual lmp::DWORD do_registerFreeLocalCCId() = 0;

@@ -29,7 +29,7 @@ namespace lmp
           bool                                    retryLimitReached;
         };
         typedef std::deque<TimeoutEvent>   TimeoutEventSequence;
-        EventCallbackCalledCheckFtor(
+        explicit EventCallbackCalledCheckFtor(
           lmp::DWORD                        numberOfCalls);
         EventCallbackCalledCheckFtor(
           const EventCallbackCalledCheckFtor&  other);

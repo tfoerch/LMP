@@ -63,7 +63,7 @@ namespace lmp
       boost::asio::ip::udp::socket                   m_socket;
       boost::asio::ip::udp::endpoint                 m_sender_endpoint;
       enum { max_buffer_length = 4096 };
-      char                                           m_buffer[max_buffer_length];
+      char                                           m_buffer[max_buffer_length] = {};
       static const boost::asio::ip::address          c_multicast_address;
     };
   } // namespace cc

@@ -20,7 +20,7 @@ namespace lmp
                      public cc::appl::IpccObserverIF
     {
     public:
-      Neighbor(
+      explicit Neighbor(
         lmp::DWORD                       nodeId);
       virtual ~Neighbor(){}
     private:

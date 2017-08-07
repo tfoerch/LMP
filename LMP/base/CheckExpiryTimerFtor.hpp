@@ -12,6 +12,9 @@
 
 #include <chrono>
 
+namespace boost { namespace asio { class io_service; } }
+namespace boost { namespace system { class error_code; } }
+
 namespace lmp
 {
   namespace base

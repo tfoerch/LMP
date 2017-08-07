@@ -19,7 +19,7 @@ namespace lmp
     class Node : public NodeApplicationIF
     {
     public:
-      Node(
+      explicit Node(
         lmp::DWORD                       nodeId);
       virtual ~Node(){}
     private:

@@ -612,7 +612,7 @@ namespace lmp
     // typedef msm::back::state_machine<cc_fsm_> cc_fsm;
     struct FSM_IPCC::FsmIpccImpl : public msm::back::state_machine<cc_fsm_>
     {
-      FsmIpccImpl(IpccFsmInvokeIF&  ipcc)
+      explicit FsmIpccImpl(IpccFsmInvokeIF&  ipcc)
        : msm::back::state_machine<cc_fsm_>(boost::ref(ipcc))
       {
       }
