@@ -15,6 +15,9 @@ set (CMAKE_CXX_FLAGS "-std=c++14")
 set (CMAKE_EXE_LINKER_FLAGS "-lc++abi -v")
 #set (CMAKE_EXE_LINKER_FLAGS "-lc++ -lc++abi -v")
 endif(USE_CLANG)
+
+include( CTest )
+
 find_program(iwyu_path NAMES include-what-you-use iwyu)
 if(NOT iwyu_path)
   message(FATAL_ERROR "Could not find the program include-what-you-use")
@@ -25,6 +28,8 @@ option(USE_IWYU "build application with iwyu analysis" OFF) # OFF is the default
 #   cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON <path-to-source-directory>
 #   cppcheck --project=compile_commands.json --enable=all
 
+find_program( MEMORYCHECK_COMMAND valgrind )
+set( MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full" )
 
 set (BUILD_TESTING ON)
 set (Boost_TEST_FLAGS "--catch_system_error=yes --log_level=test_suite")
