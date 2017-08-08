@@ -21,6 +21,11 @@ if(NOT iwyu_path)
 endif()
 option(USE_IWYU "build application with iwyu analysis" OFF) # OFF is the default
 
+# for cppcheck analysis:
+#   cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON <path-to-source-directory>
+#   cppcheck --project=compile_commands.json --enable=all
+
+
 set (BUILD_TESTING ON)
 set (Boost_TEST_FLAGS "--catch_system_error=yes --log_level=test_suite")
 # include(BoostTestTargets)
