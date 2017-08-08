@@ -3,7 +3,7 @@
 # to the root binary directory of the project as ${LMP_BINARY_DIR}.
 cmake_minimum_required (VERSION 3.3)
 project (lmp)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
+# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_FLAGS "-std=c++14")
@@ -23,8 +23,8 @@ option(USE_IWYU "build application with iwyu analysis" OFF) # OFF is the default
 
 set (BUILD_TESTING ON)
 set (Boost_TEST_FLAGS "--catch_system_error=yes --log_level=test_suite")
-include(BoostTestTargets)
-include(CppcheckTargets)
+# include(BoostTestTargets)
+# include(CppcheckTargets)
 
 include_directories ("${PROJECT_SOURCE_DIR}"
                      "${PROJECT_BINARY_DIR}/idl")

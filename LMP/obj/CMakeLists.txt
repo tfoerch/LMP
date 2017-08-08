@@ -2,7 +2,7 @@
 add_library (lmp_obj SHARED ObjectClass.cpp ByteSequence.cpp
 ControlChannelIdClass.cpp LocalCCId.cpp RemoteCCId.cpp UnknownCCIdCType.cpp ControlChannelIdCTypes.cpp NodeIdClass.cpp LocalNodeId.cpp RemoteNodeId.cpp UnknownNodeIdCType.cpp NodeIdCTypes.cpp MessageIdClass.cpp MessageId.cpp MessageIdAck.cpp UnknownMessageIdCType.cpp MessageIdCTypes.cpp ConfigClass.cpp HelloConfig.cpp UnknownConfigCType.cpp ConfigCTypes.cpp HelloClass.cpp Hello.cpp UnknownHelloCType.cpp HelloCTypes.cpp UnknownObjectClass.cpp Objects.cpp ConfigObjectSequence.cpp ObjectSequence.cpp) 
 
-add_cppcheck(lmp_obj UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
+#add_cppcheck(lmp_obj UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 
 if(USE_IWYU)
 set_property(TARGET lmp_obj PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})

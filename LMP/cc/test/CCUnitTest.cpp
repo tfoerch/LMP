@@ -42,8 +42,14 @@
 
 #include <vector>
 
+#define BOOST_TEST_MAIN
+#if !defined( WIN32 )
+    #define BOOST_TEST_DYN_LINK
+#endif
+#include <boost/test/unit_test.hpp>
+
 #define BOOST_TEST_MODULE LMP
-#include <BoostTestTargetConfig.h>
+// #include <BoostTestTargetConfig.h>
 // #include <boost/test/included/unit_test.hpp>
 
 
@@ -277,7 +283,7 @@ BOOST_AUTO_TEST_CASE( getIfAddress )
     if (addr.first)
     {
       // std::cout << *addr.first << std::endl;
-      BOOST_CHECK_EQUAL(*addr.first, boost::asio::ip::address::from_string("192.168.2.106"));
+      BOOST_CHECK_EQUAL(*addr.first, boost::asio::ip::address::from_string("192.168.1.108"));
     }
     BOOST_CHECK(addr.second);
     if (addr.second)

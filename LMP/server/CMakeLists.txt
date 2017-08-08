@@ -6,7 +6,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/server")
 
 add_executable (LMPServer_T Mgt_Node.cpp Mgt_NodeApplProxy.cpp Mgt_UDPMsgReceiveIFProxy.cpp Mgt_IPCC.cpp Mgt_Neighbor.cpp Mgt_NetworkIF.cpp Mgt_NetworkIFProxy.cpp Mgt_IPCCObserverProxy.cpp ServerMain.cpp)
 
-add_cppcheck(LMPServer_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
+#add_cppcheck(LMPServer_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 
 if(USE_IWYU)
 set_property(TARGET LMPServer_T PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})

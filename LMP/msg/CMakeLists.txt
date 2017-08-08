@@ -1,7 +1,7 @@
 
 add_library (lmp_msg SHARED MessageType.cpp CommonHeader.cpp Config.cpp ConfigAck.cpp ConfigNack.cpp Hello.cpp UnknownMessage.cpp Message.cpp)
 
-add_cppcheck(lmp_msg UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
+#add_cppcheck(lmp_msg UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 
 if(USE_IWYU)
 set_property(TARGET lmp_msg PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})

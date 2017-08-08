@@ -15,9 +15,14 @@
 #include <deque>
 #include <iostream>
 
+#define BOOST_TEST_MAIN
+#if !defined( WIN32 )
+    #define BOOST_TEST_DYN_LINK
+#endif
+#include <boost/test/unit_test.hpp>
 
 #define BOOST_TEST_MODULE LMP
-#include <BoostTestTargetConfig.h>
+// #include <BoostTestTargetConfig.h>
 // #include <boost/test/included/unit_test.hpp>
 
 typedef std::map<char, int>  ChIntMap;

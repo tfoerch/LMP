@@ -1,12 +1,14 @@
 # Add executable called "LMP_T" that is built from the source files
 include_directories ("${PROJECT_SOURCE_DIR}/node/test")
 
-find_package(Boost COMPONENTS system)
+find_package(Boost COMPONENTS unit_test_framework system)
 #add_executable (LMP_T Test_IPCC_Observer.cpp TestMain.cpp)
 enable_testing()
-add_boost_test(NodeUnitTest_T
-               SOURCES NodeUnitTest.cpp
-               LIBRARIES lmp_node lmp_neighbor ${Boost_LIBRARIES})
+add_executable (NodeUnitTest_T NodeUnitTest.cpp)
+
+#add_boost_test(NodeUnitTest_T
+#               SOURCES NodeUnitTest.cpp
+#               LIBRARIES lmp_node lmp_neighbor ${Boost_LIBRARIES})
 #add_test(unitTest LMP_T)
 #include(CppcheckTargets)
 #add_cppcheck(LMP_T UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
@@ -17,10 +19,10 @@ add_boost_test(NodeUnitTest_T
 
 # Link the executable to the Hello library. Since the Hello library has
 # public include directories we will use those link directories when building
-#target_link_libraries (LMP_T LINK_PUBLIC lmp_cc)
 
+target_link_libraries (NodeUnitTest_T LINK_PUBLIC lmp_base lmp_node lmp_neighbor ${Boost_LIBRARIES})
 
-#add_test(NAME unitTest COMMAND LMP_T --log_level=test_suite)
+add_test(NAME nodeUnitTests COMMAND NodeUnitTest_T)
 
 
 #INSTALL(TARGETS LMP_T DESTINATION bin)

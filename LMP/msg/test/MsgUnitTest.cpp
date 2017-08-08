@@ -1,5 +1,5 @@
 /*
- * ObjUnitTest.cpp
+ * MsgUnitTest.cpp
  *
  *  Created on: 27.02.2015
  *      Author: tom
@@ -24,8 +24,14 @@
 #include <type_traits>
 #include <iomanip>
 
+#define BOOST_TEST_MAIN
+#if !defined( WIN32 )
+    #define BOOST_TEST_DYN_LINK
+#endif
+#include <boost/test/unit_test.hpp>
+
 #define BOOST_TEST_MODULE LMP
-#include <BoostTestTargetConfig.h>
+// #include <BoostTestTargetConfig.h>
 // #include <boost/test/included/unit_test.hpp>
 
 template <typename ConstBuffers>
