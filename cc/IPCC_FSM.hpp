@@ -12,7 +12,9 @@
 #include "msg/ConfigAck.hpp"
 
 #include <boost/optional/optional.hpp>     // for optional
-#include <boost/smart_ptr/shared_ptr.hpp>  // for shared_ptr
+//#include <boost/smart_ptr/shared_ptr.hpp>  // for shared_ptr
+
+#include <memory>
 
 namespace lmp
 {
@@ -138,6 +140,7 @@ namespace lmp
     public:
       explicit FSM_IPCC(
         IpccFsmInvokeIF&  ipcc);
+      ~FSM_IPCC();
       // forward-declare nested type. This will inherit msm::back::state_machine<...>
       bool start();
       bool stop();
@@ -146,7 +149,7 @@ namespace lmp
       bool process_event(const Event& e);
       struct FsmIpccImpl;
       // with shared_ptr, you don't need the complete type yet.
-      boost::shared_ptr<FsmIpccImpl> theFSMImpl;
+      std::unique_ptr<FsmIpccImpl> theFSMImpl;
       FSM_IPCC(const FSM_IPCC&) = delete;
       void operator=(const FSM_IPCC&) = delete;
     };

@@ -106,6 +106,9 @@ namespace lmp
     }
     IpccImpl::~IpccImpl()
     {
+      std::cout << "Node(" << m_node.getNodeId() << ").IPCC(localCCId = " << getLocalCCId()
+                << ", remoteAddress = " << m_remote_endpoint.address().to_v4().to_ulong()
+                << ", remotePortNumber = " << m_remote_endpoint.port() << ") dtor" << std::endl;
       boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
       m_FSM.stop();
     }
@@ -258,6 +261,10 @@ namespace lmp
     {
       std::cout << "IPCC[" << getLocalCCId() << "].sendConfig()" << std::endl;
       // create and send Config
+      if (m_configMsg)
+      {
+        m_configMsg.release();
+      }
       {
         lmp::obj::config::ConfigObjectSequence  configObjectSequence;
         {

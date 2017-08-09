@@ -9,6 +9,7 @@
 #include "base/CheckCompositeFtor.hpp"
 #include "base/IntervalTimer.hpp"
 #include "node/Node.hpp"
+#include "neighbor/NeighborApplicationIF.hpp"
 #include "cc/IPCC_Impl.hpp"
 #include "cc/IPCC_NetIFSocket.hpp"
 #include "cc/UDP_Msg_Handler.hpp"
@@ -331,7 +332,7 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
     lmp::node::Node  node2(node2_nodeId);
     lmp::cc::UDPMsgHandler node2_MsgHandler(node2);
     unsigned short node2_port = 9702;
-    // boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
+    boost::asio::ip::udp::endpoint node2_endpoint(*addr.first, node2_port);
     lmp::DWORD  node2_1stCCId = 1;
     // lmp::cc::TestIpccMsgReceiver node2_msgReceiver;
     lmp::cc::NetworkIFSocket  node2_lmpSocket(io_service, ifName, node2_port, node2_MsgHandler, false);
@@ -359,6 +360,22 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
     BOOST_CHECK(lmp::test::util::wait(neighborDiscoveredCheckFtor, io_service, std::chrono::milliseconds(1000)));
     node1_lmpSocket.disable();
     node2_lmpSocket.disable();
+    lmp::neighbor::NeighborApplicationIF const* neighbor = node1.getNeighbor(node2_nodeId);
+    BOOST_CHECK(neighbor);
+    BOOST_CHECK_EQUAL(neighbor->getNodeId(), node2_nodeId);
+    lmp::cc::IpccMsgReceiveIF* ipccMsgRecIF = node1_MsgHandler.accessIpcc(node2_endpoint);
+    BOOST_CHECK(ipccMsgRecIF);
+    if (ipccMsgRecIF)
+    {
+      lmp::cc::IpccApplicationIF* ipccPtr =
+        dynamic_cast<lmp::cc::IpccApplicationIF*>(ipccMsgRecIF);
+      if (ipccPtr)
+      {
+        ipccPtr->disable();
+        node1.neighborAdjacencyRemoved(node2_nodeId, *ipccPtr);
+      }
+      node1_MsgHandler.removeIpcc(node2_endpoint);
+    }
     //io_service.run_one();
     //io_service.run_one();
   }

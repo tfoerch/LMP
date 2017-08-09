@@ -618,6 +618,7 @@ namespace lmp
       }
     };
 
+    FSM_IPCC::~FSM_IPCC() = default;
     FSM_IPCC::FSM_IPCC(
       IpccFsmInvokeIF&  ipcc)
     : theFSMImpl(new FsmIpccImpl(ipcc))
