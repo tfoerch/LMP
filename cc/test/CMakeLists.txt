@@ -1,7 +1,8 @@
 # Add executable called "LMP_T" that is built from the source files
 include_directories ("${PROJECT_SOURCE_DIR}/cc/test")
 
-find_package( Boost REQUIRED COMPONENTS unit_test_framework program_options system chrono thread )
+find_package ( Threads REQUIRED )
+find_package( Boost REQUIRED COMPONENTS unit_test_framework program_options system timer chrono thread )
 
 enable_testing()
 
@@ -20,7 +21,7 @@ add_executable (CCUnitTest_T CCUnitTest.cpp Test_Wait.cpp Test_IPCC_Observer.cpp
 
 # Link the executable to the Hello library. Since the Hello library has
 # public include directories we will use those link directories when building
-target_link_libraries (CCUnitTest_T LINK_PUBLIC lmp_cc lmp_msg lmp_obj lmp_base lmp_node lmp_neighbor ${Boost_LIBRARIES})
+target_link_libraries (CCUnitTest_T LINK_PUBLIC lmp_cc lmp_msg lmp_obj lmp_base lmp_node lmp_neighbor ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )
 
 #add_test(NAME ccUnitTests COMMAND CCUnitTest_T)
 add_test(NAME retrTimerLimitSTUnitTest COMMAND CCUnitTest_T --run_test=lmp_socket/retransmitTimer_retryLimit_singleThread)

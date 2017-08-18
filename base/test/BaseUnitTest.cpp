@@ -80,19 +80,19 @@ namespace os_iter_range
   template <typename P>
   std::ostream& operator<<(
     std::ostream&  os,
-	const P&       p)
+    const P&       p)
   {
-	for (typename P::first_type iter = p.first;
-		 iter != p.second;
-		 ++iter)
-	{
-	  if (iter != p.first)
-	  {
-		std::operator<<(os,  ", ");
-	  }
-	  std::operator<<(os, *iter);
-	}
-	return os;
+    for (typename P::first_type iter = p.first;
+         iter != p.second;
+         ++iter)
+    {
+      if (iter != p.first)
+      {
+        std::operator<<(os,  ", ");
+      }
+      std::operator<<(os, *iter);
+    }
+    return os;
   }
 }
 
@@ -101,19 +101,45 @@ namespace boost
   namespace test_tools
   {
     namespace tt_detail
-	{
+    {
       template<>
       struct print_log_value< std::deque<char> >
       {
         void operator()(
           std::ostream& os,
-	      const std::deque<char>& queue)
+          const std::deque<char>& queue)
         {
           using namespace os_iter_range;
           os_iter_range::operator <<(os, make_pair(queue.begin(), queue.end()));
         }
       };
-	}
+//      template<>
+//      struct print_log_value<char>
+//      {
+//        void operator()(
+//          std::ostream& os,
+//          char          ch)
+//        {
+//          std::operator<<(os, ch);
+//        }
+//      };
+    }
+  }
+}
+namespace boost
+{
+  namespace unit_test
+  {
+    namespace ut_detail
+    {
+      std::string normalize_test_case_name(const_string name)
+      {
+        return
+          ( name[0] == '&' ?
+            std::string(name.begin()+1, name.size()-1) :
+            std::string(name.begin(), name.size() ));
+      }
+    }
   }
 }
 

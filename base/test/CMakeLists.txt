@@ -1,5 +1,12 @@
 # Add executable called "LMP_T" that is built from the source files
 include_directories ("${PROJECT_SOURCE_DIR}/base/test")
+#set(BOOST_ROOT "${PROJECT_SOURCE_DIR}/../../3rdParty")
+#set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
+#if(USE_CLANG)
+#set(BOOST_LIBRARYDIR "${BOOST_ROOT}/clang/lib")
+#else(USE_CLANG)
+#set(BOOST_LIBRARYDIR "${BOOST_ROOT}/g++/lib")
+#endif(USE_CLANG)
 
 find_package(Boost COMPONENTS unit_test_framework system)
 enable_testing()

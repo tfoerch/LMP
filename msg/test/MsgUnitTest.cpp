@@ -393,6 +393,56 @@ BOOST_AUTO_TEST_CASE( msg_header_decode )
 //  }
 //}
 
+BOOST_AUTO_TEST_CASE( config_message_struct )
+{
+  {
+    using boost::spirit::qi::parse;
+    using boost::spirit::karma::generate;
+
+    typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+    unsigned char message[] =
+    { 0x10, 0x00, 0x00, 0x01, // <Common Header>
+      0x00, 0x28, 0x00, 0x00,
+      0x01, 0x01, 0x00, 0x08, // <LOCAL_CCID>
+      0x01, 0x02, 0x00, 0x08,
+      0x01, 0x05, 0x00, 0x08, // <MESSAGE_ID>
+      0x01, 0x02, 0x05, 0x08,
+      0x01, 0x02, 0x00, 0x08, // <LOCAL_NODE_ID>
+      0x08, 0x60, 0x04, 0x20,
+      0x81, 0x06, 0x00, 0x08, // <CONFIG> = HelloConfig
+      0x00, 0x9A, 0x01, 0xCF };
+    const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
+    boost::asio::const_buffers_1 messageBuffer(message, msgLength);
+    lmp::obj::config::ConfigObjectSequence  expectedConfigObjectSequence;
+    {
+      lmp::obj::config::HelloConfigData  expectedHelloConfig = { true, { 0x009A, 0x01CF } };
+      expectedConfigObjectSequence.push_back(lmp::obj::config::ConfigCTypes(expectedHelloConfig));
+    }
+    lmp::msg::ConfigMsg  expectedConfigMsg =
+      { false,
+        false,
+        { { false, { 0x1020008 } },      // localCCId
+          { false, { 0x1020508 } },      // messageId
+          { false, { 0x8600420 } },      // localNodeId
+          expectedConfigObjectSequence } // configObjectss
+      };
+    lmp::msg::Message expectedMessage = expectedConfigMsg;
+    lmp::msg::Message otherMessage;
+    std::cout << sizeof(otherMessage) << std::endl;
+    otherMessage = expectedConfigMsg;
+    std::cout << sizeof(otherMessage) << std::endl;
+    unsigned char emptySpace[msgLength];
+    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
+    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
+    BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
+//    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
+//    BOOST_CHECK(generate(gen_begin,
+//                         msgGenerateGrammar,
+//                         expectedMessage));
+//    BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
+//                                  emptySpace, emptySpace + msgLength);
+  }
+}
 BOOST_AUTO_TEST_CASE( config_message_spirit )
 {
   {

@@ -46,7 +46,7 @@ namespace lmp
     {
     public:
       typedef typename MsgTypeTraits::message_type     message_type;
-      static const message_type                        msgType = MsgTypeTraits::msg_type_value;
+      // static const message_type                        msgType = template MsgTypeTraits::msg_type_value;
       bool                                             m_controlChannelDown;
       bool                                             m_LMP_restart;
       typename MsgTypeTraits::data_type                m_data;

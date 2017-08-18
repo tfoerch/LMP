@@ -14,6 +14,6 @@ endif(USE_IWYU)
 
 # Link the executable to the Hello library. Since the Hello library has
 # public include directories we will use those link directories when building
-target_link_libraries (LMPClient_T LINK_PUBLIC lmp_cc lmp_mgtif omniORB4 omnithread ${Boost_LIBRARIES} )
+target_link_libraries (LMPClient_T LINK_PUBLIC lmp_mgtif omniORB4 omnithread ${Boost_LIBRARIES} )
 
 INSTALL(TARGETS LMPClient_T DESTINATION bin)
