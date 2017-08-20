@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE( getIfAddress )
     if (addr.first)
     {
       // std::cout << *addr.first << std::endl;
-      BOOST_CHECK_EQUAL(*addr.first, boost::asio::ip::address::from_string("192.168.1.108"));
+      BOOST_CHECK_EQUAL(*addr.first, boost::asio::ip::address::from_string("192.168.2.106"));
     }
     BOOST_CHECK(addr.second);
     if (addr.second)

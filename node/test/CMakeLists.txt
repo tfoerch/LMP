@@ -1,7 +1,7 @@
 # Add executable called "LMP_T" that is built from the source files
 include_directories ("${PROJECT_SOURCE_DIR}/node/test")
 
-find_package(Boost COMPONENTS unit_test_framework system)
+find_package(Boost COMPONENTS unit_test_framework timer chrono system)
 #add_executable (LMP_T Test_IPCC_Observer.cpp TestMain.cpp)
 enable_testing()
 add_executable (NodeUnitTest_T NodeUnitTest.cpp)
