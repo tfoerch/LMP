@@ -6,7 +6,7 @@
  */
 
 #include "obj/UnknownCCIdCType.hpp"
-#include "obj/ObjectClass_def.hpp"
+#include "obj/ObjectClassUnknownCType_def.hpp"
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>

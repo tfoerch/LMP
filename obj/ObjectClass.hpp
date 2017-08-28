@@ -8,7 +8,6 @@
  */
 
 #include "base/ProtocolTypes.hpp"
-#include "obj/ByteSequence.hpp"
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
 
@@ -84,37 +83,6 @@ namespace lmp
         return getLength(objClassCTypeData);
       }
     };
-    template <typename  ObjClassTraits>
-    class ObjectClassUnknownCTypeData
-    {
-    public:
-      typedef typename ObjClassTraits::obj_class_type  obj_class_type;
-      static const  obj_class_type                     obj_class;
-      lmp::BYTE                                        m_class_type;
-      bool                                             m_negotiable;
-      ByteSequence                                     m_data;
-    };
-    template <typename   ObjClassTraits>
-    std::ostream& operator<<(
-      std::ostream&                                       os,
-      const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData);
-    template <typename   ObjClassTraits>
-    bool operator==(
-      const ObjectClassUnknownCTypeData<ObjClassTraits>&  first,
-      const ObjectClassUnknownCTypeData<ObjClassTraits>&  second);
-    template <typename   ObjClassTraits>
-    lmp::DWORD getLength(
-      const ObjectClassUnknownCTypeData<ObjClassTraits>&  objClassUnknownCTypeData);
-    template<typename ObjClassTraits>
-    struct GetLengthUnknownCTypeData
-    {
-      template<typename> struct result { typedef lmp::WORD type; };
-      lmp::WORD operator()(
-        const ObjectClassUnknownCTypeData<ObjClassTraits>& objClassUnknownCTypeData) const
-      {
-        return getLength(objClassUnknownCTypeData);
-      }
-    };
     const lmp::WORD  c_objHeaderLength = 4;
     const lmp::BYTE  c_negotiableMask = 0x80;
     const lmp::BYTE  c_classTypeMask = 0x7f;
@@ -133,18 +101,6 @@ namespace lmp
                  ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>(),
                  qi::locals<lmp::WORD>>                                                     object_class_rule;
       };
-      template <typename Iterator, ObjectClass objClass>
-      struct object_class_unknown_ctype_grammar : qi::grammar<Iterator,
-                                                              ObjectClassUnknownCTypeData<ObjectClassTraits<objClass> >(),
-                                                              qi::locals<lmp::WORD> >
-      {
-        object_class_unknown_ctype_grammar();
-
-        byte_sequence_grammar<Iterator>                                         byte_sequence;
-        qi::rule<Iterator,
-                 ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>(),
-                 qi::locals<lmp::WORD>>                                         object_class_unknown_ctype_rule;
-      };
     }
     namespace generate
     {
@@ -158,15 +114,6 @@ namespace lmp
         boost::phoenix::function<GetLength<ObjectClassTypeTraits<ClassType, ctype>>>                 phx_getLength;
         typename ObjectClassTypeGenerateTraits<OutputIterator, ClassType, ctype>::grammar_type       object_body;
         karma::rule<OutputIterator, ObjectClassTypeData<ObjectClassTypeTraits<ClassType, ctype>>()>  object_class_rule;
-      };
-      template <typename OutputIterator, ObjectClass objClass>
-      struct object_class_unknown_ctype_grammar : karma::grammar<OutputIterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>
-      {
-        object_class_unknown_ctype_grammar();
-
-        boost::phoenix::function<GetLengthUnknownCTypeData<ObjectClassTraits<objClass>>>         phx_getLength;
-        byte_sequence_grammar<OutputIterator>                                                    byte_sequence;
-        karma::rule<OutputIterator, ObjectClassUnknownCTypeData<ObjectClassTraits<objClass>>()>  object_class_unknown_ctype_rule;
       };
     }
   } // namespace obj

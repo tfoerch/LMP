@@ -7,7 +7,7 @@
  *      Author: tom
  */
 
-#include "obj/ObjectClass.hpp"
+#include "obj/ObjectClassUnknownCType.hpp"
 
 namespace lmp
 {

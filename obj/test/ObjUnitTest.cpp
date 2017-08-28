@@ -57,6 +57,54 @@ namespace boost
 
 BOOST_AUTO_TEST_SUITE( obj )
 
+#if 0
+#include <string>
+#include <iostream>
+#include <iomanip>
+
+#include <boost/spirit/home/x3.hpp>
+
+int main() {
+    for (std::string const input : {
+            "3 1 2 3", // correct
+            "4 1 2 3", // too few
+            "2 1 2 3", // too many
+            //
+            "   3 1 2 3   ",
+        })
+    {
+        std::cout << "\nParsing " << std::left << std::setw(20) << ("'" + input + "':");
+
+        std::vector<int> v;
+
+        bool ok;
+        {
+            using namespace boost::spirit::x3;
+
+            unsigned n;
+            struct _n{};
+
+            auto number = [](auto &ctx) { get<_n>(ctx).get() = _attr(ctx); };
+            auto more   = [](auto &ctx) { _pass(ctx) = get<_n>(ctx) >  _val(ctx).size(); };
+            auto done   = [](auto &ctx) { _pass(ctx) = get<_n>(ctx) == _val(ctx).size(); };
+
+            auto r = rule<struct _r, std::vector<int> > {}
+                  %= with<_n>(std::ref(n))
+                        [ omit[uint_[number] ] >> *(eps [more] >> int_) >> eps [done] ];
+
+            ok = phrase_parse(input.begin(), input.end(), r >> eoi, space, v);
+        }
+
+        if (ok) {
+            std::copy(v.begin(), v.end(), std::ostream_iterator<int>(std::cout << v.size() << " elements: ", " "));
+        } else {
+            std::cout << "Parse failed";
+        }
+    }
+}
+
+#endif
+
 BOOST_AUTO_TEST_CASE( byte_sequence_decode_spirit )
 {
    using boost::spirit::qi::parse;

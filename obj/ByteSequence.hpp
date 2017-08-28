@@ -8,9 +8,11 @@
  */
 
 #include "base/ProtocolTypes.hpp"
-#include <vector>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/karma.hpp>
+
+//#include <boost/spirit/home/x3.hpp>
+#include <vector>
 
 namespace lmp
 {
@@ -26,7 +28,13 @@ namespace lmp
     namespace parse
     {
       namespace qi = boost::spirit::qi;
-
+      //namespace x3 = boost::spirit::x3;
+#if 0
+      struct byte_sequence_class;
+      typedef
+         x3::rule<byte_sequence_class, ByteSequence>  byte_sequence_type;
+      BOOST_SPIRIT_DECLARE(byte_sequence_type);
+#endif
       template <typename Iterator>
       struct byte_sequence_grammar : qi::grammar<Iterator, ByteSequence(lmp::WORD)>
       {
@@ -36,6 +44,7 @@ namespace lmp
         qi::rule<Iterator, void(ByteSequence&, lmp::WORD)>  recursive_byte_seq;
       };
     } // namespace parse
+
     namespace generate
     {
       namespace karma = boost::spirit::karma;
@@ -47,6 +56,8 @@ namespace lmp
         karma::rule<OutputIterator, ByteSequence()>  byte_sequence;
       };
     }
+//    parse::byte_sequence_type const& byte_sequence();
+
   } // namespace obj
 } // namespace lmp
 
