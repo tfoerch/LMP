@@ -1,6 +1,8 @@
 
-add_library (lmp_obj SHARED ObjectClass.cpp ByteSequence.cpp
-ControlChannelIdClass.cpp LocalCCId.cpp RemoteCCId.cpp UnknownCCIdCType.cpp ControlChannelIdCTypes.cpp NodeIdClass.cpp LocalNodeId.cpp RemoteNodeId.cpp UnknownNodeIdCType.cpp NodeIdCTypes.cpp MessageIdClass.cpp MessageId.cpp MessageIdAck.cpp UnknownMessageIdCType.cpp MessageIdCTypes.cpp ConfigClass.cpp HelloConfig.cpp UnknownConfigCType.cpp ConfigCTypes.cpp HelloClass.cpp Hello.cpp UnknownHelloCType.cpp HelloCTypes.cpp UnknownObjectClass.cpp Objects.cpp ConfigObjectSequence.cpp ObjectSequence.cpp) 
+add_library (lmp_obj SHARED UnknownObjectClassParser.cpp  UnknownObjectClassGenerator.cpp ObjectHeaderUnknownObjectClassGenerator.cpp LocalCCIdGenerator.cpp LocalCCIdParser.cpp LocalCCIdAst.cpp RemoteCCIdGenerator.cpp RemoteCCIdParser.cpp RemoteCCIdAst.cpp UnknownCCIdCTypeParser.cpp UnknownCCIdCTypeGenerator.cpp LocalNodeIdGenerator.cpp LocalNodeIdParser.cpp LocalNodeIdAst.cpp RemoteNodeIdGenerator.cpp RemoteNodeIdParser.cpp RemoteNodeIdAst.cpp UnknownNodeIdCTypeParser.cpp UnknownNodeIdCTypeGenerator.cpp ) 
+
+# add_library (lmp_obj SHARED ObjectClass.cpp UnknownObjectClass.cpp ByteSequence.cpp
+# ControlChannelIdClass.cpp LocalCCId.cpp RemoteCCId.cpp UnknownCCIdCType.cpp ControlChannelIdCTypes.cpp NodeIdClass.cpp LocalNodeId.cpp RemoteNodeId.cpp UnknownNodeIdCType.cpp NodeIdCTypes.cpp # MessageIdClass.cpp MessageId.cpp MessageIdAck.cpp UnknownMessageIdCType.cpp MessageIdCTypes.cpp ConfigClass.cpp HelloConfig.cpp UnknownConfigCType.cpp ConfigCTypes.cpp HelloClass.cpp Hello.cpp UnknownHelloCType.cpp HelloCTypes.cpp Objects.cpp ConfigObjectSequence.cpp ObjectSequence.cpp LocalCCIdParser.cpp) 
 
 #add_cppcheck(lmp_obj UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 

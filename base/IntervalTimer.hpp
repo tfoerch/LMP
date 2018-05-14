@@ -21,7 +21,7 @@ namespace lmp
     {
     public:
       IntervalTimer(
-    	boost::asio::io_service&          io_service,
+    	boost::asio::io_context&          io_context,
     	const std::chrono::milliseconds&  timeoutInterval,
     	boost::function<bool (void)>      expiry_callback);
       void start();

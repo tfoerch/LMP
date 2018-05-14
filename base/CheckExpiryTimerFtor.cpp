@@ -14,9 +14,9 @@ namespace lmp
   namespace base
   {
     CheckExpiryTimerFtor::CheckExpiryTimerFtor(
-      boost::asio::io_service&          io_service,
+      boost::asio::io_context&          io_context,
       const std::chrono::milliseconds&  expiry_time)
-      : m_timer(io_service, expiry_time),
+      : m_timer(io_context, expiry_time),
         m_hasExpired(false)
     {
       m_timer.async_wait(boost::bind(&CheckExpiryTimerFtor::handle_expired,
@@ -26,7 +26,7 @@ namespace lmp
 
     CheckExpiryTimerFtor::CheckExpiryTimerFtor(
       const CheckExpiryTimerFtor&      other)
-    : m_timer(const_cast<boost::asio::steady_timer&>(other.m_timer).get_io_service(),
+    : m_timer(const_cast<boost::asio::steady_timer&>(other.m_timer).get_io_context(),
               other.m_timer.expires_at()),
               m_hasExpired(other.m_hasExpired)
     {

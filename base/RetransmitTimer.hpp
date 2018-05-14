@@ -21,7 +21,7 @@ namespace lmp
     {
     public:
       RetransmitTimer(
-    	boost::asio::io_service&          io_service,
+    	boost::asio::io_context&          io_context,
     	const std::chrono::milliseconds&  initialRetransmitInterval,
     	lmp::DWORD                        retryLimit,
     	lmp::DWORD                        incrementValueDelta,

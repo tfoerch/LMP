@@ -5,6 +5,7 @@
  *      Author: tom
  */
 
+#if 0
 #include "obj/ByteSequence.hpp"
 #include "obj/LocalCCId.hpp"
 #include "obj/RemoteCCId.hpp"
@@ -19,8 +20,29 @@
 #include "obj/UnknownConfigCType.hpp"
 #include "obj/Hello.hpp"
 #include "obj/UnknownHelloCType.hpp"
-#include "obj/UnknownObjectClass.hpp"
+#endif
+#include "obj/UnknownObjectClassParser.hpp"
+#include "obj/UnknownObjectClassGenerator.hpp"
+#include "obj/ObjectClassUnknownCTypeParser.hpp"
+#include "obj/ObjectClassUnknownCTypeGenerator.hpp"
+#include "obj/UnknownCCIdCTypeAst.hpp"
+#include "obj/LMPParseConfig.hpp"
+#include "obj/LocalCCIdParser.hpp"
+#include "obj/LocalCCIdGenerator.hpp"
+#include "obj/LocalCCIdAst.hpp"
+#include "obj/RemoteCCIdParser.hpp"
+#include "obj/RemoteCCIdGenerator.hpp"
+#include "obj/RemoteCCIdAst.hpp"
+#include "obj/LocalNodeIdParser.hpp"
+#include "obj/LocalNodeIdGenerator.hpp"
+#include "obj/LocalNodeIdAst.hpp"
+#include "obj/RemoteNodeIdParser.hpp"
+#include "obj/RemoteNodeIdGenerator.hpp"
+#include "obj/RemoteNodeIdAst.hpp"
+#if 0
 #include "obj/ConfigObjectSequence.hpp"
+#endif
+#include <boost/spirit/home/x3/core/parse.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
 #include <iostream>
@@ -34,6 +56,20 @@
 #define BOOST_TEST_MODULE LMP
 // #include <BoostTestTargetConfig.h>
 // #include <boost/test/included/unit_test.hpp>
+
+namespace lmp
+{
+  namespace obj
+  {
+    typedef std::vector<lmp::BYTE>  ByteSequence;
+    namespace hex_stream
+    {
+      std::ostream& operator<<(
+        std::ostream&        os,
+        const ByteSequence&  byteSequence);
+    }
+  }
+}
 
 namespace boost
 {
@@ -103,8 +139,6 @@ int main() {
     }
 }
 
-#endif
-
 BOOST_AUTO_TEST_CASE( byte_sequence_decode_spirit )
 {
    using boost::spirit::qi::parse;
@@ -141,10 +175,11 @@ BOOST_AUTO_TEST_CASE( byte_sequence_decode_spirit )
    BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                  emptySpace, emptySpace + msgLength);
 }
+#endif
 
 BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
 {
-   using boost::spirit::qi::parse;
+   using boost::spirit::x3::parse;
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -156,25 +191,33 @@ BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
    boost::asio::const_buffers_1 messageBuffer(message, msgLength);
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::object_class_grammar<BufIterType,
-                                         lmp::obj::ccid::ClassType,
-                                         lmp::obj::ccid::ClassType::LocalCCId>  localCcIdGrammar;
-   lmp::obj::ccid::LocalCCIdData  localCCId;
-   lmp::obj::ccid::LocalCCIdData  expectedLocalCCId = { false, { 0x1020008 } };
+   lmp::obj::ccid::ast::LocalCCId  localCCId;
+   std::stringstream out;
+   using boost::spirit::x3::with;
+   using lmp::obj::parser::error_handler_type;
+   using lmp::obj::parser::error_handler_tag;
+   error_handler_type error_handler(begin, last, out); // Our error handler
+
+   // Our parser
+   auto const parser =
+     // we pass our error handler to the parser so we can access
+     // it later on in our on_error and on_sucess handlers
+     with<error_handler_tag>(std::ref(error_handler))
+     [
+       lmp::obj::local_cc_id()
+     ];
    BOOST_CHECK(parse(begin,
                      last,
-                     localCcIdGrammar,
+                     parser,
                      localCCId));
-   BOOST_CHECK_EQUAL(localCCId, expectedLocalCCId);
-   // std::cout << msgData << std::endl;
-   BOOST_CHECK_EQUAL(lmp::obj::getLength(localCCId), msgLength);
+   BOOST_CHECK_EQUAL(localCCId.m_ccId, 0x1020008);
+   BOOST_CHECK_EQUAL(localCCId.m_header.m_negotiable, false);
+//   BOOST_CHECK_EQUAL(localCCId.m_header.ctype, lmp::obj::ccid::ClassType::LocalCCId);
    unsigned char emptySpace[msgLength];
    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
    BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-   lmp::obj::generate::object_class_grammar<BufOutIterType,
-                                            lmp::obj::ccid::ClassType,
-                                            lmp::obj::ccid::ClassType::LocalCCId> localCCIdGenerateGrammar;
+   lmp::obj::generator::local_cc_id_grammar<BufOutIterType> localCCIdGenerateGrammar;
    BOOST_CHECK(generate(gen_begin,
                         localCCIdGenerateGrammar,
                         localCCId));
@@ -182,41 +225,97 @@ BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
                                  emptySpace, emptySpace + msgLength);
 }
 
-BOOST_AUTO_TEST_CASE( remote_control_channel_id_decode_spirit )
+BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit_wrong_length )
 {
-   using boost::spirit::qi::parse;
+   using boost::spirit::x3::parse;
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
    typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
    unsigned char message[] =
-     { 0x02, 0x01, 0x00, 0x08,
-       0x01, 0x13, 0x0a, 0x03 };
+     { 0x01, 0x01, 0x00, 0x18,
+       0x01, 0x02, 0x00, 0x08 };
    const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
    boost::asio::const_buffers_1 messageBuffer(message, msgLength);
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::object_class_grammar<BufIterType,
-                                         lmp::obj::ccid::ClassType,
-                                         lmp::obj::ccid::ClassType::RemoteCCId>  remoteCcIdGrammar;
-   lmp::obj::ccid::RemoteCCIdData  remoteCCId;
-   lmp::obj::ccid::RemoteCCIdData  expectedRemoteCCId = { false, { 0x01130a03 } };
-   BOOST_CHECK(parse(begin,
-                     last,
-                     remoteCcIdGrammar,
-                     remoteCCId));
-   BOOST_CHECK_EQUAL(remoteCCId, expectedRemoteCCId);
+   lmp::obj::ccid::ast::LocalCCId  localCCId;
+   std::stringstream out;
+   using boost::spirit::x3::with;
+   using lmp::obj::parser::error_handler_type;
+   using lmp::obj::parser::error_handler_tag;
+   error_handler_type error_handler(begin, last, out); // Our error handler
+
+   // Our parser
+   auto const parser =
+     // we pass our error handler to the parser so we can access
+     // it later on in our on_error and on_sucess handlers
+     with<error_handler_tag>(std::ref(error_handler))
+     [
+       lmp::obj::local_cc_id()
+     ];
+   try
+   {
+     BOOST_CHECK(!parse(begin,
+                        last,
+                        parser,
+                        localCCId));
+   }
+   catch(boost::spirit::x3::expectation_failure<BufIterType>const& e)
+   {
+     std::cout << "Expected: " << e.which() << " at '" /*<< std::string(e.where(), str.end())*/ << "'\n";
+   }
+   // BOOST_CHECK_EQUAL(localCCId.m_ccId, 0x1020008);
+   // BOOST_CHECK_EQUAL(localCCId.m_header.m_negotiable, false);
+   std::cout << out.str() << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( remote_control_channel_id_decode_spirit )
+{
+  using boost::spirit::x3::parse;
+  using boost::spirit::karma::generate;
+
+  typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+  typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
+  unsigned char message[] =
+    { 0x02, 0x01, 0x00, 0x08,
+      0x01, 0x13, 0x0a, 0x03 };
+  const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
+  boost::asio::const_buffers_1 messageBuffer(message, msgLength);
+  BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+  BufIterType last = boost::asio::buffers_end(messageBuffer);
+  lmp::obj::ccid::ast::RemoteCCId  remoteCCId;
+  std::stringstream out;
+  using boost::spirit::x3::with;
+  using lmp::obj::parser::error_handler_type;
+  using lmp::obj::parser::error_handler_tag;
+  error_handler_type error_handler(begin, last, out); // Our error handler
+
+  // Our parser
+  auto const parser =
+    // we pass our error handler to the parser so we can access
+    // it later on in our on_error and on_sucess handlers
+    with<error_handler_tag>(std::ref(error_handler))
+    [
+      lmp::obj::remote_cc_id()
+    ];
+  BOOST_CHECK(parse(begin,
+                    last,
+                    parser,
+                    remoteCCId));
+  BOOST_CHECK_EQUAL(remoteCCId.m_ccId, 0x01130a03);
+  BOOST_CHECK_EQUAL(remoteCCId.m_header.m_negotiable, false);
+//  lmp::obj::ccid::RemoteCCIdData  expectedRemoteCCId = { false, { 0x01130a03 } };
+//  BOOST_CHECK_EQUAL(remoteCCId, expectedRemoteCCId);
    // std::cout << msgData << std::endl;
-   BOOST_CHECK_EQUAL(lmp::obj::getLength(remoteCCId), msgLength);
+//  BOOST_CHECK_EQUAL(lmp::obj::getLength(remoteCCId), msgLength);
    unsigned char emptySpace[msgLength];
    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
    BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-   lmp::obj::generate::object_class_grammar<BufOutIterType,
-                                            lmp::obj::ccid::ClassType,
-                                            lmp::obj::ccid::ClassType::RemoteCCId> remoteCcIdGenerateGrammar;
+   lmp::obj::generator::remote_cc_id_grammar<BufOutIterType> remoteCCIdGenerateGrammar;
    BOOST_CHECK(generate(gen_begin,
-                        remoteCcIdGenerateGrammar,
+                        remoteCCIdGenerateGrammar,
                         remoteCCId));
    BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                  emptySpace, emptySpace + msgLength);
@@ -224,7 +323,7 @@ BOOST_AUTO_TEST_CASE( remote_control_channel_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( unknown_control_channel_id_decode_spirit )
 {
-   using boost::spirit::qi::parse;
+   using boost::spirit::x3::parse;
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -236,33 +335,49 @@ BOOST_AUTO_TEST_CASE( unknown_control_channel_id_decode_spirit )
    boost::asio::const_buffers_1 messageBuffer(message, msgLength);
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::object_class_unknown_ctype_grammar<BufIterType,
-                                                       lmp::obj::ObjectClass::ControlChannelID>  unknownCcIdGrammar;
-   lmp::obj::ccid::UnknownCCIdCTypeData  unknownCCId;
-   lmp::obj::ccid::UnknownCCIdCTypeData  expectedUnknownCCId = { 0x07, false, { 0x01, 0x13, 0x0a, 0x03 } };
+   lmp::obj::ccid::ast::UnknownCCIdCType  unknownCCIdCType;
+   std::stringstream out;
+   using boost::spirit::x3::with;
+   using lmp::obj::parser::error_handler_type;
+   using lmp::obj::parser::error_handler_tag;
+   error_handler_type error_handler(begin, last, out); // Our error handler
+
+   // Our parser
+   auto const parser =
+     // we pass our error handler to the parser so we can access
+     // it later on in our on_error and on_sucess handlers
+     with<error_handler_tag>(std::ref(error_handler))
+     [
+       lmp::obj::object_class_unknown_ctype<lmp::obj::ObjectClass::ControlChannelID>()
+     ];
    BOOST_CHECK(parse(begin,
                      last,
-                     unknownCcIdGrammar,
-                     unknownCCId));
-   BOOST_CHECK_EQUAL(unknownCCId, expectedUnknownCCId);
+                     parser,
+                     unknownCCIdCType));
+//   lmp::obj::ccid::ast::UnknownCCIdCType  expectedUnknownCCIdCTypeData =
+//     { { 0x07, false }, { 0x01, 0x13, 0x0a, 0x03 } };
+   BOOST_CHECK_EQUAL(unknownCCIdCType.m_data.size(), 4);
+   BOOST_CHECK_EQUAL(unknownCCIdCType.m_header.m_class_type, 7);
+   BOOST_CHECK_EQUAL(unknownCCIdCType.m_header.m_negotiable, false);
+   // BOOST_CHECK_EQUAL(unknownCCIdCType, expectedUnknownCCIdCTypeData);
+   // BOOST_CHECK_EQUAL(lmp::obj::getLength(unknownCCIdCType), msgLength);
 //   std::cout << unknownCCId << std::endl;
-   BOOST_CHECK_EQUAL(lmp::obj::getLength(unknownCCId), msgLength);
    unsigned char emptySpace[msgLength];
    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
    BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-   lmp::obj::generate::object_class_unknown_ctype_grammar<BufOutIterType,
-                                                          lmp::obj::ObjectClass::ControlChannelID>  unknownCcIdGenerateGrammar;
+   lmp::obj::generator::object_class_unknown_ctype_grammar<BufOutIterType,
+                                                           lmp::obj::ObjectClass::ControlChannelID>  unknownCcIdGenerateGrammar;
    BOOST_CHECK(generate(gen_begin,
                         unknownCcIdGenerateGrammar,
-                        unknownCCId));
+                        unknownCCIdCType));
    BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                  emptySpace, emptySpace + msgLength);
 }
 
 BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
 {
-  using boost::spirit::qi::parse;
+  using boost::spirit::x3::parse;
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -272,27 +387,36 @@ BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
        0x01, 0x02, 0x00, 0x08 };
   const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
   boost::asio::const_buffers_1 messageBuffer(message, msgLength);
-   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
-   BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::object_class_grammar<BufIterType,
-                                         lmp::obj::nodeid::ClassType,
-                                         lmp::obj::nodeid::ClassType::LocalNodeId>    localNodeIdGrammar;
-   lmp::obj::nodeid::LocalNodeIdData  localNodeId;
-   lmp::obj::nodeid::LocalNodeIdData  expectedLocalNodeId = { false, { 0x1020008 } };
+  BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+  BufIterType last = boost::asio::buffers_end(messageBuffer);
+  lmp::obj::nodeid::ast::LocalNodeId  localNodeId;
+  std::stringstream out;
+  using boost::spirit::x3::with;
+  using lmp::obj::parser::error_handler_type;
+  using lmp::obj::parser::error_handler_tag;
+  error_handler_type error_handler(begin, last, out); // Our error handler
+
+  // Our parser
+  auto const parser =
+    // we pass our error handler to the parser so we can access
+    // it later on in our on_error and on_sucess handlers
+     with<error_handler_tag>(std::ref(error_handler))
+     [
+       lmp::obj::local_node_id()
+     ];
    BOOST_CHECK(parse(begin,
                      last,
-                     localNodeIdGrammar,
+                     parser,
                      localNodeId));
-   BOOST_CHECK_EQUAL(localNodeId, expectedLocalNodeId);
+   BOOST_CHECK_EQUAL(localNodeId.m_nodeId, 0x1020008);
+   BOOST_CHECK_EQUAL(localNodeId.m_header.m_negotiable, false);
    // std::cout << msgData << std::endl;
-   BOOST_CHECK_EQUAL(lmp::obj::getLength(localNodeId), msgLength);
+   //BOOST_CHECK_EQUAL(lmp::obj::getLength(localNodeId), msgLength);
    unsigned char emptySpace[msgLength];
    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
    BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-   lmp::obj::generate::object_class_grammar<BufOutIterType,
-                                            lmp::obj::nodeid::ClassType,
-                                            lmp::obj::nodeid::ClassType::LocalNodeId> localNodeIdGenerateGrammar;
+   lmp::obj::generator::local_node_id_grammar<BufOutIterType> localNodeIdGenerateGrammar;
    BOOST_CHECK(generate(gen_begin,
                         localNodeIdGenerateGrammar,
                         localNodeId));
@@ -302,7 +426,7 @@ BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( remote_node_id_decode_spirit )
 {
-  using boost::spirit::qi::parse;
+  using boost::spirit::x3::parse;
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -314,31 +438,43 @@ BOOST_AUTO_TEST_CASE( remote_node_id_decode_spirit )
    boost::asio::const_buffers_1 messageBuffer(message, msgLength);
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::object_class_grammar<BufIterType,
-   		                         lmp::obj::nodeid::ClassType,
-   		                         lmp::obj::nodeid::ClassType::RemoteNodeId>  remoteNodeIdGrammar;
-   lmp::obj::nodeid::RemoteNodeIdData  remoteNodeId;
-   lmp::obj::nodeid::RemoteNodeIdData  expectedRemoteNodeId = { false, { 0x01130a03 } };
+   lmp::obj::nodeid::ast::RemoteNodeId  remoteNodeId;
+   std::stringstream out;
+   using boost::spirit::x3::with;
+   using lmp::obj::parser::error_handler_type;
+   using lmp::obj::parser::error_handler_tag;
+   error_handler_type error_handler(begin, last, out); // Our error handler
+
+   // Our parser
+   auto const parser =
+     // we pass our error handler to the parser so we can access
+     // it later on in our on_error and on_sucess handlers
+     with<error_handler_tag>(std::ref(error_handler))
+     [
+       lmp::obj::remote_node_id()
+     ];
    BOOST_CHECK(parse(begin,
                      last,
-                     remoteNodeIdGrammar,
+                     parser,
                      remoteNodeId));
-   BOOST_CHECK_EQUAL(remoteNodeId, expectedRemoteNodeId);
+   BOOST_CHECK_EQUAL(remoteNodeId.m_nodeId, 0x01130a03);
+   BOOST_CHECK_EQUAL(remoteNodeId.m_header.m_negotiable, false);
    // std::cout << msgData << std::endl;
-   BOOST_CHECK_EQUAL(lmp::obj::getLength(remoteNodeId), msgLength);
+   //BOOST_CHECK_EQUAL(lmp::obj::getLength(remoteNodeId), msgLength);
    unsigned char emptySpace[msgLength];
    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
    BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-   lmp::obj::generate::object_class_grammar<BufOutIterType,
-                                            lmp::obj::nodeid::ClassType,
-                                            lmp::obj::nodeid::ClassType::RemoteNodeId> remoteNodeIdGenerateGrammar;
+   lmp::obj::generator::remote_node_id_grammar<BufOutIterType> remoteNodeIdGenerateGrammar;
    BOOST_CHECK(generate(gen_begin,
                         remoteNodeIdGenerateGrammar,
                         remoteNodeId));
    BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                  emptySpace, emptySpace + msgLength);
 }
+
+#if 0
+
 BOOST_AUTO_TEST_CASE( unknown_node_id_decode_spirit )
 {
    using boost::spirit::qi::parse;
@@ -652,33 +788,63 @@ BOOST_AUTO_TEST_CASE( unknown_hello_decode_spirit )
                                  emptySpace, emptySpace + msgLength);
 }
 
+#endif
+
 BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
 {
-   using boost::spirit::qi::parse;
+   using boost::spirit::x3::parse;
+   using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
+   typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
    unsigned char message[] =
      { 0x01, 0x09, 0x00, 0x0C,
        0x00, 0x00, 0x00, 0x01,
        0x00, 0x00, 0x00, 0x00 };
-   boost::asio::const_buffers_1 messageBuffer(message,
-		                                      sizeof(message)/sizeof(unsigned char));
+   const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
+   boost::asio::const_buffers_1 messageBuffer(message, msgLength);
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::unknown_object_class_grammar<BufIterType>  unknownObjectClassGrammar;
-   lmp::obj::UnknownObjectClassData  unknownObjectClass;
+   lmp::obj::ast::UnknownObjectClass  unknownObjectClass;
+   std::stringstream out;
+   using boost::spirit::x3::with;
+   using lmp::obj::parser::error_handler_type;
+   using lmp::obj::parser::error_handler_tag;
+   error_handler_type error_handler(begin, last, out); // Our error handler
+
+   // Our parser
+   auto const parser =
+       // we pass our error handler to the parser so we can access
+       // it later on in our on_error and on_sucess handlers
+       with<error_handler_tag>(std::ref(error_handler))
+       [
+         lmp::obj::unknown_object_class()
+       ];
    BOOST_CHECK(parse(begin,
-		             last,
-					 unknownObjectClassGrammar,
-					 unknownObjectClass));
+		     last,
+		     parser,
+		     unknownObjectClass));
+//   lmp::obj::ast::UnknownObjectClass  expectedUnknownObjectClass =
+//     { { 0x09, 0x01, false }, { 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00 } };
    BOOST_CHECK_EQUAL(unknownObjectClass.m_data.size(), 8);
-   BOOST_CHECK_EQUAL(unknownObjectClass.m_object_class, 9);
-   BOOST_CHECK_EQUAL(unknownObjectClass.m_class_type, 1);
-   BOOST_CHECK_EQUAL(unknownObjectClass.m_length, 12);
-   BOOST_CHECK_EQUAL(unknownObjectClass.m_negotiable, false);
-   // std::cout << msgData << std::endl;
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_object_class, 9);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_class_type, 1);
+   BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_negotiable, false);
+   // BOOST_CHECK_EQUAL(unknownObjectClass, expectedUnknownObjectClass);
+   BOOST_CHECK_EQUAL(lmp::obj::getLength(unknownObjectClass), msgLength);
+   unsigned char emptySpace[msgLength];
+   boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
+   BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
+   BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
+   lmp::obj::generator::unknown_object_class_grammar<BufOutIterType>  unknownObjectClassGeneratorGrammar;
+   BOOST_CHECK(generate(gen_begin,
+                        unknownObjectClassGeneratorGrammar,
+                        unknownObjectClass));
+   BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
+                                 emptySpace, emptySpace + msgLength);
 }
 
+#if 0
 BOOST_AUTO_TEST_CASE( config_object_sequence_decode_spirit )
 {
   using boost::spirit::qi::parse;
@@ -721,6 +887,7 @@ BOOST_AUTO_TEST_CASE( config_object_sequence_decode_spirit )
    BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                  emptySpace, emptySpace + msgLength);
 }
+#endif
 
 #if 0
 BOOST_AUTO_TEST_CASE( obj_header_decode )

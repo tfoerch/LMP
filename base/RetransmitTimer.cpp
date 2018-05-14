@@ -27,12 +27,12 @@ namespace lmp
     //      do any needed clean up;
     //      exit;
    RetransmitTimer::RetransmitTimer(
-      boost::asio::io_service&          io_service,
+      boost::asio::io_context&          io_context,
       const std::chrono::milliseconds&  initialRetransmitInterval,
       lmp::DWORD                        retryLimit,
       lmp::DWORD                        incrementValueDelta,
       boost::function<bool (bool)>      expiry_callback)
-      : m_timer(io_service),
+      : m_timer(io_context),
         m_initialRetransmitInterval(initialRetransmitInterval),
         m_retryLimit(retryLimit),
         m_incrementValueDelta(incrementValueDelta),

@@ -12,7 +12,7 @@
 
 #include <chrono>
 
-namespace boost { namespace asio { class io_service; } }
+namespace boost { namespace asio { class io_context; } }
 namespace boost { namespace system { class error_code; } }
 
 namespace lmp
@@ -23,7 +23,7 @@ namespace lmp
     {
     public:
       CheckExpiryTimerFtor(
-    	boost::asio::io_service&          io_service,
+    	boost::asio::io_context&          io_context,
     	const std::chrono::milliseconds&  expiry_time);
       CheckExpiryTimerFtor(
         const CheckExpiryTimerFtor&      other);

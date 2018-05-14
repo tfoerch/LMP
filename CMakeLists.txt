@@ -8,7 +8,7 @@ option(USE_CLANG "build application with clang" OFF) # OFF is the default
 set (CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # build local boost and use it
-# ./bootstrap.sh --with-toolset=darwin --prefix=/home/tom/3rdParty --exec-prefix=/home/tom/3rdParty/clang
+# ./bootstrap.sh --with-toolset=clang --prefix=/home/tom/3rdParty --exec-prefix=/home/tom/3rdParty/clang
 # ./b2 clean
 # ./b2 toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=/home/tom/3rdParty --exec-prefix=/home/tom/3rdParty/clang --libdir=/home/tom/3rdParty/clang/lib   --build-dir=/home/tom/3rdParty/boost/build/clang
 # ./b2 install toolset=clang cxxflags="-std=c++14 -stdlib=libc++" linkflags="-stdlib=libc++" --prefix=/home/tom/3rdParty --exec-prefix=/home/tom/3rdParty/clang --libdir=/home/tom/3rdParty/clang/lib   --build-dir=/home/tom/3rdParty/boost/build/clang
@@ -18,8 +18,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(BOOST_ROOT "${PROJECT_SOURCE_DIR}/../../3rdParty")
 set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
 if(USE_CLANG)
-SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++-4.0")
-SET (CMAKE_C_COMPILER               "/usr/bin/clang-4.0")
+SET (CMAKE_CXX_COMPILER             "/usr/bin/clang++-5.0")
+SET (CMAKE_C_COMPILER               "/usr/bin/clang-5.0")
 SET(_CMAKE_TOOLCHAIN_PREFIX "llvm-")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -v -stdlib=libc++")
 #set (CMAKE_CXX_FLAGS "-std=c++14 -stdlib=libc++")

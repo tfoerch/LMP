@@ -1,0 +1,24 @@
+/*
+ * UnknownObjectClassParser.cpp
+ *
+ *  Created on: 28.02.2015
+ *      Author: tom
+ */
+
+#include "obj/UnknownObjectClassParser_def.hpp"
+#include "obj/LMPParseConfig.hpp"
+
+
+namespace lmp
+{
+  namespace obj
+  {
+    namespace parser
+    {
+      namespace x3 = boost::spirit::x3;
+
+      BOOST_SPIRIT_INSTANTIATE(
+        unknown_object_class_type, iterator_type, context_type);
+    }
+  }
+}

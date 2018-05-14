@@ -16,10 +16,10 @@ namespace lmp
   namespace base
   {
    IntervalTimer::IntervalTimer(
-      boost::asio::io_service&          io_service,
+      boost::asio::io_context&          io_context,
       const std::chrono::milliseconds&  timeoutInterval,
       boost::function<bool (void)>      expiry_callback)
-      : m_timer(io_service),
+      : m_timer(io_context),
         m_timeoutInterval(timeoutInterval),
         m_expiry_callback(expiry_callback)
     {
