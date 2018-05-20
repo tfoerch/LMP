@@ -10,6 +10,7 @@
 #include "obj/ObjectHeaderUnknownObjectClassAstAdapted.hpp"
 #include "obj/ObjectHeaderUnknownObjectClassParser.hpp"
 #include "obj/ObjectClassAst.hpp"
+#include "obj/LMPParseConfig.hpp"
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <boost/spirit/home/x3/binary/binary.hpp>
 #include <boost/spirit/home/x3.hpp>
@@ -45,7 +46,6 @@ namespace lmp
       ///////////////////////////////////////////////////////////////////////////
       // Grammar
       ///////////////////////////////////////////////////////////////////////////
-      struct ObjLength{};
 
       auto objclass = [](auto &ctx) { at_c<0>(_val(ctx)) = _attr(ctx); };
       auto classTypeAndNeg = [](auto &ctx) { at_c<1>(_val(ctx)) = static_cast<lmp::BYTE>( _attr(ctx) & lmp::obj::c_classTypeMask); at_c<2>(_val(ctx)) = ( _attr(ctx) & lmp::obj::c_negotiableMask); };

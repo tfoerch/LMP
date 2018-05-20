@@ -21,6 +21,7 @@ namespace lmp
   {
     namespace parser
     {
+      struct ObjLength{};
       typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  iterator_type;
       typedef error_handler<iterator_type> error_handler_type;
       typedef x3::with_context<error_handler_tag,

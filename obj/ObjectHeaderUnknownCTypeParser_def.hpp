@@ -9,6 +9,7 @@
 
 #include "obj/ObjectHeaderUnknownCTypeAstAdapted.hpp"
 #include "obj/ObjectHeaderUnknownCTypeParser.hpp"
+#include "obj/LMPParseConfig.hpp"
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <boost/spirit/home/x3/binary/binary.hpp>
 #include <boost/spirit/home/x3.hpp>
@@ -49,7 +50,6 @@ namespace lmp
       ///////////////////////////////////////////////////////////////////////////
       // Grammar
       ///////////////////////////////////////////////////////////////////////////
-      struct ObjLength{};
 
       auto classTypeAndNeg = [](auto &ctx) { at_c<0>(_val(ctx)) = ( _attr(ctx) & lmp::obj::c_classTypeMask); at_c<1>(_val(ctx)) = ( _attr(ctx) & lmp::obj::c_negotiableMask); };
       auto length = [](auto &ctx) { get<ObjLength>(ctx).get() = _attr(ctx); };

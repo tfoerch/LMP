@@ -6,7 +6,7 @@
  */
 
 #include "obj/UnknownNodeIdCTypeAst.hpp"
-#include "obj/ObjectClassUnknownCTypeParser_def.hpp"
+#include "obj/UnknownNodeIdCTypeParser_def.hpp"
 #include "obj/LMPParseConfig.hpp"
 
 namespace lmp
@@ -17,16 +17,10 @@ namespace lmp
     {
       namespace x3 = boost::spirit::x3;
 
-      template bool parse_rule<iterator_type,
-                               context_type,
-                               nodeid::ast::UnknownNodeIdCType,
-                               ObjectClass::NodeID>(object_class_unknown_ctype_type<ObjectClass::NodeID>  rule,
-                                                    iterator_type&                                        first,
-                                                    iterator_type const&                                  last,
-                                                    context_type const&                                   context,
-                                                    nodeid::ast::UnknownNodeIdCType&                      attr);
+      BOOST_SPIRIT_INSTANTIATE(
+        unknown_node_id_ctype_type, iterator_type, context_type);
+
     }
-    template parser::object_class_unknown_ctype_type<ObjectClass::NodeID> const& object_class_unknown_ctype();
   }
 }
 
