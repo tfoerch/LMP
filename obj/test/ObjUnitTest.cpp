@@ -39,7 +39,6 @@
 #include "obj/UnknownNodeIdCTypeParser.hpp"
 #include "obj/UnknownObjectClassParser.hpp"
 #include "obj/UnknownObjectClassGenerator.hpp"
-//#include "obj/ObjectClassUnknownCTypeParser.hpp"
 #include "obj/ObjectClassUnknownCTypeGenerator.hpp"
 #if 0
 #include "obj/ConfigObjectSequence.hpp"
