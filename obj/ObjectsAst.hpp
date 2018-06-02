@@ -25,7 +25,11 @@ namespace lmp
     namespace ast
     {
       typedef boost::variant<ccid::ast::ControlChannelIdCTypes,
+<<<<<<< HEAD
                              msgid::ast::MessageIdCTypes,
+=======
+//                           msgid::ast::MessageIdCTypes,
+>>>>>>> efcddf6b039b96339d36b87afcb7f9aab59b99ab
                              nodeid::ast::NodeIdCTypes,
 //                           config::ast::ConfigCTypes,
 //                           hello::ast::HelloCTypes,
