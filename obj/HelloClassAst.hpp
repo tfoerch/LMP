@@ -1,16 +1,16 @@
-#ifndef LMP_OBJ_HELLO_CLASS_HPP_
-#define LMP_OBJ_HELLO_CLASS_HPP_
+#ifndef LMP_OBJ_HELLO_CLASS_AST_HPP_
+#define LMP_OBJ_HELLO_CLASS_AST_HPP_
 /*
- * HelloClass.hpp
+ * HelloClassAst.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom
  */
 
 #include "base/ProtocolTypes.hpp"
-#include "obj/ObjectClass.hpp"
-
-#include <iostream>
+#include "obj/ObjectClassAst.hpp"
+#include "obj/ObjectHeaderAst.hpp"
+#include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
 
 namespace lmp
 {
@@ -20,18 +20,15 @@ namespace lmp
     {
       enum class ClassType : lmp::BYTE
       {
-        Hello = 1
+        Hello = 1,
       };
-      std::ostream& operator<<(
-        std::ostream&     os,
-        const ClassType&  cType);
     }
     template <>
-    struct ObjectClassTypeConst<hello::ClassType>
+    struct HeaderObjClassTypeTraits<hello::ClassType>
     {
       static const ObjectClass  obj_class = ObjectClass::Hello;
     };
   } // namespace obj
 } // namespace lmp
 
-#endif /* LMP_OBJ_HELLO_CLASS_HPP_ */
+#endif /* LMP_OBJ_HELLO_CLASS_AST_HPP_ */

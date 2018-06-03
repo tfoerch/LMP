@@ -50,6 +50,11 @@
 #include "obj/HelloConfigAst.hpp"
 #include "obj/UnknownConfigCTypeAst.hpp"
 #include "obj/UnknownConfigCTypeParser.hpp"
+#include "obj/HelloParser.hpp"
+#include "obj/HelloGenerator.hpp"
+#include "obj/HelloAst.hpp"
+#include "obj/UnknownHelloCTypeAst.hpp"
+#include "obj/UnknownHelloCTypeParser.hpp"
 #include "obj/UnknownObjectClassParser.hpp"
 #include "obj/UnknownObjectClassGenerator.hpp"
 #include "obj/ObjectClassUnknownCTypeGenerator.hpp"
@@ -795,11 +800,9 @@ BOOST_AUTO_TEST_CASE( unknown_config_decode_spirit )
                                  emptySpace, emptySpace + msgLength);
 }
 
-#if 0
-
 BOOST_AUTO_TEST_CASE( hello_decode_spirit )
 {
-  using boost::spirit::qi::parse;
+  using boost::spirit::x3::parse;
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -810,27 +813,37 @@ BOOST_AUTO_TEST_CASE( hello_decode_spirit )
        0x00, 0x00, 0x00, 0x00 };
   const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
   boost::asio::const_buffers_1 messageBuffer(message, msgLength);
-   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
-   BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::object_class_grammar<BufIterType,
-                                         lmp::obj::hello::ClassType,
-                                         lmp::obj::hello::ClassType::Hello>  helloGrammar;
-   lmp::obj::hello::HelloData  hello;
-   lmp::obj::hello::HelloData  expectedHello = { false, { 0x00000001, 0x00000000 } };
-   BOOST_CHECK(parse(begin,
-                     last,
-                     helloGrammar,
-                     hello));
-   BOOST_CHECK_EQUAL(hello, expectedHello);
+  BufIterType begin = boost::asio::buffers_begin(messageBuffer);
+  BufIterType last = boost::asio::buffers_end(messageBuffer);
+  lmp::obj::hello::ast::Hello  hello;
+  std::stringstream out;
+  using boost::spirit::x3::with;
+  using lmp::obj::parser::error_handler_type;
+  using lmp::obj::parser::error_handler_tag;
+  error_handler_type error_handler(begin, last, out); // Our error handler
+
+  // Our parser
+  auto const parser =
+    // we pass our error handler to the parser so we can access
+    // it later on in our on_error and on_sucess handlers
+    with<error_handler_tag>(std::ref(error_handler))
+      [
+        lmp::obj::hello_parser()
+      ];
+  BOOST_CHECK(parse(begin,
+                    last,
+                    parser,
+                    hello));
+  BOOST_CHECK_EQUAL(hello.m_txSeqNum, 0x00000001);
+  BOOST_CHECK_EQUAL(hello.m_rcvSeqNum, 0x00000000);
+  BOOST_CHECK_EQUAL(hello.m_header.m_negotiable, false);
    // std::cout << msgData << std::endl;
-   BOOST_CHECK_EQUAL(lmp::obj::getLength(hello), msgLength);
+//   BOOST_CHECK_EQUAL(lmp::obj::getLength(hello), msgLength);
    unsigned char emptySpace[msgLength];
    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
    BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-   lmp::obj::generate::object_class_grammar<BufOutIterType,
-                                            lmp::obj::hello::ClassType,
-                                            lmp::obj::hello::ClassType::Hello> helloGenerateGrammar;
+   lmp::obj::generator::hello_grammar<BufOutIterType> helloGenerateGrammar;
    BOOST_CHECK(generate(gen_begin,
                         helloGenerateGrammar,
                         hello));
@@ -840,7 +853,7 @@ BOOST_AUTO_TEST_CASE( hello_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( unknown_hello_decode_spirit )
 {
-   using boost::spirit::qi::parse;
+   using boost::spirit::x3::parse;
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -852,31 +865,45 @@ BOOST_AUTO_TEST_CASE( unknown_hello_decode_spirit )
    boost::asio::const_buffers_1 messageBuffer(message, msgLength);
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
-   lmp::obj::parse::object_class_unknown_ctype_grammar<BufIterType,
-                                                       lmp::obj::ObjectClass::Hello>  unknownHelloGrammar;
-   lmp::obj::hello::UnknownHelloCTypeData  unknownHello;
-   lmp::obj::hello::UnknownHelloCTypeData  expectedUnknownHello = { 0x07, false, { 0x01, 0x13, 0x0a, 0x03 } };
+   lmp::obj::hello::ast::UnknownHelloCType  unknownHelloCType;
+   std::stringstream out;
+   using boost::spirit::x3::with;
+   using lmp::obj::parser::error_handler_type;
+   using lmp::obj::parser::error_handler_tag;
+   error_handler_type error_handler(begin, last, out); // Our error handler
+
+   // Our parser
+   auto const parser =
+     // we pass our error handler to the parser so we can access
+     // it later on in our on_error and on_sucess handlers
+     with<error_handler_tag>(std::ref(error_handler))
+     [
+       lmp::obj::unknown_hello_ctype()
+     ];
    BOOST_CHECK(parse(begin,
                      last,
-                     unknownHelloGrammar,
-                     unknownHello));
-   BOOST_CHECK_EQUAL(unknownHello, expectedUnknownHello);
+                     parser,
+                     unknownHelloCType));
+ //   lmp::obj::ccid::ast::UnknownCCIdCType  expectedUnknownCCIdCTypeData =
+ //     { { 0x07, false }, { 0x01, 0x13, 0x0a, 0x03 } };
+   BOOST_CHECK_EQUAL(unknownHelloCType.m_data.size(), 4);
+   BOOST_CHECK_EQUAL(unknownHelloCType.m_header.m_class_type, 0x07);
+   BOOST_CHECK_EQUAL(unknownHelloCType.m_header.m_negotiable, false);
 //   std::cout << unknownHello << std::endl;
-   BOOST_CHECK_EQUAL(lmp::obj::getLength(unknownHello), msgLength);
+   //BOOST_CHECK_EQUAL(lmp::obj::getLength(unknownHello), msgLength);
    unsigned char emptySpace[msgLength];
    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
    BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-   lmp::obj::generate::object_class_unknown_ctype_grammar<BufOutIterType,
+   lmp::obj::generator::object_class_unknown_ctype_grammar<BufOutIterType,
                                                           lmp::obj::ObjectClass::Hello>  unknownHelloGenerateGrammar;
    BOOST_CHECK(generate(gen_begin,
                         unknownHelloGenerateGrammar,
-                        unknownHello));
+                        unknownHelloCType));
    BOOST_CHECK_EQUAL_COLLECTIONS(message, message + msgLength,
                                  emptySpace, emptySpace + msgLength);
 }
 
-#endif
 
 BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
 {
