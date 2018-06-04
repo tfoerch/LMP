@@ -11,7 +11,7 @@
 #include "obj/MessageIdCTypesAst.hpp"
 #include "obj/NodeIdCTypesAst.hpp"
 #include "obj/ConfigCTypesAst.hpp"
-//#include "obj/HelloCTypes.hpp"
+#include "obj/HelloCTypesAst.hpp"
 #include "obj/UnknownObjectClassAst.hpp"
 //
 //#include <boost/variant.hpp>
@@ -28,7 +28,7 @@ namespace lmp
                              msgid::ast::MessageIdCTypes,
                              nodeid::ast::NodeIdCTypes,
                              config::ast::ConfigCTypes,
-//                           hello::ast::HelloCTypes,
+                             hello::ast::HelloCTypes,
                              UnknownObjectClass>   Objects;
     }
   } // namespace obj
