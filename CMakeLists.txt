@@ -5,7 +5,8 @@ cmake_minimum_required (VERSION 3.3)
 project (lmp)
 # list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 option(USE_CLANG "build application with clang" OFF) # OFF is the default
-set (CMAKE_CXX_STANDARD 14)
+option(USE_SPIRIT_X3 "use spirit X3 for parsing" OFF) # OFF is the default
+set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # build local boost and use it
 # ./bootstrap.sh --with-toolset=clang --prefix=/home/tom/3rdParty --exec-prefix=/home/tom/3rdParty/clang
@@ -31,6 +32,10 @@ set(BOOST_LIBRARYDIR "${BOOST_ROOT}/clang/lib")
 else(USE_CLANG)
 set(BOOST_LIBRARYDIR "${BOOST_ROOT}/g++/lib")
 endif(USE_CLANG)
+
+if(USE_SPIRIT_X3)
+  add_definitions(-DUSE_SPIRIT_X3_PARSER)
+endif(USE_SPIRIT_X3)
 
 #set(CMAKE_VERBOSE_MAKEFILE on)
 

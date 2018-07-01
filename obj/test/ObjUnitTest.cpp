@@ -5,22 +5,6 @@
  *      Author: tom
  */
 
-#if 0
-#include "obj/ByteSequence.hpp"
-#include "obj/LocalCCId.hpp"
-#include "obj/RemoteCCId.hpp"
-#include "obj/UnknownCCIdCType.hpp"
-#include "obj/LocalNodeId.hpp"
-#include "obj/RemoteNodeId.hpp"
-#include "obj/UnknownNodeIdCType.hpp"
-#include "obj/MessageId.hpp"
-#include "obj/MessageIdAck.hpp"
-#include "obj/UnknownMessageIdCType.hpp"
-#include "obj/HelloConfig.hpp"
-#include "obj/UnknownConfigCType.hpp"
-#include "obj/Hello.hpp"
-#include "obj/UnknownHelloCType.hpp"
-#endif
 #include "obj/LocalCCIdParser.hpp"
 #include "obj/LocalCCIdGenerator.hpp"
 #include "obj/LocalCCIdAst.hpp"
@@ -28,7 +12,9 @@
 #include "obj/RemoteCCIdGenerator.hpp"
 #include "obj/RemoteCCIdAst.hpp"
 #include "obj/UnknownCCIdCTypeAst.hpp"
+#ifdef USE_SPIRIT_X3_PARSER
 #include "obj/UnknownCCIdCTypeParser.hpp"
+#endif /* USE_SPIRIT_X3_PARSER */
 #include "obj/LocalNodeIdParser.hpp"
 #include "obj/LocalNodeIdGenerator.hpp"
 #include "obj/LocalNodeIdAst.hpp"
@@ -36,7 +22,9 @@
 #include "obj/RemoteNodeIdGenerator.hpp"
 #include "obj/RemoteNodeIdAst.hpp"
 #include "obj/UnknownNodeIdCTypeAst.hpp"
+#ifdef USE_SPIRIT_X3_PARSER
 #include "obj/UnknownNodeIdCTypeParser.hpp"
+#endif /* USE_SPIRIT_X3_PARSER */
 #include "obj/MessageIdParser.hpp"
 #include "obj/MessageIdGenerator.hpp"
 #include "obj/MessageIdAst.hpp"
@@ -44,27 +32,39 @@
 #include "obj/MessageIdAckGenerator.hpp"
 #include "obj/MessageIdAckAst.hpp"
 #include "obj/UnknownMessageIdCTypeAst.hpp"
+#ifdef USE_SPIRIT_X3_PARSER
 #include "obj/UnknownMessageIdCTypeParser.hpp"
+#endif /* USE_SPIRIT_X3_PARSER */
 #include "obj/HelloConfigParser.hpp"
 #include "obj/HelloConfigGenerator.hpp"
 #include "obj/HelloConfigAst.hpp"
 #include "obj/UnknownConfigCTypeAst.hpp"
+#ifdef USE_SPIRIT_X3_PARSER
 #include "obj/UnknownConfigCTypeParser.hpp"
+#endif /* USE_SPIRIT_X3_PARSER */
 #include "obj/HelloParser.hpp"
 #include "obj/HelloGenerator.hpp"
 #include "obj/HelloAst.hpp"
 #include "obj/UnknownHelloCTypeAst.hpp"
+#ifdef USE_SPIRIT_X3_PARSER
 #include "obj/UnknownHelloCTypeParser.hpp"
+#else
+#include "obj/ObjectClassUnknownCTypeParser_def.hpp"
+#endif /* USE_SPIRIT_X3_PARSER */
 #include "obj/UnknownObjectClassParser.hpp"
 #include "obj/UnknownObjectClassGenerator.hpp"
 #include "obj/ObjectClassUnknownCTypeGenerator.hpp"
 #if 0
 #include "obj/ConfigObjectSequence.hpp"
 #endif
+#ifdef USE_SPIRIT_X3_PARSER
 #include "obj/LMPParseConfig.hpp"
 #include <boost/spirit/home/x3/core/parse.hpp>
+#else
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/buffers_iterator.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
+
 #include <iostream>
 
 #define BOOST_TEST_MAIN
@@ -199,7 +199,11 @@ BOOST_AUTO_TEST_CASE( byte_sequence_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
 {
+#ifdef USE_SPIRIT_X3_PARSER
    using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -212,6 +216,7 @@ BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
    lmp::obj::ccid::ast::LocalCCId  localCCId;
+#ifdef USE_SPIRIT_X3_PARSER
    std::stringstream out;
    using boost::spirit::x3::with;
    using lmp::obj::parser::error_handler_type;
@@ -226,6 +231,9 @@ BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
      [
        lmp::obj::local_cc_id()
      ];
+#else
+   lmp::obj::parser::local_cc_id_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
    BOOST_CHECK(parse(begin,
                      last,
                      parser,
@@ -247,7 +255,11 @@ BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit_wrong_length )
 {
+#ifdef USE_SPIRIT_X3_PARSER
    using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -260,6 +272,7 @@ BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit_wrong_length )
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
    lmp::obj::ccid::ast::LocalCCId  localCCId;
+#ifdef USE_SPIRIT_X3_PARSER
    std::stringstream out;
    using boost::spirit::x3::with;
    using lmp::obj::parser::error_handler_type;
@@ -274,12 +287,18 @@ BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit_wrong_length )
      [
        lmp::obj::local_cc_id()
      ];
-   try
+#else
+   lmp::obj::parser::local_cc_id_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
+#ifdef USE_SPIRIT_X3_PARSER
+  try
    {
-     BOOST_CHECK(!parse(begin,
+#endif /* USE_SPIRIT_X3_PARSER */
+    BOOST_CHECK(!parse(begin,
                         last,
                         parser,
                         localCCId));
+#ifdef USE_SPIRIT_X3_PARSER
    }
    catch(boost::spirit::x3::expectation_failure<BufIterType>const& e)
    {
@@ -288,11 +307,16 @@ BOOST_AUTO_TEST_CASE( local_control_channel_id_decode_spirit_wrong_length )
    // BOOST_CHECK_EQUAL(localCCId.m_ccId, 0x1020008);
    // BOOST_CHECK_EQUAL(localCCId.m_header.m_negotiable, false);
    std::cout << out.str() << std::endl;
+#endif /* USE_SPIRIT_X3_PARSER */
 }
 
 BOOST_AUTO_TEST_CASE( remote_control_channel_id_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -305,6 +329,7 @@ BOOST_AUTO_TEST_CASE( remote_control_channel_id_decode_spirit )
   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
   BufIterType last = boost::asio::buffers_end(messageBuffer);
   lmp::obj::ccid::ast::RemoteCCId  remoteCCId;
+#ifdef USE_SPIRIT_X3_PARSER
   std::stringstream out;
   using boost::spirit::x3::with;
   using lmp::obj::parser::error_handler_type;
@@ -319,6 +344,9 @@ BOOST_AUTO_TEST_CASE( remote_control_channel_id_decode_spirit )
     [
       lmp::obj::remote_cc_id()
     ];
+#else
+   lmp::obj::parser::remote_cc_id_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
   BOOST_CHECK(parse(begin,
                     last,
                     parser,
@@ -343,7 +371,11 @@ BOOST_AUTO_TEST_CASE( remote_control_channel_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( unknown_control_channel_id_decode_spirit )
 {
+#ifdef USE_SPIRIT_X3_PARSER
    using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -356,7 +388,8 @@ BOOST_AUTO_TEST_CASE( unknown_control_channel_id_decode_spirit )
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
    lmp::obj::ccid::ast::UnknownCCIdCType  unknownCCIdCType;
-   std::stringstream out;
+#ifdef USE_SPIRIT_X3_PARSER
+  std::stringstream out;
    using boost::spirit::x3::with;
    using lmp::obj::parser::error_handler_type;
    using lmp::obj::parser::error_handler_tag;
@@ -370,7 +403,10 @@ BOOST_AUTO_TEST_CASE( unknown_control_channel_id_decode_spirit )
      [
        lmp::obj::unknown_cc_id_ctype()
      ];
-   BOOST_CHECK(parse(begin,
+#else
+   lmp::obj::parser::object_class_unknown_ctype_grammar<BufIterType, lmp::obj::ObjectClass::ControlChannelID>   parser;
+#endif /* USE_SPIRIT_X3_PARSER */
+  BOOST_CHECK(parse(begin,
                      last,
                      parser,
                      unknownCCIdCType));
@@ -397,7 +433,11 @@ BOOST_AUTO_TEST_CASE( unknown_control_channel_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -410,6 +450,7 @@ BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
   BufIterType last = boost::asio::buffers_end(messageBuffer);
   lmp::obj::nodeid::ast::LocalNodeId  localNodeId;
+#ifdef USE_SPIRIT_X3_PARSER
   std::stringstream out;
   using boost::spirit::x3::with;
   using lmp::obj::parser::error_handler_type;
@@ -424,6 +465,9 @@ BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
      [
        lmp::obj::local_node_id()
      ];
+#else
+   lmp::obj::parser::local_node_id_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
    BOOST_CHECK(parse(begin,
                      last,
                      parser,
@@ -446,7 +490,11 @@ BOOST_AUTO_TEST_CASE( local_node_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( remote_node_id_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -459,6 +507,7 @@ BOOST_AUTO_TEST_CASE( remote_node_id_decode_spirit )
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
    lmp::obj::nodeid::ast::RemoteNodeId  remoteNodeId;
+#ifdef USE_SPIRIT_X3_PARSER
    std::stringstream out;
    using boost::spirit::x3::with;
    using lmp::obj::parser::error_handler_type;
@@ -473,6 +522,9 @@ BOOST_AUTO_TEST_CASE( remote_node_id_decode_spirit )
      [
        lmp::obj::remote_node_id()
      ];
+#else
+   lmp::obj::parser::remote_node_id_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
    BOOST_CHECK(parse(begin,
                      last,
                      parser,
@@ -495,7 +547,11 @@ BOOST_AUTO_TEST_CASE( remote_node_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( unknown_node_id_decode_spirit )
 {
+#ifdef USE_SPIRIT_X3_PARSER
    using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -508,6 +564,7 @@ BOOST_AUTO_TEST_CASE( unknown_node_id_decode_spirit )
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
    lmp::obj::nodeid::ast::UnknownNodeIdCType  unknownNodeIdCType;
+#ifdef USE_SPIRIT_X3_PARSER
    std::stringstream out;
    using boost::spirit::x3::with;
    using lmp::obj::parser::error_handler_type;
@@ -522,6 +579,9 @@ BOOST_AUTO_TEST_CASE( unknown_node_id_decode_spirit )
      [
        lmp::obj::unknown_node_id_ctype()
      ];
+#else
+   lmp::obj::parser::object_class_unknown_ctype_grammar<BufIterType, lmp::obj::ObjectClass::NodeID>  parser;
+#endif /* USE_SPIRIT_X3_PARSER */
    BOOST_CHECK(parse(begin,
                      last,
                      parser,
@@ -548,7 +608,11 @@ BOOST_AUTO_TEST_CASE( unknown_node_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( message_id_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -561,7 +625,8 @@ BOOST_AUTO_TEST_CASE( message_id_decode_spirit )
   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
   BufIterType last = boost::asio::buffers_end(messageBuffer);
   lmp::obj::msgid::ast::MessageId  messageId;
-  std::stringstream out;
+#ifdef USE_SPIRIT_X3_PARSER
+ std::stringstream out;
   using boost::spirit::x3::with;
   using lmp::obj::parser::error_handler_type;
   using lmp::obj::parser::error_handler_tag;
@@ -575,6 +640,9 @@ BOOST_AUTO_TEST_CASE( message_id_decode_spirit )
      [
        lmp::obj::message_id()
      ];
+#else
+   lmp::obj::parser::message_id_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
    BOOST_CHECK(parse(begin,
                      last,
                      parser,
@@ -597,7 +665,11 @@ BOOST_AUTO_TEST_CASE( message_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( message_id_ack_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -610,6 +682,7 @@ BOOST_AUTO_TEST_CASE( message_id_ack_decode_spirit )
   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
   BufIterType last = boost::asio::buffers_end(messageBuffer);
   lmp::obj::msgid::ast::MessageIdAck  messageIdAck;
+#ifdef USE_SPIRIT_X3_PARSER
   std::stringstream out;
   using boost::spirit::x3::with;
   using lmp::obj::parser::error_handler_type;
@@ -624,6 +697,9 @@ BOOST_AUTO_TEST_CASE( message_id_ack_decode_spirit )
       [
         lmp::obj::message_id_ack()
       ];
+#else
+   lmp::obj::parser::message_id_ack_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
   BOOST_CHECK(parse(begin,
                     last,
                     parser,
@@ -646,7 +722,11 @@ BOOST_AUTO_TEST_CASE( message_id_ack_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( unknown_message_id_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -659,6 +739,7 @@ BOOST_AUTO_TEST_CASE( unknown_message_id_decode_spirit )
   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
   BufIterType last = boost::asio::buffers_end(messageBuffer);
   lmp::obj::msgid::ast::UnknownMessageIdCType  unknownMessageIdCType;
+#ifdef USE_SPIRIT_X3_PARSER
   std::stringstream out;
   using boost::spirit::x3::with;
   using lmp::obj::parser::error_handler_type;
@@ -673,6 +754,9 @@ BOOST_AUTO_TEST_CASE( unknown_message_id_decode_spirit )
     [
       lmp::obj::unknown_message_id_ctype()
     ];
+#else
+   lmp::obj::parser::object_class_unknown_ctype_grammar<BufIterType, lmp::obj::ObjectClass::MessageID>  parser;
+#endif /* USE_SPIRIT_X3_PARSER */
   BOOST_CHECK(parse(begin,
                     last,
                     parser,
@@ -699,7 +783,11 @@ BOOST_AUTO_TEST_CASE( unknown_message_id_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( hello_config_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -712,6 +800,7 @@ BOOST_AUTO_TEST_CASE( hello_config_decode_spirit )
   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
   BufIterType last = boost::asio::buffers_end(messageBuffer);
   lmp::obj::config::ast::HelloConfig  helloConfig;
+#ifdef USE_SPIRIT_X3_PARSER
   std::stringstream out;
   using boost::spirit::x3::with;
   using lmp::obj::parser::error_handler_type;
@@ -726,6 +815,9 @@ BOOST_AUTO_TEST_CASE( hello_config_decode_spirit )
       [
         lmp::obj::hello_config()
       ];
+#else
+   lmp::obj::parser::hello_config_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
   BOOST_CHECK(parse(begin,
                     last,
                     parser,
@@ -749,7 +841,11 @@ BOOST_AUTO_TEST_CASE( hello_config_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( unknown_config_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -762,6 +858,7 @@ BOOST_AUTO_TEST_CASE( unknown_config_decode_spirit )
   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
   BufIterType last = boost::asio::buffers_end(messageBuffer);
   lmp::obj::config::ast::UnknownConfigCType  unknownConfigCType;
+#ifdef USE_SPIRIT_X3_PARSER
   std::stringstream out;
   using boost::spirit::x3::with;
   using lmp::obj::parser::error_handler_type;
@@ -776,6 +873,9 @@ BOOST_AUTO_TEST_CASE( unknown_config_decode_spirit )
     [
       lmp::obj::unknown_config_ctype()
     ];
+#else
+   lmp::obj::parser::object_class_unknown_ctype_grammar<BufIterType, lmp::obj::ObjectClass::Config>  parser;
+#endif /* USE_SPIRIT_X3_PARSER */
   BOOST_CHECK(parse(begin,
                     last,
                     parser,
@@ -802,7 +902,11 @@ BOOST_AUTO_TEST_CASE( unknown_config_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( hello_decode_spirit )
 {
-  using boost::spirit::x3::parse;
+#ifdef USE_SPIRIT_X3_PARSER
+   using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
   using boost::spirit::karma::generate;
 
   typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -816,6 +920,7 @@ BOOST_AUTO_TEST_CASE( hello_decode_spirit )
   BufIterType begin = boost::asio::buffers_begin(messageBuffer);
   BufIterType last = boost::asio::buffers_end(messageBuffer);
   lmp::obj::hello::ast::Hello  hello;
+#ifdef USE_SPIRIT_X3_PARSER
   std::stringstream out;
   using boost::spirit::x3::with;
   using lmp::obj::parser::error_handler_type;
@@ -830,6 +935,9 @@ BOOST_AUTO_TEST_CASE( hello_decode_spirit )
       [
         lmp::obj::hello_parser()
       ];
+#else
+   lmp::obj::parser::hello_grammar<BufIterType>                                      parser;
+#endif /* USE_SPIRIT_X3_PARSER */
   BOOST_CHECK(parse(begin,
                     last,
                     parser,
@@ -853,7 +961,11 @@ BOOST_AUTO_TEST_CASE( hello_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( unknown_hello_decode_spirit )
 {
+#ifdef USE_SPIRIT_X3_PARSER
    using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -866,6 +978,7 @@ BOOST_AUTO_TEST_CASE( unknown_hello_decode_spirit )
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
    lmp::obj::hello::ast::UnknownHelloCType  unknownHelloCType;
+#ifdef USE_SPIRIT_X3_PARSER
    std::stringstream out;
    using boost::spirit::x3::with;
    using lmp::obj::parser::error_handler_type;
@@ -880,6 +993,9 @@ BOOST_AUTO_TEST_CASE( unknown_hello_decode_spirit )
      [
        lmp::obj::unknown_hello_ctype()
      ];
+#else
+   lmp::obj::parser::object_class_unknown_ctype_grammar<BufIterType, lmp::obj::ObjectClass::Hello>  parser;
+#endif /* USE_SPIRIT_X3_PARSER */
    BOOST_CHECK(parse(begin,
                      last,
                      parser,
@@ -907,7 +1023,11 @@ BOOST_AUTO_TEST_CASE( unknown_hello_decode_spirit )
 
 BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
 {
+#ifdef USE_SPIRIT_X3_PARSER
    using boost::spirit::x3::parse;
+#else
+   using boost::spirit::qi::parse;
+#endif /* USE_SPIRIT_X3_PARSER */
    using boost::spirit::karma::generate;
 
    typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
@@ -921,6 +1041,7 @@ BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
    BufIterType begin = boost::asio::buffers_begin(messageBuffer);
    BufIterType last = boost::asio::buffers_end(messageBuffer);
    lmp::obj::ast::UnknownObjectClass  unknownObjectClass;
+#ifdef USE_SPIRIT_X3_PARSER
    std::stringstream out;
    using boost::spirit::x3::with;
    using lmp::obj::parser::error_handler_type;
@@ -935,6 +1056,9 @@ BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
        [
          lmp::obj::unknown_object_class()
        ];
+#else
+   lmp::obj::parser::unknown_object_class_grammar<BufIterType>       parser;
+#endif /* USE_SPIRIT_X3_PARSER */
    BOOST_CHECK(parse(begin,
 		     last,
 		     parser,

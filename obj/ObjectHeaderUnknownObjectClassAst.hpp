@@ -9,7 +9,9 @@
 
 #include "base/ProtocolTypes.hpp"
 
+#ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
 
 namespace lmp
 {
@@ -17,9 +19,14 @@ namespace lmp
   {
     namespace ast
     {
+#ifdef USE_SPIRIT_X3_PARSER
       namespace x3 = boost::spirit::x3;
+#endif /* USE_SPIRIT_X3_PARSER */
 
-      struct ObjectHeaderUnknownObjectClass : x3::position_tagged
+      struct ObjectHeaderUnknownObjectClass
+#ifdef USE_SPIRIT_X3_PARSER
+          : x3::position_tagged
+#endif /* USE_SPIRIT_X3_PARSER */
       {
         lmp::BYTE               m_object_class;
         lmp::BYTE               m_class_type;

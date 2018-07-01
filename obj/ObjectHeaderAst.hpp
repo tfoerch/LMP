@@ -10,7 +10,9 @@
 #include "base/ProtocolTypes.hpp"
 #include "obj/ObjectClassAst.hpp"
 
+#ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
 
 namespace lmp
 {
@@ -28,11 +30,16 @@ namespace lmp
     };
     namespace ast
     {
+#ifdef USE_SPIRIT_X3_PARSER
       namespace x3 = boost::spirit::x3;
+#endif /* USE_SPIRIT_X3_PARSER */
 
       // instantiate following with ObjectHeader<HeaderTypeTraits<ClassType, ctype>>
       template <typename   HeaderTypeTraits>
-      struct ObjectHeader : x3::position_tagged
+      struct ObjectHeader
+#ifdef USE_SPIRIT_X3_PARSER
+          : x3::position_tagged
+#endif /* USE_SPIRIT_X3_PARSER */
       {
         typedef typename HeaderTypeTraits::ctype_type      ctype_type;
         static const ObjectClass                           obj_class;

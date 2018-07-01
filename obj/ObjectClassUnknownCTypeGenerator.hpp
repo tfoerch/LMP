@@ -16,19 +16,6 @@ namespace lmp
 {
   namespace obj
   {
-    template <typename  ObjClassTraits>
-    lmp::DWORD getLength(
-      const ast::ObjectClassUnknownCType<ObjClassTraits>&  objectClassUnknownCType);
-    template<typename ObjClassTraits>
-    struct GetLengthUnknownCType
-    {
-      template<typename> struct result { typedef lmp::WORD type; };
-      lmp::WORD operator()(
-        const ast::ObjectClassUnknownCType<ObjClassTraits>& objClassUnknownCType) const
-      {
-        return getLength(objClassUnknownCType);
-      }
-    };
     namespace generator
     {
       namespace karma = boost::spirit::karma;

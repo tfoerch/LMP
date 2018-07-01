@@ -9,7 +9,9 @@
 
 #include "obj/ObjectClassAst.hpp"
 
+#ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
 
 #include <vector>
 
@@ -19,10 +21,15 @@ namespace lmp
   {
     namespace ast
     {
+#ifdef USE_SPIRIT_X3_PARSER
       namespace x3 = boost::spirit::x3;
+#endif /* USE_SPIRIT_X3_PARSER */
 
       template <typename  ObjClassTraits>
-      class ObjectHeaderUnknownCType : x3::position_tagged
+      class ObjectHeaderUnknownCType
+#ifdef USE_SPIRIT_X3_PARSER
+          : x3::position_tagged
+#endif /* USE_SPIRIT_X3_PARSER */
       {
       public:
         typedef typename ObjClassTraits::obj_class_type  obj_class_type;

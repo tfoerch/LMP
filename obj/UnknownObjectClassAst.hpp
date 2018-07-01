@@ -9,7 +9,9 @@
 
 #include "obj/ObjectHeaderUnknownObjectClassAst.hpp"
 
+#ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
 
 #include <vector>
 
@@ -19,15 +21,31 @@ namespace lmp
   {
     namespace ast
     {
+#ifdef USE_SPIRIT_X3_PARSER
       namespace x3 = boost::spirit::x3;
+#endif /* USE_SPIRIT_X3_PARSER */
 
       typedef std::vector<lmp::BYTE>  ByteSequence;
 
-      struct UnknownObjectClass : x3::position_tagged
+      struct UnknownObjectClass
+#ifdef USE_SPIRIT_X3_PARSER
+          : x3::position_tagged
+#endif /* USE_SPIRIT_X3_PARSER */
       {
         ObjectHeaderUnknownObjectClass  m_header;
         ByteSequence                    m_data;
       };
+//      lmp::DWORD getLength(
+//        const ast::UnknownObjectClass&  unknownObjectClass);
+//      struct GetLengthUnknownObjectClass
+//      {
+//        template<typename> struct result { typedef lmp::WORD type; };
+//        lmp::WORD operator()(
+//          const ast::UnknownObjectClass& unknownObjectClass) const
+//        {
+//          return getLength(unknownObjectClass);
+//        }
+//      };
     } // namespace ast
   } // namespace obj
 } // namespace lmp

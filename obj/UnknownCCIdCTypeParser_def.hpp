@@ -52,7 +52,8 @@ namespace lmp
         with<ObjLength>(std::ref(unknown_cc_id_ctype_obj_length))
         [
           object_header_unknown_ctype<ObjectClass::ControlChannelID> [header]  // class type
-          >> *( eps [more] >> byte_[push_back] ) >> eps [done] // data
+          >> *( eps [more] >> byte_[push_back] )
+          >> eps [done] // data
         ];
 
       BOOST_SPIRIT_DEFINE(unknown_cc_id_ctype);

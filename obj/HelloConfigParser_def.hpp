@@ -11,9 +11,18 @@
 #include "obj/HelloConfigParser.hpp"
 #include "obj/ObjectHeaderParser_def.hpp"
 #include "obj/ObjectClassAst.hpp"
+#ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <boost/spirit/home/x3/binary/binary.hpp>
 #include <boost/spirit/home/x3.hpp>
+#else
+#include <boost/spirit/include/qi_binary.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/phoenix/object/static_cast.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
 
 #include <type_traits>
 
@@ -23,6 +32,7 @@ namespace lmp
   {
     namespace parser
     {
+#ifdef USE_SPIRIT_X3_PARSER
       namespace x3 = boost::spirit::x3;
       namespace fusion = boost::fusion;
       using x3::big_word;
@@ -69,12 +79,35 @@ namespace lmp
       // We want error-handling only for the start (outermost) rexpr
       // rexpr is the same as rexpr_inner but without error-handling (see error_handler.hpp)
       struct hello_config_class : x3::annotate_on_success/*, error_handler_base*/ {};
+#else
+      namespace qi = boost::spirit::qi;
+      template <typename Iterator>
+      hello_config_grammar<Iterator>::hello_config_grammar()
+      : hello_config_grammar::base_type(hello_config_rule,
+                                       "hello_config")
+      {
+        using qi::big_word;
+        using qi::_1;
+        // using phoenix::at_c;
+        using namespace qi::labels;
+
+        hello_config_rule =
+          object_header
+          >> big_word //[helloIntv]
+          >> big_word //[helloDeadIntv]
+          ;
+
+        hello_config_rule.name("hello_config");
+      }
+#endif /* USE_SPIRIT_X3_PARSER */
     } // namespace parser
 
+#ifdef USE_SPIRIT_X3_PARSER
     parser::hello_config_type const& hello_config()
     {
       return parser::hello_config;
     }
+#endif /* USE_SPIRIT_X3_PARSER */
   } // namespace obj
 } // namespace lmp
 

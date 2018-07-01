@@ -29,7 +29,7 @@ namespace lmp
         return getLength(unknownObjectClass);
       }
     };
-   namespace generator
+    namespace generator
     {
       namespace karma = boost::spirit::karma;
       template <typename OutputIterator>

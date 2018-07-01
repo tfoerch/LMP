@@ -9,10 +9,20 @@
 
 #include "obj/ObjectHeaderAstAdapted.hpp"
 #include "obj/ObjectHeaderParser.hpp"
+
+#ifdef USE_SPIRIT_X3_PARSER
 #include "obj/LMPParseConfig.hpp"
+
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <boost/spirit/home/x3/binary/binary.hpp>
 #include <boost/spirit/home/x3.hpp>
+#else
+#include <boost/spirit/include/qi_binary.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
 
 #include <type_traits>
 
@@ -23,6 +33,7 @@ namespace lmp
   {
     namespace parser
     {
+#ifdef USE_SPIRIT_X3_PARSER
       namespace x3 = boost::spirit::x3;
       namespace fusion = boost::fusion;
       using x3::byte_;
@@ -54,12 +65,7 @@ namespace lmp
       auto setNeg = [](auto &ctx) { at_c<0>(_val(ctx)) = true; };
       auto setNeg2 = [](auto &ctx) { at_c<1>(_val(ctx)) = true; };
       auto setNotNeg = [](auto &ctx) { at_c<0>(_val(ctx)) = false; };
-      auto push_back = [](auto &ctx) { at_c<1>(_val(ctx)).push_back(_attr(ctx)); };
-      auto number = [](auto &ctx) { get<ObjLength>(ctx).get() = _attr(ctx); };
       auto length = [](auto &ctx) { get<ObjLength>(ctx).get() = _attr(ctx); };
-      auto setData = [](auto &ctx) { at_c<1>(_val(ctx)) = _attr(ctx); };
-      auto more   = [](auto &ctx) { _pass(ctx) = get<ObjLength>(ctx) >  at_c<1>(_val(ctx)).size() + lmp::obj::c_objHeaderLength; };
-      auto done   = [](auto &ctx) { _pass(ctx) = get<ObjLength>(ctx) == at_c<1>(_val(ctx)).size() + lmp::obj::c_objHeaderLength; };
 
       template <typename ClassType, ClassType ctype>
       auto const object_header_fix_length_def =
@@ -102,8 +108,56 @@ namespace lmp
       // rexpr is the same as rexpr_inner but without error-handling (see error_handler.hpp)
       struct object_header_fix_length_class : x3::annotate_on_success/*, error_handler_base*/ {};
       struct object_header_var_length_class : x3::annotate_on_success/*, error_handler_base*/ {};
+#else
+      namespace fusion = boost::fusion;
+      namespace phoenix = boost::phoenix;
+      namespace qi = boost::spirit::qi;
+
+      template <typename Iterator, typename ClassType, ClassType ctype>
+      object_header_fix_length_grammar<Iterator, ClassType, ctype>::object_header_fix_length_grammar()
+      : object_header_fix_length_grammar::base_type(object_header_fix_length_rule, "object_header_fix_length")
+      {
+        using qi::byte_;
+        using qi::big_word;
+        using qi::big_dword;
+        using qi::_1;
+        using phoenix::at_c;
+        using namespace qi::labels;
+
+        object_header_fix_length_rule =
+            ( byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype))                              [ at_c<0>(_val) = false ] |
+              byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype) + lmp::obj::c_negotiableMask) [ at_c<0>(_val) = true  ] ) // class type
+            >> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(HeaderObjClassTypeTraits<ClassType>::obj_class))    // object class
+            >> big_word(HeaderCTypeTraits<ClassType, ctype>::length) // length
+            ;
+
+        object_header_fix_length_rule.name("object_header_fix_length");
+      }
+
+      template <typename Iterator, typename ClassType, ClassType ctype>
+      object_header_var_length_grammar<Iterator, ClassType, ctype>::object_header_var_length_grammar()
+      : object_header_var_length_grammar::base_type(object_header_var_length_rule, "object_header_var_length")
+      {
+        using qi::byte_;
+        using qi::big_word;
+        using qi::big_dword;
+        using qi::_1;
+        using phoenix::at_c;
+        using namespace qi::labels;
+
+        object_header_var_length_rule =
+            ( byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype))                              [ at_c<0>(_val) = false ] |
+              byte_(static_cast<typename std::underlying_type<ClassType>::type>(ctype) + lmp::obj::c_negotiableMask) [ at_c<0>(_val) = true  ] ) // class type
+            >> byte_(static_cast<typename std::underlying_type<ObjectClass>::type>(HeaderObjClassTypeTraits<ClassType>::obj_class))    // object class
+            >> big_word [_a = _1] // length
+            ;
+
+        object_header_var_length_rule.name("object_header_var_length");
+      }
+      #endif /* USE_SPIRIT_X3_PARSER */
     } // namespace parser
 
+#ifdef USE_SPIRIT_X3_PARSER
     template <typename ClassType, ClassType ctype>
     parser::object_header_fix_length_type<ClassType, ctype> const& object_header_fix_length()
     {
@@ -115,6 +169,7 @@ namespace lmp
     {
       return parser::object_header_var_length<ClassType, ctype>;
     }
+#endif /* USE_SPIRIT_X3_PARSER */
 
   } // namespace obj
 } // namespace lmp

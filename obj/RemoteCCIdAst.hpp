@@ -10,7 +10,9 @@
 #include "obj/ObjectHeaderAst.hpp"
 #include "obj/ObjectClassAst.hpp"
 #include "obj/ControlChannelIdClassAst.hpp"
+#ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
 
 namespace lmp
 {
@@ -28,8 +30,13 @@ namespace lmp
     {
       namespace ast
       {
+#ifdef USE_SPIRIT_X3_PARSER
         namespace x3 = boost::spirit::x3;
-        struct RemoteCCId : x3::position_tagged
+#endif /* USE_SPIRIT_X3_PARSER */
+        struct RemoteCCId
+#ifdef USE_SPIRIT_X3_PARSER
+            : x3::position_tagged
+#endif /* USE_SPIRIT_X3_PARSER */
         {
           typedef
             lmp::obj::ast::ObjectHeader<HeaderCTypeTraits<ccid::ClassType,
