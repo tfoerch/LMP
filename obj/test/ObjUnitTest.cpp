@@ -1070,7 +1070,7 @@ BOOST_AUTO_TEST_CASE( unknown_object_class_decode_spirit )
    BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_class_type, 1);
    BOOST_CHECK_EQUAL(unknownObjectClass.m_header.m_negotiable, false);
    // BOOST_CHECK_EQUAL(unknownObjectClass, expectedUnknownObjectClass);
-   BOOST_CHECK_EQUAL(lmp::obj::getLength(unknownObjectClass), msgLength);
+   BOOST_CHECK_EQUAL(lmp::obj::ast::getLength(unknownObjectClass), msgLength);
    unsigned char emptySpace[msgLength];
    boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
    BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);

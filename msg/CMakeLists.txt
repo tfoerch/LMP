@@ -1,5 +1,5 @@
 
-add_library (lmp_msg SHARED MessageType.cpp CommonHeader.cpp Config.cpp ConfigAck.cpp ConfigNack.cpp Hello.cpp UnknownMessage.cpp Message.cpp)
+add_library (lmp_msg SHARED MessageType.cpp ConfigParser.cpp ConfigGenerator.cpp ConfigAst.cpp ConfigAckParser.cpp ConfigAckGenerator.cpp ConfigAckAst.cpp ConfigNackParser.cpp ConfigNackGenerator.cpp ConfigNackAst.cpp HelloParser.cpp HelloGenerator.cpp HelloAst.cpp UnknownMessageParser.cpp UnknownMessageGenerator.cpp UnknownMessageAst.cpp MessageParser.cpp MessageGenerator.cpp MessageAst.cpp)
 
 #add_cppcheck(lmp_msg UNUSED_FUNCTIONS STYLE POSSIBLE_ERROR FORCE FAIL_ON_WARNINGS)
 

@@ -17,5 +17,14 @@ namespace lmp
       ccid::ClassType::RemoteCCId;
     const lmp::WORD HeaderCTypeTraits<ccid::ClassType, ccid::ClassType::RemoteCCId>::length =
         c_objHeaderLength + 4;
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<ccid::ast::RemoteCCId>(
+        const ccid::ast::RemoteCCId&  objCType)
+      {
+        return 4;
+      }
+    }
   }
 }

@@ -18,17 +18,6 @@ namespace lmp
 {
   namespace obj
   {
-    lmp::DWORD getLength(
-      const ast::UnknownObjectClass&  unknownObjectClass);
-    struct GetLengthUnknownObjectClass
-    {
-      template<typename> struct result { typedef lmp::WORD type; };
-      lmp::WORD operator()(
-        const ast::UnknownObjectClass& unknownObjectClass) const
-      {
-        return getLength(unknownObjectClass);
-      }
-    };
     namespace generator
     {
       namespace karma = boost::spirit::karma;
@@ -38,7 +27,7 @@ namespace lmp
       {
         unknown_object_class_grammar();
 
-        boost::phoenix::function<GetLengthUnknownObjectClass>                            phx_getLength;
+        boost::phoenix::function<ast::GetLength<ast::UnknownObjectClass>>                phx_getLength;
         lmp::obj::generator::object_header_unknown_object_class_grammar<OutputIterator>  object_header;
 //        lmp::obj::generate::byte_sequence_grammar<OutputIterator>                        byte_sequence;
         karma::rule<OutputIterator, ast::UnknownObjectClass()>                           unknown_object_class_rule;

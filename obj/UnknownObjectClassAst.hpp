@@ -8,6 +8,9 @@
  */
 
 #include "obj/ObjectHeaderUnknownObjectClassAst.hpp"
+#include "obj/ObjectClassAst.hpp"
+
+#include <iostream>
 
 #ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/ast/position_tagged.hpp>
@@ -35,6 +38,13 @@ namespace lmp
         ObjectHeaderUnknownObjectClass  m_header;
         ByteSequence                    m_data;
       };
+      std::ostream& operator<<(
+        std::ostream&   os,
+        const UnknownObjectClass&  object);
+      template <>
+      lmp::DWORD getBodyLength<UnknownObjectClass>(
+        const UnknownObjectClass&  object);
+
 //      lmp::DWORD getLength(
 //        const ast::UnknownObjectClass&  unknownObjectClass);
 //      struct GetLengthUnknownObjectClass

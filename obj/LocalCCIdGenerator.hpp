@@ -35,7 +35,7 @@ namespace lmp
       {
         local_cc_id_grammar();
 
-//        boost::phoenix::function<GetLengthLocalCCId>   phx_getLength;
+        boost::phoenix::function<ast::GetLength<ccid::ast::LocalCCId>>   phx_getLength;
         lmp::obj::generator::object_header_grammar<OutputIterator, ccid::ClassType, ccid::ClassType::LocalCCId> object_header;
         karma::rule<OutputIterator, ccid::ast::LocalCCId()>  local_cc_id_rule;
       };

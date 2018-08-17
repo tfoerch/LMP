@@ -30,6 +30,12 @@ namespace lmp
                              config::ast::ConfigCTypes,
                              hello::ast::HelloCTypes,
                              UnknownObjectClass>   Objects;
+      std::ostream& operator<<(
+        std::ostream&   os,
+        const Objects&  objects);
+      template <>
+      lmp::DWORD getBodyLength<Objects>(
+        const Objects&  objects);
     }
   } // namespace obj
 } // namespace lmp

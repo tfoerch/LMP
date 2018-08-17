@@ -17,5 +17,14 @@ namespace lmp
       ccid::ClassType::LocalCCId;
     const lmp::WORD HeaderCTypeTraits<ccid::ClassType, ccid::ClassType::LocalCCId>::length =
         c_objHeaderLength + 4;
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<ccid::ast::LocalCCId>(
+        const ccid::ast::LocalCCId&  objCType)
+      {
+        return 4;
+      }
+    }
   }
 }

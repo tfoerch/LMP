@@ -17,5 +17,14 @@ namespace lmp
       nodeid::ClassType::RemoteNodeId;
     const lmp::WORD HeaderCTypeTraits<nodeid::ClassType, nodeid::ClassType::RemoteNodeId>::length =
         c_objHeaderLength + 4;
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<nodeid::ast::RemoteNodeId>(
+        const nodeid::ast::RemoteNodeId&  objCType)
+      {
+        return 4;
+      }
+    }
   }
 }

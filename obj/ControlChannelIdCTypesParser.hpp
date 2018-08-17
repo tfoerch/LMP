@@ -16,7 +16,7 @@
 #else
 #include "obj/LocalCCIdParser.hpp"
 #include "obj/RemoteCCIdParser.hpp"
-#include "obj/ObjectClassUnknownCTypeParser_def.hpp"
+#include "obj/ObjectClassUnknownCTypeParser.hpp"
 #include <boost/spirit/include/qi.hpp>
 #endif /* USE_SPIRIT_X3_PARSER */
 

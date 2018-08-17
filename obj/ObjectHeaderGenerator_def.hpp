@@ -53,7 +53,7 @@ namespace lmp
             (  eps(at_c<0>(_val)) << byte_ [ _1 = ( static_cast<typename std::underlying_type<ClassType>::type>(ctype) | lmp::obj::c_negotiableMask ) ] |
                byte_ [ _1 = static_cast<typename std::underlying_type<ClassType>::type>(ctype) ] ) // class type
             << byte_ [ _1 = static_cast<typename std::underlying_type<ObjectClass>::type>(HeaderObjClassTypeTraits<ClassType>::obj_class) ] // object class
-            << big_word [ _1 = HeaderCTypeTraits<ClassType, ctype>::length ] // length
+            << big_word [ _1 = _r1 ] // length
             ;
 
         object_header_rule.name("object_header");

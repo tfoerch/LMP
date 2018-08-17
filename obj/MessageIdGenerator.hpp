@@ -35,7 +35,7 @@ namespace lmp
       {
         message_id_grammar();
 
-//        boost::phoenix::function<GetLengthMessageId>   phx_getLength;
+        boost::phoenix::function<ast::GetLength<msgid::ast::MessageId>>   phx_getLength;
         lmp::obj::generator::object_header_grammar<OutputIterator, msgid::ClassType, msgid::ClassType::MessageId> object_header;
         karma::rule<OutputIterator, msgid::ast::MessageId()>  message_id_rule;
       };

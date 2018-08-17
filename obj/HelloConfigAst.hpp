@@ -50,6 +50,12 @@ namespace lmp
         };
       }
     }
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<config::ast::HelloConfig>(
+        const config::ast::HelloConfig&  objCType);
+    }
   } // namespace obj
 } // namespace lmp
 

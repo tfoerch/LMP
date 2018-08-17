@@ -24,13 +24,6 @@ namespace lmp
 {
   namespace obj
   {
-//    lmp::DWORD getLength(
-//      const nodeid::ast::LocalNodeId&  localNodeId)
-//    {
-//      return
-//        ( c_objHeaderLength +
-//          localNodeId.m_data.size() );
-//    }
     namespace generator
     {
       namespace fusion = boost::fusion;
@@ -48,7 +41,7 @@ namespace lmp
         using namespace qi::labels;
 
         local_node_id_rule =
-            object_header [ _1 = at_c<0>(_val) ]
+            object_header(phx_getLength(_val)) [ _1 = at_c<0>(_val) ]
             << big_dword [ _1 = at_c<1>(_val) ]
             ;
 

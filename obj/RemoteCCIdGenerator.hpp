@@ -35,7 +35,7 @@ namespace lmp
       {
         remote_cc_id_grammar();
 
-//        boost::phoenix::function<GetLengthRemoteCCId>   phx_getLength;
+        boost::phoenix::function<ast::GetLength<ccid::ast::RemoteCCId>>   phx_getLength;
         lmp::obj::generator::object_header_grammar<OutputIterator, ccid::ClassType, ccid::ClassType::RemoteCCId> object_header;
         karma::rule<OutputIterator, ccid::ast::RemoteCCId()>  remote_cc_id_rule;
       };

@@ -22,7 +22,16 @@ namespace lmp
       {
          typedef boost::variant<lmp::obj::hello::ast::Hello,
                                 lmp::obj::hello::ast::UnknownHelloCType>   HelloCTypes;
+         std::ostream& operator<<(
+           std::ostream&       os,
+           const HelloCTypes&  helloCType);
       }
+    }
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<hello::ast::HelloCTypes>(
+        const hello::ast::HelloCTypes&  helloCType);
     }
   } // namespace obj
 } // namespace lmp

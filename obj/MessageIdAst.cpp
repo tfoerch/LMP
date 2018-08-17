@@ -17,5 +17,14 @@ namespace lmp
       msgid::ClassType::MessageId;
     const lmp::WORD HeaderCTypeTraits<msgid::ClassType, msgid::ClassType::MessageId>::length =
         c_objHeaderLength + 4;
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<msgid::ast::MessageId>(
+        const msgid::ast::MessageId&  objCType)
+      {
+        return 4;
+      }
+    }
   }
 }

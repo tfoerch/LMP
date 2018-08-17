@@ -48,7 +48,7 @@ namespace lmp
         using namespace qi::labels;
 
         hello_config_rule =
-            object_header [ _1 = at_c<0>(_val) ]
+            object_header(phx_getLength(_val)) [ _1 = at_c<0>(_val) ]
             << big_word [ _1 = at_c<1>(_val) ]
             << big_word [ _1 = at_c<2>(_val) ]
             ;

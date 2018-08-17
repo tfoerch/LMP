@@ -5,10 +5,10 @@
  *      Author: tom
  */
 
-#include "MessageType_def.hpp"
+#include "MessageType.hpp"
 
 std::ostream& lmp::msg::operator<<(
-  std::ostream&    os,
+  std::ostream&              os,
   const lmp::msg::MsgType&   msgType)
 {
   switch(msgType)

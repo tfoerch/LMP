@@ -24,7 +24,16 @@ namespace lmp
          typedef boost::variant<lmp::obj::nodeid::ast::LocalNodeId,
                                 lmp::obj::nodeid::ast::RemoteNodeId,
                                 lmp::obj::nodeid::ast::UnknownNodeIdCType>   NodeIdCTypes;
+         std::ostream& operator<<(
+           std::ostream&        os,
+           const NodeIdCTypes&  nodeIdCType);
       }
+    }
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<nodeid::ast::NodeIdCTypes>(
+        const nodeid::ast::NodeIdCTypes&  nodeIdCType);
     }
   } // namespace obj
 } // namespace lmp

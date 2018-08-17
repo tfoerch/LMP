@@ -21,25 +21,13 @@ namespace lmp
     };
     namespace generator
     {
-      template<typename HeaderCTypeTraits>
-      struct GetLength
-      {
-        template<typename> struct result { typedef lmp::WORD type; };
-        lmp::WORD operator()(
-          const ast::ObjectHeader<HeaderCTypeTraits>& objHeader) const
-        {
-          return getLength(objHeader);
-        }
-      };
-
       namespace karma = boost::spirit::karma;
       template <typename OutputIterator, typename ClassType, ClassType ctype>
-      struct object_header_grammar : karma::grammar<OutputIterator, ast::ObjectHeader<HeaderCTypeTraits<ClassType, ctype>>()>
+      struct object_header_grammar : karma::grammar<OutputIterator, ast::ObjectHeader<HeaderCTypeTraits<ClassType, ctype>>(lmp::WORD)>
       {
         object_header_grammar();
 
-        boost::phoenix::function<GetLength<HeaderCTypeTraits<ClassType, ctype>>>                 phx_getLength;
-        karma::rule<OutputIterator, ast::ObjectHeader<HeaderCTypeTraits<ClassType, ctype>>()>  object_header_rule;
+        karma::rule<OutputIterator, ast::ObjectHeader<HeaderCTypeTraits<ClassType, ctype>>(lmp::WORD)>  object_header_rule;
       };
     }
   } // namespace obj

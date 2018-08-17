@@ -29,9 +29,34 @@ namespace lmp
       typedef ObjectClass            obj_class_type;
       static const  obj_class_type   obj_class = objClass;
     };
+
     const lmp::WORD  c_objHeaderLength = 4;
     const lmp::BYTE  c_negotiableMask = 0x80;
     const lmp::BYTE  c_classTypeMask = 0x7f;
+
+    namespace ast
+    {
+      template <typename   ObjCType>
+      lmp::DWORD getBodyLength(
+        const ObjCType&  objCType);
+
+      template <typename   ObjCType>
+      lmp::DWORD getLength(
+        const ObjCType&  objCType)
+      { // implementation for all ast type below lmp::obj except of sequences
+        return c_objHeaderLength + getBodyLength(objCType);
+      }
+      template<typename ObjCType>
+      struct GetLength
+      {
+        template<typename> struct result { typedef lmp::WORD type; };
+        lmp::WORD operator()(
+          const ObjCType& objCType) const
+        {
+          return getLength(objCType);
+        }
+      };
+    }
   } // namespace obj
 } // namespace lmp
 

@@ -35,7 +35,7 @@ namespace lmp
       {
         message_id_ack_grammar();
 
-//        boost::phoenix::function<GetLengthMessageIdAck>   phx_getLength;
+        boost::phoenix::function<ast::GetLength<msgid::ast::MessageIdAck>>   phx_getLength;
         lmp::obj::generator::object_header_grammar<OutputIterator, msgid::ClassType, msgid::ClassType::MessageIdAck> object_header;
         karma::rule<OutputIterator, msgid::ast::MessageIdAck()>  message_id_ack_rule;
       };

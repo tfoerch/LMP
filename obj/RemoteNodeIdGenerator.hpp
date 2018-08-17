@@ -35,7 +35,7 @@ namespace lmp
       {
         remote_node_id_grammar();
 
-//        boost::phoenix::function<GetLengthRemoteNodeId>   phx_getLength;
+        boost::phoenix::function<ast::GetLength<nodeid::ast::RemoteNodeId>>   phx_getLength;
         lmp::obj::generator::object_header_grammar<OutputIterator, nodeid::ClassType, nodeid::ClassType::RemoteNodeId> object_header;
         karma::rule<OutputIterator, nodeid::ast::RemoteNodeId()>  remote_node_id_rule;
       };

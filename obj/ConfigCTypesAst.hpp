@@ -1,5 +1,5 @@
-#ifndef LMP_OBJ_CONFIG_CTYPES_HPP_
-#define LMP_OBJ_CONFIG_CTYPES_HPP_
+#ifndef LMP_OBJ_CONFIG_CTYPES_AST_HPP_
+#define LMP_OBJ_CONFIG_CTYPES_AST_HPP_
 /*
  * ConfigCTypesAst.hpp
  *
@@ -20,11 +20,20 @@ namespace lmp
     {
       namespace ast
       {
-         typedef boost::variant<lmp::obj::config::ast::HelloConfig,
-                                lmp::obj::config::ast::UnknownConfigCType>   ConfigCTypes;
+        typedef boost::variant<lmp::obj::config::ast::HelloConfig,
+                               lmp::obj::config::ast::UnknownConfigCType>   ConfigCTypes;
+        std::ostream& operator<<(
+          std::ostream&        os,
+          const ConfigCTypes&  configCType);
       }
+    }
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<config::ast::ConfigCTypes>(
+        const config::ast::ConfigCTypes&  configCType);
     }
   } // namespace obj
 } // namespace lmp
 
-#endif /* LMP_OBJ_CONFIG_CTYPES_HPP_ */
+#endif /* LMP_OBJ_CONFIG_CTYPES_AST_HPP_ */

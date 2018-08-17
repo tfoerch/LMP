@@ -14,6 +14,7 @@
 #endif /* USE_SPIRIT_X3_PARSER */
 
 #include <vector>
+#include <iostream>
 
 namespace lmp
 {
@@ -38,24 +39,30 @@ namespace lmp
         ByteSequence                              m_data;
       };
     }
+    template <typename   ObjClassTraits>
+    std::ostream& operator<<(
+      std::ostream&                                        os,
+      const ast::ObjectClassUnknownCType<ObjClassTraits>&  objClassUnknownCTypeData)
+    {
+      return os;
+    }
     template <typename  ObjClassTraits>
-    lmp::DWORD getLength(
+    lmp::DWORD getBodyLength(
       const ast::ObjectClassUnknownCType<ObjClassTraits>&  objectClassUnknownCType)
     {
       return
-        ( c_objHeaderLength +
-          objectClassUnknownCType.m_data.size() );
+        objectClassUnknownCType.m_data.size();
     }
-    template<typename ObjClassTraits>
-    struct GetLengthUnknownCType
-    {
-      template<typename> struct result { typedef lmp::WORD type; };
-      lmp::WORD operator()(
-        const ast::ObjectClassUnknownCType<ObjClassTraits>& objClassUnknownCType) const
-      {
-        return getLength(objClassUnknownCType);
-      }
-    };
+//    template<typename ObjClassTraits>
+//    struct GetLengthUnknownCType
+//    {
+//      template<typename> struct result { typedef lmp::WORD type; };
+//      lmp::WORD operator()(
+//        const ast::ObjectClassUnknownCType<ObjClassTraits>& objClassUnknownCType) const
+//      {
+//        return getLength(objClassUnknownCType);
+//      }
+//    };
 
   } // namespace obj
 } // namespace lmp

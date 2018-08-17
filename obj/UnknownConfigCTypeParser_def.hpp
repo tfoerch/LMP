@@ -12,9 +12,18 @@
 #include "obj/ObjectClassUnknownCTypeAstAdapted.hpp"
 #include "obj/ObjectHeaderUnknownCTypeParser_def.hpp"
 #include "obj/ObjectClassAst.hpp"
+#ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>
 #include <boost/spirit/home/x3/binary/binary.hpp>
 #include <boost/spirit/home/x3.hpp>
+#else
+#include <boost/spirit/include/qi_binary.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/phoenix/object/static_cast.hpp>
+#endif /* USE_SPIRIT_X3_PARSER */
 
 #include <type_traits>
 
@@ -24,6 +33,7 @@ namespace lmp
   {
     namespace parser
     {
+#ifdef USE_SPIRIT_X3_PARSER
       namespace x3 = boost::spirit::x3;
       namespace fusion = boost::fusion;
       using x3::big_dword;
@@ -64,12 +74,16 @@ namespace lmp
       // We want error-handling only for the start (outermost) rexpr
       // rexpr is the same as rexpr_inner but without error-handling (see error_handler.hpp)
       struct unknown_config_ctype_class : x3::annotate_on_success/*, error_handler_base*/ {};
+#else
+#endif /* USE_SPIRIT_X3_PARSER */
     } // namespace parser
 
+#ifdef USE_SPIRIT_X3_PARSER
     parser::unknown_config_ctype_type const& unknown_config_ctype()
     {
       return parser::unknown_config_ctype;
     }
+#endif /* USE_SPIRIT_X3_PARSER */
   } // namespace obj
 } // namespace lmp
 

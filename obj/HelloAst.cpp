@@ -17,5 +17,14 @@ namespace lmp
       hello::ClassType::Hello;
     const lmp::WORD HeaderCTypeTraits<hello::ClassType, hello::ClassType::Hello>::length =
         c_objHeaderLength + 4 + 4;
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<hello::ast::Hello>(
+        const hello::ast::Hello&  objCType)
+      {
+        return 4 + 4;
+      }
+    }
   }
 }

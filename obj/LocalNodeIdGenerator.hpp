@@ -35,7 +35,7 @@ namespace lmp
       {
         local_node_id_grammar();
 
-//        boost::phoenix::function<GetLengthLocalNodeId>   phx_getLength;
+        boost::phoenix::function<ast::GetLength<nodeid::ast::LocalNodeId>>   phx_getLength;
         lmp::obj::generator::object_header_grammar<OutputIterator, nodeid::ClassType, nodeid::ClassType::LocalNodeId> object_header;
         karma::rule<OutputIterator, nodeid::ast::LocalNodeId()>  local_node_id_rule;
       };

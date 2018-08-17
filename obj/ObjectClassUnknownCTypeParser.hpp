@@ -25,7 +25,7 @@ namespace lmp
       {
         object_class_unknown_ctype_grammar();
 
-        boost::phoenix::function<GetLengthUnknownCType<ObjectClassTraits<objClass>>>     phx_getLength;
+//        boost::phoenix::function<GetLengthUnknownCType<ObjectClassTraits<objClass>>>     phx_getLength;
         lmp::obj::parser::object_header_unknown_ctype_grammar<Iterator, objClass>        object_header;
         qi::rule<Iterator,
                  ast::ObjectClassUnknownCType<ObjectClassTraits<objClass>>(),

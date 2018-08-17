@@ -47,6 +47,12 @@ namespace lmp
         };
       }
     }
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<ccid::ast::RemoteCCId>(
+        const ccid::ast::RemoteCCId&  objCType);
+    }
   } // namespace obj
 } // namespace lmp
 

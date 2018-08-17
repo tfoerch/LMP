@@ -49,6 +49,12 @@ namespace lmp
         };
       }
     }
+    namespace ast
+    {
+      template <>
+      lmp::DWORD getBodyLength<msgid::ast::MessageIdAck>(
+        const msgid::ast::MessageIdAck&  objCType);
+    }
   } // namespace obj
 } // namespace lmp
 

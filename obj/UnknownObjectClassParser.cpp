@@ -30,5 +30,21 @@ namespace lmp
       template struct unknown_object_class_grammar<BufIterType>;
 #endif /* USE_SPIRIT_X3_PARSER */
     }
+
+    namespace ast
+    {
+      std::ostream& operator<<(
+        std::ostream&   os,
+        const UnknownObjectClass&  object)
+      {
+        return os;
+      }
+      template <>
+      lmp::DWORD getBodyLength<UnknownObjectClass>(
+        const UnknownObjectClass&  object)
+      {
+        return object.m_data.size();
+      }
+    }
   }
 }

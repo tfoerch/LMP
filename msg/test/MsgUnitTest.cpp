@@ -5,12 +5,18 @@
  *      Author: tom
  */
 
-#include "msg/CommonHeader.hpp"
-#include "msg/Config.hpp"
-#include "msg/ConfigAck.hpp"
-#include "msg/ConfigNack.hpp"
-#include "msg/Hello.hpp"
-#include "msg/Message.hpp"
+#include "msg/CommonHeaderParser.hpp"
+#include "msg/ConfigParser.hpp"
+#include "msg/ConfigAckParser.hpp"
+#include "msg/ConfigNackParser.hpp"
+#include "msg/HelloParser.hpp"
+#include "msg/MessageParser.hpp"
+#include "msg/CommonHeaderGenerator.hpp"
+#include "msg/ConfigGenerator.hpp"
+#include "msg/ConfigAckGenerator.hpp"
+#include "msg/ConfigNackGenerator.hpp"
+#include "msg/HelloGenerator.hpp"
+#include "msg/MessageGenerator.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
@@ -413,21 +419,20 @@ BOOST_AUTO_TEST_CASE( config_message_struct )
       0x00, 0x9A, 0x01, 0xCF };
     const lmp::WORD msgLength = sizeof(message)/sizeof(unsigned char);
     boost::asio::const_buffers_1 messageBuffer(message, msgLength);
-    lmp::obj::config::ConfigObjectSequence  expectedConfigObjectSequence;
+    lmp::obj::config::ast::ConfigObjectSequence  expectedConfigObjectSequence;
     {
-      lmp::obj::config::HelloConfigData  expectedHelloConfig = { true, { 0x009A, 0x01CF } };
-      expectedConfigObjectSequence.push_back(lmp::obj::config::ConfigCTypes(expectedHelloConfig));
+      lmp::obj::config::ast::HelloConfig  expectedHelloConfig = { { true }, 0x009A, 0x01CF };
+      expectedConfigObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(expectedHelloConfig));
     }
-    lmp::msg::ConfigMsg  expectedConfigMsg =
-      { false,
-        false,
-        { { false, { 0x1020008 } },      // localCCId
-          { false, { 0x1020508 } },      // messageId
-          { false, { 0x8600420 } },      // localNodeId
-          expectedConfigObjectSequence } // configObjectss
+    lmp::msg::ast::Config  expectedConfigMsg =
+      { { false, false },
+        { { false }, 0x1020008 },      // localCCId
+        { { false }, 0x1020508 },      // messageId
+        { { false }, 0x8600420 },      // localNodeId
+        expectedConfigObjectSequence   // configObjectss
       };
-    lmp::msg::Message expectedMessage = expectedConfigMsg;
-    lmp::msg::Message otherMessage;
+    lmp::msg::ast::Message expectedMessage = expectedConfigMsg;
+    lmp::msg::ast::Message otherMessage;
     std::cout << sizeof(otherMessage) << std::endl;
     otherMessage = expectedConfigMsg;
     std::cout << sizeof(otherMessage) << std::endl;
@@ -466,36 +471,33 @@ BOOST_AUTO_TEST_CASE( config_message_spirit )
     boost::asio::const_buffers_1 messageBuffer(message, msgLength);
     BufIterType begin = boost::asio::buffers_begin(messageBuffer);
     BufIterType last = boost::asio::buffers_end(messageBuffer);
-    lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-    lmp::msg::Message parsedMessage;
-    lmp::obj::config::ConfigObjectSequence  expectedConfigObjectSequence;
+    lmp::msg::parser::message_grammar<BufIterType>  msgGrammar;
+    lmp::msg::ast::Message parsedMessage;
+    lmp::obj::config::ast::ConfigObjectSequence  expectedConfigObjectSequence;
     {
-      lmp::obj::config::HelloConfigData  expectedHelloConfig = { true, { 0x009A, 0x01CF } };
-      expectedConfigObjectSequence.push_back(lmp::obj::config::ConfigCTypes(expectedHelloConfig));
+      lmp::obj::config::ast::HelloConfig  expectedHelloConfig = { { true }, 0x009A, 0x01CF };
+      expectedConfigObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(expectedHelloConfig));
     }
-    lmp::msg::ConfigMsg  expectedConfigMsg =
-      { false,
-        false,
-        { { false, { 0x1020008 } },      // localCCId
-          { false, { 0x1020508 } },      // messageId
-          { false, { 0x8600420 } },      // localNodeId
-          expectedConfigObjectSequence } // configObjectss
+    lmp::msg::ast::Config  expectedConfigMsg =
+      { { false, false },
+        { { false }, 0x1020008 },      // localCCId
+        { { false }, 0x1020508 },      // messageId
+        { { false }, 0x8600420 },      // localNodeId
+        expectedConfigObjectSequence   // configObjectss
       };
-    lmp::msg::Message expectedMessage = expectedConfigMsg;
+    lmp::msg::ast::Message expectedMessage = expectedConfigMsg;
     BOOST_CHECK(parse(begin,
                       last,
                       msgGrammar,
                       parsedMessage));
     BOOST_CHECK_EQUAL(parsedMessage, expectedMessage);
-    BOOST_CHECK_EQUAL(lmp::msg::getLength(parsedMessage), msgLength);
+    BOOST_CHECK_EQUAL(lmp::msg::ast::getLength(parsedMessage), msgLength);
     std::cout << parsedMessage << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
-//    lmp::msg::generate::message_type_grammar<BufOutIterType,
-//                                             lmp::msg::MsgType::Config>  configMsgGenerateGrammar;
+    lmp::msg::generator::message_grammar<BufOutIterType>  msgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
                          msgGenerateGrammar,
                          parsedMessage));
@@ -529,32 +531,29 @@ BOOST_AUTO_TEST_CASE( config_ack_message_spirit )
     boost::asio::const_buffers_1 messageBuffer(message, msgLength);
     BufIterType begin = boost::asio::buffers_begin(messageBuffer);
     BufIterType last = boost::asio::buffers_end(messageBuffer);
-    lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-    lmp::msg::Message parsedMessage;
-    lmp::msg::ConfigAckMsg  expectedConfigAckMsg =
-      { false,
-        false,
-        { { false, { 0x1020008 } },    // localCCId
-          { false, { 0x8600420 } },    // localNodeId
-          { false, { 0x1130a03 } },    // remoteCCId
-          { false, { 0x1020508 } },    // messageId
-          { false, { 0x1130a05 } } }   // remoteNodeId
+    lmp::msg::parser::message_grammar<BufIterType>  msgGrammar;
+    lmp::msg::ast::Message parsedMessage;
+    lmp::msg::ast::ConfigAck  expectedConfigAckMsg =
+      { { false, false },
+        { { false } , 0x1020008 },    // localCCId
+        { { false }, 0x8600420 },    // localNodeId
+        { { false }, 0x1130a03 },    // remoteCCId
+        { { false }, 0x1020508 },    // messageId
+        { { false }, 0x1130a05 }    // remoteNodeId
       };
-    lmp::msg::Message expectedMessage = expectedConfigAckMsg;
+    lmp::msg::ast::Message expectedMessage = expectedConfigAckMsg;
     BOOST_CHECK(parse(begin,
                       last,
                       msgGrammar,
                       parsedMessage));
     BOOST_CHECK_EQUAL(parsedMessage, expectedMessage);
-    BOOST_CHECK_EQUAL(lmp::msg::getLength(parsedMessage), msgLength);
+    BOOST_CHECK_EQUAL(lmp::msg::ast::getLength(parsedMessage), msgLength);
     std::cout << parsedMessage << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
-//    lmp::msg::generate::message_type_grammar<BufOutIterType,
-//                                             lmp::msg::MsgType::ConfigAck>  configAckMsgGenerateGrammar;
+    lmp::msg::generator::message_grammar<BufOutIterType>  msgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
                          msgGenerateGrammar,
                          parsedMessage));
@@ -590,33 +589,30 @@ BOOST_AUTO_TEST_CASE( config_nack_message_spirit )
     boost::asio::const_buffers_1 messageBuffer(message, msgLength);
     BufIterType begin = boost::asio::buffers_begin(messageBuffer);
     BufIterType last = boost::asio::buffers_end(messageBuffer);
-    lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-    lmp::msg::Message parsedMessage;
-    lmp::msg::ConfigNackMsg  expectedConfigNackMsg =
-      { false,
-        false,
-        { { false, { 0x1020008 } },    // localCCId
-          { false, { 0x8600420 } },    // localNodeId
-          { false, { 0x1130a03 } },    // remoteCCId
-          { false, { 0x1020508 } },    // messageId
-          { false, { 0x1130a05 } },    // remoteNodeId
-          { true,  { 0x009A, 0x01CF } } } // helloConfig
+    lmp::msg::parser::message_grammar<BufIterType>  msgGrammar;
+    lmp::msg::ast::Message parsedMessage;
+    lmp::msg::ast::ConfigNack  expectedConfigNackMsg =
+      { { false, false },
+        { { false }, 0x1020008 },    // localCCId
+        { { false }, 0x8600420 },    // localNodeId
+        { { false }, 0x1130a03 },    // remoteCCId
+        { { false }, 0x1020508 },    // messageId
+        { { false }, 0x1130a05 },    // remoteNodeId
+        { { true },  0x009A, 0x01CF } // helloConfig
       };
-    lmp::msg::Message expectedMessage = expectedConfigNackMsg;
+    lmp::msg::ast::Message expectedMessage = expectedConfigNackMsg;
     BOOST_CHECK(parse(begin,
                       last,
                       msgGrammar,
                       parsedMessage));
     BOOST_CHECK_EQUAL(parsedMessage, expectedMessage);
-    BOOST_CHECK_EQUAL(lmp::msg::getLength(parsedMessage), msgLength);
+    BOOST_CHECK_EQUAL(lmp::msg::ast::getLength(parsedMessage), msgLength);
     std::cout << parsedMessage << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
-//    lmp::msg::generate::message_type_grammar<BufOutIterType,
-//                                             lmp::msg::MsgType::ConfigNack>  configNackMsgGenerateGrammar;
+    lmp::msg::generator::message_grammar<BufOutIterType>  msgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
                          msgGenerateGrammar,
                          parsedMessage));
@@ -643,28 +639,25 @@ BOOST_AUTO_TEST_CASE( hello_message_spirit )
     boost::asio::const_buffers_1 messageBuffer(message, msgLength);
     BufIterType begin = boost::asio::buffers_begin(messageBuffer);
     BufIterType last = boost::asio::buffers_end(messageBuffer);
-    lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-    lmp::msg::Message parsedMessage;
-    lmp::msg::HelloMsg  expectedHelloMsg =
-      { false,
-        false,
-        { { false, { 0x00000001, 0x00000000 } } } // hello
+    lmp::msg::parser::message_grammar<BufIterType>  msgGrammar;
+    lmp::msg::ast::Message parsedMessage;
+    lmp::msg::ast::Hello  expectedHelloMsg =
+      { { false, false },
+        { { false }, 0x00000001, 0x00000000 } // hello
       };
-    lmp::msg::Message expectedMessage = expectedHelloMsg;
+    lmp::msg::ast::Message expectedMessage = expectedHelloMsg;
     BOOST_CHECK(parse(begin,
                       last,
                       msgGrammar,
                       parsedMessage));
     BOOST_CHECK_EQUAL(parsedMessage, expectedMessage);
-    BOOST_CHECK_EQUAL(lmp::msg::getLength(parsedMessage), msgLength);
+    BOOST_CHECK_EQUAL(lmp::msg::ast::getLength(parsedMessage), msgLength);
     std::cout << parsedMessage << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
     BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-    lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
-//    lmp::msg::generate::message_type_grammar<BufOutIterType,
-//                                             lmp::msg::MsgType::Hello>  helloMsgGenerateGrammar;
+    lmp::msg::generator::message_grammar<BufOutIterType>  msgGenerateGrammar;
     BOOST_CHECK(generate(gen_begin,
                          msgGenerateGrammar,
                          parsedMessage));
@@ -694,12 +687,12 @@ BOOST_AUTO_TEST_CASE( unknown_message_spirit )
                                                sizeof(message)/sizeof(unsigned char));
 	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
 	BufIterType last = boost::asio::buffers_end(messageBuffer);
-	lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-	lmp::msg::Message parsedMessage;
+	lmp::msg::parser::message_grammar<BufIterType>  msgGrammar;
+	lmp::msg::ast::Message parsedMessage;
 	BOOST_CHECK(parse(begin,
-		              last,
-		              msgGrammar,
-		              parsedMessage));
+	                  last,
+	                  msgGrammar,
+	                  parsedMessage));
 	std::cout << parsedMessage << std::endl;
 	// BOOST_CHECK_EQUAL(msgData.m_type, lmp::msg::parse::MsgType::Config);
 	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
@@ -746,8 +739,8 @@ BOOST_AUTO_TEST_CASE( unknown_msg_type_header_spirit )
                                                sizeof(message)/sizeof(unsigned char));
 	BufIterType begin = boost::asio::buffers_begin(messageBuffer);
 	BufIterType last = boost::asio::buffers_end(messageBuffer);
-	lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-	lmp::msg::Message parsedMessage;
+	lmp::msg::parser::message_grammar<BufIterType>  msgGrammar;
+	lmp::msg::ast::Message parsedMessage;
 	BOOST_CHECK(!parse(begin,
 	                   last,
 	                   msgGrammar,

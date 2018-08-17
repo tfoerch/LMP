@@ -35,7 +35,7 @@ namespace lmp
       {
         hello_config_grammar();
 
-//        boost::phoenix::function<GetLengthHelloConfig>   phx_getLength;
+        boost::phoenix::function<ast::GetLength<config::ast::HelloConfig>>   phx_getLength;
         lmp::obj::generator::object_header_grammar<OutputIterator, config::ClassType, config::ClassType::HelloConfig> object_header;
         karma::rule<OutputIterator, config::ast::HelloConfig()>  hello_config_rule;
       };
