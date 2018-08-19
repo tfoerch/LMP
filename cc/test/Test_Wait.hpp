@@ -11,7 +11,7 @@
 
 namespace boost
 {
-  namespace asio { class io_service; }
+  namespace asio { class io_context; }
 }
 namespace lmp
 {
@@ -22,7 +22,7 @@ namespace lmp
     {
       bool wait(
     	const lmp::base::CheckFtorIF&     checkFtor,
-    	boost::asio::io_service&          io_service,
+    	boost::asio::io_context&          io_context,
         const std::chrono::milliseconds&  expiry_time);
     } // namespace util
   } // namespace test

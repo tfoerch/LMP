@@ -14,7 +14,7 @@
 #include <boost/asio/buffer.hpp>
 #include <boost/optional/optional.hpp>        // for optional
 
-namespace boost { namespace asio { class io_service; } }
+namespace boost { namespace asio { class io_context; } }
 
 namespace lmp
 {
@@ -26,7 +26,7 @@ namespace lmp
     {
     public:
       NetworkIFSocket(
-    	boost::asio::io_service&          io_service,
+    	boost::asio::io_context&          io_context,
         const std::string&                ifName,
         lmp::WORD                         port,
         UDPMsgReceiveIF&                  udpMsgHandler,
@@ -55,7 +55,7 @@ namespace lmp
       void handle_send_msg(
     	const boost::system::error_code&  error,
     	size_t                            bytes_sent);
-      boost::asio::io_service&                       m_io_service;
+      boost::asio::io_context&                       m_io_context;
       UDPMsgReceiveIF&                               m_udpMsgHandler;
       std::string                                    m_ifName;
       lmp::WORD                                      m_port;

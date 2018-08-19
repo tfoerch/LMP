@@ -16,10 +16,12 @@
 #include "cc/IPCC_State.hpp"
 #include "cc/IPCC_Event.hpp"
 #include "cc/IPCC_Action.hpp"
-#include "msg/Config.hpp"
-#include "msg/ConfigAck.hpp"
-#include "msg/ConfigNack.hpp"
-#include "msg/Hello.hpp"
+#include "msg/ConfigAst.hpp"
+#include "msg/ConfigAckAst.hpp"
+#include "msg/ConfigNackAst.hpp"
+#include "msg/HelloAst.hpp"
+#include "msg/MessageParser.hpp"
+#include "msg/MessageGenerator.hpp"
 #include "Test_IPCC_Observer.hpp"
 #include "Test_IPCC_Msg_Receiver.hpp"
 #include "Test_NeighborDiscoveredCheckFtor.hpp"
@@ -338,20 +340,20 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_loopback_addr)
     lmp::cc::NetworkIFSocket  node2_lmpSocket(io_service, ifName, node2_port, node2_MsgHandler, false);
     node2_lmpSocket.enable();
 
-    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+    lmp::obj::config::ast::ConfigObjectSequence  configObjectSequence;
     {
-      lmp::obj::config::HelloConfigData  helloConfig = { true, { 0x009A, 0x01CF } };
-      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+      lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 0x009A, 0x01CF };
+      configObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(helloConfig));
     }
-    lmp::msg::ConfigMsg  configMsg =
-      { false,
-        false,
-        { { false, { node1_1stCCId } },      // localCCId
-          { false, { 0x1020508 } },      // messageId
-          { false, { node2_nodeId } },      // localNodeId
-          configObjectSequence } // configObjectss
+    lmp::msg::ast::Config  configMsg =
+      { { false,
+          false },
+        { { false }, node1_1stCCId },      // localCCId
+        { { false }, 0x1020508 },      // messageId
+        { { false }, node2_nodeId },      // localNodeId
+        configObjectSequence // configObjectss
       };
-    lmp::msg::Message sendMessage = configMsg;
+    lmp::msg::ast::Message sendMessage = configMsg;
 
     node2_MsgHandler.sendMessage(node2_lmpSocket, node1_endpoint, sendMessage);
 //    node1_lmpSocket.send(node2_endpoint, sendBuffer);
@@ -395,28 +397,27 @@ BOOST_AUTO_TEST_CASE( bind_socket_to_netif)
 
   boost::asio::ip::udp::endpoint remote_endpoint(boost::asio::ip::address::from_string("224.0.0.1"),
                                                  port);
-  lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+  lmp::obj::config::ast::ConfigObjectSequence  configObjectSequence;
   {
-    lmp::obj::config::HelloConfigData  helloConfig = { true, { 0x009A, 0x01CF } };
-    configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+    lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 0x009A, 0x01CF };
+    configObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(helloConfig));
   }
-  lmp::msg::ConfigMsg  configMsg =
-    { false,
-      false,
-      { { false, { 0x1020008 } },      // localCCId
-        { false, { 0x1020508 } },      // messageId
-        { false, { 0x8600420 } },      // localNodeId
-        configObjectSequence } // configObjectss
+  lmp::msg::ast::Config  configMsg =
+    { { false,
+        false },
+      { { false }, 0x1020008 },      // localCCId
+      { { false }, 0x1020508 },      // messageId
+      { { false }, 0x8600420 },      // localNodeId
+        configObjectSequence  // configObjectss
     };
-  const lmp::WORD msgLength = lmp::msg::getLength(configMsg);
+  const lmp::WORD msgLength = lmp::msg::ast::getLength(configMsg);
   unsigned char rawBuffer[msgLength];
   boost::asio::mutable_buffers_1 sendBuffer(rawBuffer, msgLength);
   typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
   BufOutIterType  gen_begin = boost::asio::buffers_begin(sendBuffer);
   BufOutIterType gen_last = boost::asio::buffers_end(sendBuffer);
   using boost::spirit::karma::generate;
-  lmp::msg::generate::message_type_grammar<BufOutIterType,
-                                           lmp::msg::MsgType::Config>  configMsgGenerateGrammar;
+  lmp::msg::generator::message_grammar<BufOutIterType>  configMsgGenerateGrammar;
   BOOST_CHECK(generate(gen_begin,
                        configMsgGenerateGrammar,
                        configMsg));
@@ -560,15 +561,15 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfigErr )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
       }
     }
-    lmp::msg::ConfigNackMsg configNackMsg =
-      { false,
-        false,
-        { { false, { 2 } },        // localCCId
-          { false, { 115 } },      // localNodeId
-          { false, { 7 } },        // remoteCCId
-          { false, { 34 } },       // messageId
-          { false, { 117 } },      // remoteNodeId
-          { true, { 100, 450 } } } // helloConfig
+    lmp::msg::ast::ConfigNack configNackMsg =
+      { { false,
+          false },
+        { { false }, 2 },        // localCCId
+        { { false }, 115 },      // localNodeId
+        { { false }, 7 },        // remoteCCId
+        { { false }, 34 },       // messageId
+        { { false }, 117 },      // remoteNodeId
+        { { true }, 100, 450 } // helloConfig
       };
     activeIPCC.processReceivedMessage(configNackMsg);
     {
@@ -628,18 +629,18 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenWin )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
       }
     }
-    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+    lmp::obj::config::ast::ConfigObjectSequence  configObjectSequence;
     {
-      lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
-      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+      lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 100, 450 };// helloConfig
+      configObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(helloConfig));
     }
-    lmp::msg::ConfigMsg  configMsg =
-      { false,
-        false,
-        { { false, { node2_1stCCId } },      // localCCId
-          { false, { 34 } },     // messageId
-          { false, { node2_nodeId } },    // localNodeId
-          configObjectSequence } // configObjects
+    lmp::msg::ast::Config  configMsg =
+      { { false,
+          false },
+        { { false }, node2_1stCCId },      // localCCId
+        { { false }, 34 },     // messageId
+        { { false }, node2_nodeId },    // localNodeId
+          configObjectSequence  // configObjects
       };
 
     activeIPCC.processReceivedMessage(configMsg);
@@ -700,7 +701,7 @@ BOOST_AUTO_TEST_CASE( activeIPCC_Reconfig )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
       }
     }
-    lmp::obj::config::HelloConfigBody  helloConfig = { 150, 600 };
+    lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 150, 600 };
     activeIPCC.reconfigure(helloConfig);
     {
       const boost::optional<const lmp::cc::appl::State&>& activeState = activeIPCC.getState();
@@ -801,18 +802,18 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_NotAcceptConf )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
       }
     }
-    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+    lmp::obj::config::ast::ConfigObjectSequence  configObjectSequence;
     {
-      lmp::obj::config::HelloConfigData  helloConfig = { true, { 450, 450 } };// helloConfig
-      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+      lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 450, 450 };// helloConfig
+      configObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(helloConfig));
     }
-    lmp::msg::ConfigMsg  configMsg =
-      { false,
-        false,
-        { { false, { node2_1stCCId } },      // localCCId
-          { false, { 34 } },     // messageId
-          { false, { node2_nodeId } },    // localNodeId
-          configObjectSequence } // configObjectss
+    lmp::msg::ast::Config  configMsg =
+      { { false,
+          false },
+        { { false }, node2_1stCCId },      // localCCId
+        { { false }, 34 },     // messageId
+        { { false }, node2_nodeId },    // localNodeId
+        configObjectSequence  // configObjectss
       };
     activeIPCC.processReceivedMessage(configMsg);
     // BOOST_TEST_MESSAGE("getState");
@@ -873,14 +874,14 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
       }
     }
-    lmp::msg::ConfigAckMsg configAckMsg =
-      { false,
-        false,
-        { { false, { node2_1stCCId } },      // localCCId
-          { false, { node2_nodeId } },    // localNodeId
-          { false, { node1_1stCCId } },      // remoteCCId
-          { false, { 34 } },     // messageId
-          { false, { node1_nodeId } } }   // remoteNodeId
+    lmp::msg::ast::ConfigAck configAckMsg =
+      { { false,
+          false },
+        { { false }, node2_1stCCId },      // localCCId
+        { { false }, node2_nodeId },    // localNodeId
+        { { false }, node1_1stCCId },      // remoteCCId
+        { { false }, 34 },     // messageId
+        { { false }, node1_nodeId }   // remoteNodeId
       };
     activeIPCC.processReceivedMessage(configAckMsg);
     {
@@ -903,10 +904,10 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
       }
     }
     {
-      lmp::msg::HelloMsg  helloMsg =
-        { false,
-          false,
-          { { false, { 1, 0 } } }    // hello
+      lmp::msg::ast::Hello  helloMsg =
+        { { false,
+            false },
+          { { false }, 1, 0 }    // hello
         };
       activeIPCC.processReceivedMessage(helloMsg);
       {
@@ -926,10 +927,10 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
       }
     }
     {
-      lmp::msg::HelloMsg  helloMsg =
-        { false,
-          false,
-          { { false, { 1, 1 } } }     // hello
+      lmp::msg::ast::Hello  helloMsg =
+        { { false,
+            false },
+          { { false }, 1, 1 }     // hello
         };
       activeIPCC.processReceivedMessage(helloMsg);
       {
@@ -965,10 +966,10 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ConfDone_HelloRcvd )
       }
     }
     {
-      lmp::msg::HelloMsg  helloMsg =
-        { false,
-          false,
-          { { false, { 2, 2 } } }   // hello
+      lmp::msg::ast::Hello  helloMsg =
+        { { false,
+            false },
+          { { false }, 2, 2 }   // hello
         };
       activeIPCC.processReceivedMessage(helloMsg);
       {
@@ -1053,18 +1054,18 @@ BOOST_AUTO_TEST_CASE( activeIPCC_ContenLost_AcceptConf )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfSnd());
       }
     }
-    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+    lmp::obj::config::ast::ConfigObjectSequence  configObjectSequence;
     {
-      lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
-      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+      lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 100, 450 };// helloConfig
+      configObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(helloConfig));
     }
-    lmp::msg::ConfigMsg  configMsg =
-      { false,
-        false,
-        { { false, { 7002 } },      // localCCId
-          { false, { 32 } },     // messageId
-          { false, { node2_nodeId } },    // localNodeId
-          configObjectSequence } // configObjectss
+    lmp::msg::ast::Config  configMsg =
+      { { false,
+          false },
+        { { false }, 7002 },      // localCCId
+        { { false }, 32 },     // messageId
+        { { false }, node2_nodeId },    // localNodeId
+          configObjectSequence // configObjectss
       };
     activeIPCC.processReceivedMessage(configMsg);
     // BOOST_TEST_MESSAGE("getState");
@@ -1132,18 +1133,18 @@ BOOST_AUTO_TEST_CASE( passiveIPCC )
         BOOST_CHECK_EQUAL(*activeState, lmp::cc::appl::ConfRcv());
       }
     }
-    lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+    lmp::obj::config::ast::ConfigObjectSequence  configObjectSequence;
     {
-      lmp::obj::config::HelloConfigData  helloConfig = { true, { 100, 450 } };// helloConfig
-      configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+      lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 100, 450 };// helloConfig
+      configObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(helloConfig));
     }
-    lmp::msg::ConfigMsg  configMsg =
-      { false,
-        false,
-        { { false, { node2_1stCCId } },      // localCCId
-          { false, { 38 } },     // messageId
-          { false, { node2_nodeId } },    // localNodeId
-          configObjectSequence } // configObjectss
+    lmp::msg::ast::Config  configMsg =
+      { { false,
+          false },
+        { { false }, node2_1stCCId },      // localCCId
+        { { false }, 38 },     // messageId
+        { { false }, node2_nodeId },    // localNodeId
+        configObjectSequence  // configObjectss
       };
     passiveIPCC.processReceivedMessage(configMsg);
     {

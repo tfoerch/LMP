@@ -37,13 +37,13 @@ namespace lmp
 	  const lmp::base::CheckFtorIF& getHelloMessageReceivedFtor() const;
 	private:
 	  virtual void do_processReceivedMessage(
-	    const msg::ConfigMsg&                  configMsg);
+	    const msg::ast::Config&                  configMsg);
 	  virtual void do_processReceivedMessage(
-	    const msg::ConfigAckMsg&               configAckMsg);
+	    const msg::ast::ConfigAck&               configAckMsg);
 	  virtual void do_processReceivedMessage(
-	    const msg::ConfigNackMsg&              configNackMsg);
+	    const msg::ast::ConfigNack&              configNackMsg);
 	  virtual void do_processReceivedMessage(
-	    const msg::HelloMsg&                   helloMsg);
+	    const msg::ast::Hello&                   helloMsg);
 	  MsgReceivedFtor  m_ConfigMessageReceivedFtor;
 	  MsgReceivedFtor  m_ConfigAckMessageReceivedFtor;
 	  MsgReceivedFtor  m_ConfigNackMessageReceivedFtor;

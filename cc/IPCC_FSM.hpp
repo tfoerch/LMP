@@ -8,8 +8,8 @@
  */
 
 #include "cc/IPCC_Event.hpp"
-#include "msg/Config.hpp"
-#include "msg/ConfigAck.hpp"
+//#include "msg/ConfigAst.hpp"
+//#include "msg/ConfigAckAst.hpp"
 
 #include <boost/optional/optional.hpp>     // for optional
 //#include <boost/smart_ptr/shared_ptr.hpp>  // for shared_ptr
@@ -18,6 +18,14 @@
 
 namespace lmp
 {
+  namespace msg
+  {
+    namespace ast
+    {
+      struct Config;
+      struct ConfigAck;
+    }
+  }
   namespace cc
   {
     namespace appl
@@ -49,10 +57,10 @@ namespace lmp
     {
     public:
       explicit EvConfDone(
-        const msg::ConfigAckMsg&  configAckMsg)
+        const msg::ast::ConfigAck&  configAckMsg)
       : m_ConfigAckMsg(configAckMsg)
       {}
-      const msg::ConfigAckMsg&  m_ConfigAckMsg;
+      const msg::ast::ConfigAck&  m_ConfigAckMsg;
       static lmp::cc::appl::EvConfDone  theApplEvent;
     };
     class EvConfErr
@@ -64,10 +72,10 @@ namespace lmp
     {
     public:
       explicit EvNewConfOK(
-        const msg::ConfigMsg&  configMsg)
+        const msg::ast::Config&  configMsg)
       : m_ConfigMsg(configMsg)
       {}
-      const msg::ConfigMsg&  m_ConfigMsg;
+      const msg::ast::Config&  m_ConfigMsg;
       static lmp::cc::appl::EvNewConfOK  theApplEvent;
     };
     class EvNewConfErr
@@ -84,10 +92,10 @@ namespace lmp
     {
     public:
       explicit EvContenLost(
-        const msg::ConfigMsg&  configMsg)
+        const msg::ast::Config&  configMsg)
       : m_ConfigMsg(configMsg)
       {}
-      const msg::ConfigMsg&  m_ConfigMsg;
+      const msg::ast::Config&  m_ConfigMsg;
       static lmp::cc::appl::EvContenLost  theApplEvent;
     };
     class EvAdminDown

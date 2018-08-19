@@ -20,15 +20,15 @@ namespace lmp
     public:
       inline void processReceivedMessage(
         NetworkIFSocketIF&                     networkIFSocket,
-        boost::asio::io_service&               io_service,
+        boost::asio::io_context&               io_context,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
     	boost::asio::const_buffers_1&          messageBuffer)
-      { do_processReceivedMessage(networkIFSocket, io_service, sender_endpoint, messageBuffer); }
+      { do_processReceivedMessage(networkIFSocket, io_context, sender_endpoint, messageBuffer); }
       virtual ~UDPMsgReceiveIF(){}
     private:
       virtual void do_processReceivedMessage(
         NetworkIFSocketIF&                     networkIFSocket,
-        boost::asio::io_service&               io_service,
+        boost::asio::io_context&               io_context,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         boost::asio::const_buffers_1&          messageBuffer) = 0;
     };

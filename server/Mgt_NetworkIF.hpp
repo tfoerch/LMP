@@ -30,7 +30,7 @@ namespace lmp_netif
     NetworkIF_i(
       PortableServer::POA_ptr                  poa,
       lmp_node::NodeApplProxy&                 node,
-      boost::asio::io_service&                 io_service,
+      boost::asio::io_context&                 io_context,
       const std::string&                       ifName,
       lmp::WORD                                port,
       lmp_node::NetworkIFInDestructionFtorIF&  networkIFInDestructionFtor);
@@ -80,7 +80,7 @@ namespace lmp_netif
     };
     PortableServer::POA_ptr                  m_POA;
     lmp_node::NodeApplProxy&                 m_node;
-    boost::asio::io_service&                 m_io_service;
+    boost::asio::io_context&                 m_io_context;
     IPCCByRemoteEndPointMap                  m_IPCCs;
     IPCCAdjacencyObserverContainer           m_ipccAdjacencyObservers;
     IPCCAdjDiscoveredFtor                    m_ipccAdjDiscoveredFtor;

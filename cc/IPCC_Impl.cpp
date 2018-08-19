@@ -13,10 +13,11 @@
 #include "IPCC_Action.hpp"
 #include "UDP_Msg_Handler.hpp"
 #include "neighbor/NeighborAdjacencyObserverIF.hpp"
-#include "msg/Config.hpp"
-#include "msg/ConfigAck.hpp"
-#include "msg/ConfigNack.hpp"
-#include "msg/Hello.hpp"
+#include "msg/ConfigAst.hpp"
+#include "msg/ConfigAckAst.hpp"
+#include "msg/ConfigNackAst.hpp"
+#include "msg/HelloAst.hpp"
+#include "msg/MessageAst.hpp"
 
 #include <boost/core/explicit_operator_bool.hpp>
 #include <boost/ptr_container/detail/reversible_ptr_container.hpp>
@@ -30,12 +31,12 @@ namespace
 {
   struct ConfigCTypes_IsAcceptableVisitor : boost::static_visitor<bool>
   {
-    bool operator()(const lmp::obj::config::HelloConfigData& helloConfig) const
+    bool operator()(const lmp::obj::config::ast::HelloConfig& helloConfig) const
     {
       return
-        ( (3 * helloConfig.m_data.m_helloIntv ) < helloConfig.m_data.m_helloDeadIntv );
+        ( (3 * helloConfig.m_helloIntv ) < helloConfig.m_helloDeadIntv );
     }
-    bool operator()(const lmp::obj::config::UnknownConfigCTypeData& unknownConfig) const
+    bool operator()(const lmp::obj::config::ast::UnknownConfigCType& unknownConfig) const
     {
       return false;
     }
@@ -50,13 +51,13 @@ namespace lmp
       lmp::DWORD                             localCCId,
       node::NodeApplicationIF&               node,
       NetworkIFSocketIF&                     networkIFSocket,
-      boost::asio::io_service&               io_service,
+      boost::asio::io_context&               io_context,
       const boost::asio::ip::udp::endpoint&  remote_endpoint,
       bool                                   isActiveSetup)
       : m_localCCId(localCCId),
         m_node(node),
         m_networkIFSocket(networkIFSocket),
-        m_io_service(io_service),
+        m_io_context(io_context),
         m_remote_endpoint(remote_endpoint),
         m_remoteNodeId(0),
         m_remoteCCId(0),
@@ -64,7 +65,7 @@ namespace lmp
         m_FSM(*this),
         m_helloInterval(std::chrono::milliseconds(150)),
         m_helloDeadInterval(std::chrono::milliseconds(500)),
-        m_configSend_timer(m_io_service,
+        m_configSend_timer(m_io_context,
                            std::chrono::milliseconds(500),
                            3,
                            1,
@@ -72,17 +73,17 @@ namespace lmp
                              boost::bind(&IpccImpl::evtConfRet,
                                          this,
                                          _1))),
-        m_hello_timer(m_io_service,
+        m_hello_timer(m_io_context,
                       m_helloInterval,
                       boost::function<bool (void)>(
                         boost::bind(&IpccImpl::evtHelloRet,
                                     this))),
-        m_helloDead_timer(m_io_service,
+        m_helloDead_timer(m_io_context,
                           m_helloDeadInterval,
                           boost::function<bool (void)>(
                             boost::bind(&IpccImpl::evtHoldTimer,
                                         this))),
-        m_goingDown_timer(m_io_service,
+        m_goingDown_timer(m_io_context,
                           m_helloDeadInterval,
                           boost::function<bool (void)>(
                             boost::bind(&IpccImpl::evtDownTimer,
@@ -160,7 +161,7 @@ namespace lmp
       return m_remote_endpoint;
     }
     void IpccImpl::reconfigure(
-      const obj::config::HelloConfigBody&  helloConfig)
+      const obj::config::ast::HelloConfig&  helloConfig)
     {
       {
         boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
@@ -244,12 +245,12 @@ namespace lmp
       return (getLocalNodeId() > remoteNodeId);
     }
     bool IpccImpl::do_isConfigAcceptable(
-      const msg::ConfigMsg&  configMsg) const
+      const msg::ast::Config&  configMsg) const
     {
       // remoteNodeId, remoeCCId valid; HelloConfig in acceptable range
       bool isAcceptable = true;
-      const lmp::obj::config::ConfigObjectSequence&  configObjectSequence = configMsg.m_data.m_configObjects;
-      for (std::vector<lmp::obj::config::ConfigCTypes>::const_iterator iter = configObjectSequence.begin();
+      const lmp::obj::config::ast::ConfigObjectSequence&  configObjectSequence = configMsg.m_configObjects;
+      for (std::vector<lmp::obj::config::ast::ConfigCTypes>::const_iterator iter = configObjectSequence.begin();
            iter != configObjectSequence.end() && isAcceptable;
            ++iter)
       {
@@ -266,21 +267,21 @@ namespace lmp
         m_configMsg.release();
       }
       {
-        lmp::obj::config::ConfigObjectSequence  configObjectSequence;
+        lmp::obj::config::ast::ConfigObjectSequence  configObjectSequence;
         {
-          lmp::obj::config::HelloConfigData  helloConfig = { true, { 0x009A, 0x01CF } };
-          configObjectSequence.push_back(lmp::obj::config::ConfigCTypes(helloConfig));
+          lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 0x009A, 0x01CF };
+          configObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(helloConfig));
         }
-        lmp::msg::ConfigMsg  configMsg =
-          { isGoingDown(),
-            isLMPRestart(),
-            { { false, { getLocalCCId() } },      // localCCId
-              { false, { ++m_messageId } },      // messageId
-              { false, { getLocalNodeId() } },      // localNodeId
-              configObjectSequence } // configObjectss
+        lmp::msg::ast::Config  configMsg =
+          { { isGoingDown(),
+              isLMPRestart() },
+            { { false }, getLocalCCId() },      // localCCId
+            { { false }, ++m_messageId },      // messageId
+            { { false }, getLocalNodeId() },      // localNodeId
+            configObjectSequence  // configObjectss
           };
-        m_configMsg = std::make_unique<lmp::msg::ConfigMsg>(configMsg);
-        lmp::msg::Message sendMessage = configMsg;
+        m_configMsg = std::make_unique<lmp::msg::ast::Config>(configMsg);
+        lmp::msg::ast::Message sendMessage = configMsg;
         lmp::cc::UDPMsgHandler::sendMessage(m_networkIFSocket,
                                             m_remote_endpoint,
                                             sendMessage);
@@ -301,36 +302,36 @@ namespace lmp
       }
     }
     void IpccImpl::do_sendConfigAck(
-      const msg::ConfigMsg&  configMsg)
+      const msg::ast::Config&  configMsg)
     {
       std::cout << "IPCC[" << getLocalCCId() << "].sendConfigAck()" << std::endl;
       updateConfig(configMsg);
       // create and send ConfigAck
       {
-        lmp::msg::ConfigAckMsg configAckMsg =
-          { isGoingDown(),
-            isLMPRestart(),
-            { { false, { getLocalCCId() } },      // localCCId
-              { false, { getLocalNodeId() } },    // localNodeId
-              { false, { configMsg.m_data.m_localCCId.m_data } },      // remoteCCId
-              { false, { configMsg.m_data.m_messageId.m_data } },     // messageId
-              { false, { configMsg.m_data.m_localNodeId.m_data } } }   // remoteNodeId
+        lmp::msg::ast::ConfigAck configAckMsg =
+          { { isGoingDown(),
+              isLMPRestart() },
+            { { false }, getLocalCCId() },      // localCCId
+            { { false }, getLocalNodeId() },    // localNodeId
+            { { false }, configMsg.m_localCCId.m_ccId },      // remoteCCId
+            { { false }, configMsg.m_messageId.m_msgId },     // messageId
+            { { false }, configMsg.m_localNodeId.m_nodeId }   // remoteNodeId
           };
-        lmp::msg::Message sendMessage = configAckMsg;
+        lmp::msg::ast::Message sendMessage = configAckMsg;
         lmp::cc::UDPMsgHandler::sendMessage(m_networkIFSocket,
                                             m_remote_endpoint,
                                             sendMessage);
       }
     }
     void IpccImpl::do_sendConfigNack(
-      const msg::ConfigMsg&  configMsg)
+      const msg::ast::Config&  configMsg)
     {
     }
     void IpccImpl::updateConfig(
-      const msg::ConfigMsg&  configMsg)
+      const msg::ast::Config&  configMsg)
     {
       std::cout << "IPCC[" << getLocalCCId() << "].updateConfig(" << configMsg << ")" << std::endl;
-      if (m_remoteNodeId != configMsg.m_data.m_localNodeId.m_data.m_nodeId)
+      if (m_remoteNodeId != configMsg.m_localNodeId.m_nodeId)
       {
         if (m_remoteNodeId)
         {
@@ -345,8 +346,8 @@ namespace lmp
             }
           }
         }
-        m_remoteNodeId = configMsg.m_data.m_localNodeId.m_data.m_nodeId;
-        m_remoteCCId = configMsg.m_data.m_localCCId.m_data.m_CCId;
+        m_remoteNodeId = configMsg.m_localNodeId.m_nodeId;
+        m_remoteCCId = configMsg.m_localCCId.m_ccId;
         for (IPCCObservers::iterator iter = m_Observers.begin(),
                                      end_iter = m_Observers.end();
              iter != end_iter;
@@ -371,9 +372,9 @@ namespace lmp
           }
         }
       }
-      else if (m_remoteCCId != configMsg.m_data.m_localCCId.m_data.m_CCId)
+      else if (m_remoteCCId != configMsg.m_localCCId.m_ccId)
       {
-        m_remoteCCId = configMsg.m_data.m_localCCId.m_data.m_CCId;
+        m_remoteCCId = configMsg.m_localCCId.m_ccId;
       }
       std::cout << "IPCC[" << getLocalCCId() << "].updateConfig(): remoteNodeId = " << m_remoteNodeId
                 << ", remoteCCId = " << m_remoteCCId << std::endl;
@@ -407,12 +408,12 @@ namespace lmp
     	++m_TxSeqNum;
       }
       // create and send Hello message and schedule Hello interval timer
-      lmp::msg::HelloMsg  helloMsg =
-        { isGoingDown(),
-          isLMPRestart(),
-          { { false, { m_TxSeqNum, m_RcvSeqNum } } }     // hello
+      lmp::msg::ast::Hello  helloMsg =
+        { { isGoingDown(),
+            isLMPRestart() },
+          { { false }, m_TxSeqNum, m_RcvSeqNum }     // hello
         };
-      lmp::msg::Message sendMessage = helloMsg;
+      lmp::msg::ast::Message sendMessage = helloMsg;
       lmp::cc::UDPMsgHandler::sendMessage(m_networkIFSocket,
                                           m_remote_endpoint,
                                           sendMessage);
@@ -425,7 +426,7 @@ namespace lmp
       m_helloDead_timer.stop();
     }
     void IpccImpl::do_processReceivedMessage(
-      const msg::ConfigMsg&                  configMsg)
+      const msg::ast::Config&                  configMsg)
     {
       if (canAcceptNewConfig())
       {
@@ -463,7 +464,7 @@ namespace lmp
       }
     }
     void IpccImpl::do_processReceivedMessage(
-      const msg::ConfigAckMsg&               configAckMsg)
+      const msg::ast::ConfigAck&               configAckMsg)
     {
       {
         boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
@@ -471,7 +472,7 @@ namespace lmp
       }
     }
     void IpccImpl::do_processReceivedMessage(
-      const msg::ConfigNackMsg&              configNackMsg)
+      const msg::ast::ConfigNack&              configNackMsg)
     {
       {
         boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
@@ -479,7 +480,7 @@ namespace lmp
       }
     }
     void IpccImpl::do_processReceivedMessage(
-      const msg::HelloMsg&                   helloMsg)
+      const msg::ast::Hello&                   helloMsg)
     {
       std::cout << "Node(" << m_node.getNodeId() << ").IPCC["
                 << getLocalCCId() << "].processReceivedMessage("
@@ -491,11 +492,11 @@ namespace lmp
 //            New value is less than old value;
 //         }
       if (!( (boost::int32_t) m_RcvSeqNum -
-             (boost::int32_t) helloMsg.m_data.m_hello.m_data.m_txSeqNum > 0))
+             (boost::int32_t) helloMsg.m_hello.m_txSeqNum > 0))
       {
-        m_RcvSeqNum = helloMsg.m_data.m_hello.m_data.m_txSeqNum;
+        m_RcvSeqNum = helloMsg.m_hello.m_txSeqNum;
       }
-      if (helloMsg.m_data.m_hello.m_data.m_rcvSeqNum == m_TxSeqNum)
+      if (helloMsg.m_hello.m_rcvSeqNum == m_TxSeqNum)
       {
         {
           boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
@@ -511,7 +512,7 @@ namespace lmp
       }
     }
     void IpccImpl::do_processReceivedMessage(
-      const msg::UnknownMessage&             unknownMessage)
+      const msg::ast::UnknownMessage&             unknownMessage)
     {
       // report
     }
@@ -528,9 +529,9 @@ namespace lmp
     	    *activeState == stateUp ) );
     }
     bool IpccImpl::isConntentionWinning(
-      const msg::ConfigMsg&  configMsg) const
+      const msg::ast::Config&  configMsg) const
     {
-      return do_isConntentionWinning(configMsg.m_data.m_localNodeId.m_data.m_nodeId);
+      return do_isConntentionWinning(configMsg.m_localNodeId.m_nodeId);
     }
     bool IpccImpl::isGoingDown() const
     {

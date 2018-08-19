@@ -7,7 +7,7 @@
  *      Author: tom
  */
 
-#include "msg/Message.hpp"
+#include "msg/MessageAst.hpp"
 
 #include <boost/asio/ip/udp.hpp>
 
@@ -20,13 +20,13 @@ namespace lmp
     public:
       inline void sendMessage(
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
-        const msg::Message&                    message)
+        const msg::ast::Message&               message)
       { do_sendMessage(destination_endpoint, message); }
       virtual ~IpccMsgSendIF(){}
     private:
       virtual void do_sendMessage(
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
-        const msg::Message&                    message) = 0;
+        const msg::ast::Message&               message) = 0;
     };
   } // namespace cc
 } // namespace lmp

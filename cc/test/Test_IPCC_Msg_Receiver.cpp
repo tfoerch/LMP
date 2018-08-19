@@ -39,25 +39,25 @@ namespace lmp
     }
 
     void TestIpccMsgReceiver::do_processReceivedMessage(
-      const msg::ConfigMsg&      configMsg)
+      const msg::ast::Config&      configMsg)
     {
       m_ConfigMessageReceivedFtor.set();
     }
 
     void TestIpccMsgReceiver::do_processReceivedMessage(
-      const msg::ConfigAckMsg&   configAckMsg)
+      const msg::ast::ConfigAck&   configAckMsg)
     {
       m_ConfigAckMessageReceivedFtor.set();
     }
 
     void TestIpccMsgReceiver::do_processReceivedMessage(
-      const msg::ConfigNackMsg&  configNackMsg)
+      const msg::ast::ConfigNack&  configNackMsg)
     {
       m_ConfigNackMessageReceivedFtor.set();
     }
 
     void TestIpccMsgReceiver::do_processReceivedMessage(
-      const msg::HelloMsg&       helloMsg)
+      const msg::ast::Hello&       helloMsg)
     {
       m_HelloMessageReceivedFtor.set();
     }

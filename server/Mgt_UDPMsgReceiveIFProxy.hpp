@@ -34,7 +34,7 @@ namespace lmp_netif
     // implement UDPMsgReceiveIF
     virtual void do_processReceivedMessage(
       lmp::cc::NetworkIFSocketIF&            networkIFSocket,
-      boost::asio::io_service&               io_service,
+      boost::asio::io_context&               io_context,
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
       boost::asio::const_buffers_1&          messageBuffer);
     // implement IpccFactoryIF
@@ -45,7 +45,7 @@ namespace lmp_netif
     virtual lmp::cc::IpccMsgReceiveIF* do_createIpcc(
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
       lmp::cc::NetworkIFSocketIF&            networkIFSocket,
-      boost::asio::io_service&               io_service);
+      boost::asio::io_context&               io_context);
     virtual bool do_removeIpcc(
       const boost::asio::ip::udp::endpoint&  sender_endpoint);
 

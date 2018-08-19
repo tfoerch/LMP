@@ -26,17 +26,17 @@ namespace lmp
     const boost::asio::ip::address  NetworkIFSocket::c_multicast_address = boost::asio::ip::address::from_string("224.0.0.1");;
 
     NetworkIFSocket::NetworkIFSocket(
-      boost::asio::io_service&  io_service,
+      boost::asio::io_context&  io_context,
       const std::string&        ifName,
       lmp::WORD                 port,
       UDPMsgReceiveIF&          udpMsgHandler,
       bool                      bind2Interface)
-      : m_io_service(io_service),
+      : m_io_context(io_context),
         m_udpMsgHandler(udpMsgHandler),
         m_ifName(ifName),
         m_port(port),
         m_bind2Interface(bind2Interface),
-        m_socket(m_io_service),
+        m_socket(m_io_context),
         m_sender_endpoint()
     {
       std::cout << "NetworkIFSocket(ifName = " << m_ifName << ") ctor" << std::endl;
@@ -88,7 +88,7 @@ namespace lmp
           if (m_bind2Interface)
           {
             // SO_BINDTODEVICE
-            if ((::setsockopt(m_socket.native(), SOL_SOCKET, SO_BINDTODEVICE,
+            if ((::setsockopt(m_socket.native_handle(), SOL_SOCKET, SO_BINDTODEVICE,
                               m_ifName.c_str(), m_ifName.size() + 1) == -1))
             {
               throw std::runtime_error("setsockopt() SO_BINDTODEVICE");
@@ -228,7 +228,7 @@ namespace lmp
         std::cout << "NetworkIFSocket['" << m_ifName << "', " << m_port << "].handle_received_msg(" << bytes_recvd << ")" << std::endl;
         boost::asio::const_buffers_1  messageBuffer(m_buffer, bytes_recvd);
         m_udpMsgHandler.processReceivedMessage(*this,
-                                               m_io_service,
+                                               m_io_context,
                                                m_sender_endpoint,
                                                messageBuffer);
       }

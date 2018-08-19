@@ -9,6 +9,8 @@
 #include "IPCC_Impl.hpp"
 #include "NetworkIFSocketIF.hpp"
 #include "node/NodeApplicationIF.hpp"
+#include "msg/MessageParser.hpp"
+#include "msg/MessageGenerator.hpp"
 #include "neighbor/Neighbor.hpp"
 #include <boost/asio/buffers_iterator.hpp>
 
@@ -20,23 +22,23 @@ namespace
       lmp::cc::IpccMsgReceiveIF&           ipcc)
     : m_ipcc(ipcc)
     {}
-    void operator()(const lmp::msg::ConfigMsg& config) const
+    void operator()(const lmp::msg::ast::Config& config) const
     {
       m_ipcc.processReceivedMessage(config);
     }
-    void operator()(const lmp::msg::ConfigAckMsg& configAck) const
+    void operator()(const lmp::msg::ast::ConfigAck& configAck) const
     {
       m_ipcc.processReceivedMessage(configAck);
     }
-    void operator()(const lmp::msg::ConfigNackMsg& configNack) const
+    void operator()(const lmp::msg::ast::ConfigNack& configNack) const
     {
       m_ipcc.processReceivedMessage(configNack);
     }
-    void operator()(const lmp::msg::HelloMsg& hello) const
+    void operator()(const lmp::msg::ast::Hello& hello) const
     {
       m_ipcc.processReceivedMessage(hello);
     }
-    void operator()(const lmp::msg::UnknownMessage& unknownMessage) const
+    void operator()(const lmp::msg::ast::UnknownMessage& unknownMessage) const
     {
       m_ipcc.processReceivedMessage(unknownMessage);
     }
@@ -56,15 +58,15 @@ namespace lmp
     void UDPMsgHandler::sendMessage(
       NetworkIFSocketIF&                     networkIFSocket,
       const boost::asio::ip::udp::endpoint&  destination_endpoint,
-      const msg::Message&                    message)
+      const msg::ast::Message&               message)
     {
       typedef boost::asio::buffers_iterator<boost::asio::mutable_buffers_1>  BufOutIterType;
-      const lmp::WORD msgLength = lmp::msg::getLength(message);
+      const lmp::WORD msgLength = lmp::msg::ast::getLength(message);
       unsigned char sendSpace[msgLength];
       boost::asio::mutable_buffers_1 sendBuffer(sendSpace, msgLength);
       BufOutIterType  gen_begin = boost::asio::buffers_begin(sendBuffer);
       //BufOutIterType gen_last = boost::asio::buffers_end(emptyBuffer);
-      lmp::msg::generate::message_grammar<BufOutIterType>  msgGenerateGrammar;
+      lmp::msg::generator::message_grammar<BufOutIterType>  msgGenerateGrammar;
       if (generate(gen_begin,
                    msgGenerateGrammar,
                    message))
@@ -75,7 +77,7 @@ namespace lmp
 
     void UDPMsgHandler::do_processReceivedMessage(
       NetworkIFSocketIF&                     networkIFSocket,
-      boost::asio::io_service&               io_service,
+      boost::asio::io_context&               io_context,
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
       boost::asio::const_buffers_1&          messageBuffer)
     {
@@ -83,7 +85,7 @@ namespace lmp
         accessIpcc(sender_endpoint);
       if (!ipccPtr)
       {
-        ipccPtr = createIpcc(sender_endpoint, networkIFSocket, io_service);
+        ipccPtr = createIpcc(sender_endpoint, networkIFSocket, io_context);
         if (ipccPtr)
         {
           IpccApplicationIF* ipccApplPtr =
@@ -100,8 +102,8 @@ namespace lmp
         typedef boost::asio::buffers_iterator<boost::asio::const_buffers_1>  BufIterType;
         BufIterType begin = boost::asio::buffers_begin(messageBuffer);
         BufIterType last = boost::asio::buffers_end(messageBuffer);
-        lmp::msg::parse::message_grammar<BufIterType>  msgGrammar;
-        lmp::msg::Message parsedMessage;
+        lmp::msg::parser::message_grammar<BufIterType>  msgGrammar;
+        lmp::msg::ast::Message parsedMessage;
         if (parse(begin,
                   last,
                   msgGrammar,
@@ -135,7 +137,7 @@ namespace lmp
     IpccMsgReceiveIF* UDPMsgHandler::do_createIpcc(
       const boost::asio::ip::udp::endpoint&  sender_endpoint,
       NetworkIFSocketIF&                     networkIFSocket,
-      boost::asio::io_service&               io_service)
+      boost::asio::io_context&               io_context)
     {
       IPCCMap::iterator ipccIter = m_IPCCs.find(sender_endpoint);
       if (ipccIter == m_IPCCs.end())
@@ -144,7 +146,7 @@ namespace lmp
           new IpccImpl(m_node.registerFreeLocalCCId(),
                        m_node,
                        networkIFSocket,
-                       io_service,
+                       io_context,
                        sender_endpoint,
                        true);
         if (ipccPtr)

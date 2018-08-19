@@ -20,7 +20,7 @@ namespace lmp_netif
 
   void UDPMsgReceiveIFProxy::do_processReceivedMessage(
     lmp::cc::NetworkIFSocketIF&            networkIFSocket,
-    boost::asio::io_service&               io_service,
+    boost::asio::io_context&               io_context,
     const boost::asio::ip::udp::endpoint&  sender_endpoint,
     boost::asio::const_buffers_1&          messageBuffer)
   {
@@ -35,7 +35,7 @@ namespace lmp_netif
     if (ipccPtr)
     {
       m_udpMsgHandler.processReceivedMessage(networkIFSocket,
-                                             io_service,
+                                             io_context,
                                              sender_endpoint,
                                              messageBuffer);
     }
@@ -56,9 +56,9 @@ namespace lmp_netif
   lmp::cc::IpccMsgReceiveIF* UDPMsgReceiveIFProxy::do_createIpcc(
     const boost::asio::ip::udp::endpoint&  sender_endpoint,
     lmp::cc::NetworkIFSocketIF&            networkIFSocket,
-    boost::asio::io_service&               io_service)
+    boost::asio::io_context&               io_context)
   {
-    return m_udpMsgHandler.createIpcc(sender_endpoint, networkIFSocket, io_service);
+    return m_udpMsgHandler.createIpcc(sender_endpoint, networkIFSocket, io_context);
   }
 
   bool UDPMsgReceiveIFProxy::do_removeIpcc(

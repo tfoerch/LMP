@@ -39,13 +39,13 @@ namespace lmp
       static void sendMessage(
         NetworkIFSocketIF&                     networkIFSocket,
         const boost::asio::ip::udp::endpoint&  destination_endpoint,
-        const msg::Message&                    message);
+        const msg::ast::Message&               message);
     private:
       typedef std::map<boost::asio::ip::udp::endpoint, IpccMsgReceiveIF*>  IPCCMap;
       // implement UDPMsgReceiveIF
       virtual void do_processReceivedMessage(
         NetworkIFSocketIF&                     networkIFSocket,
-        boost::asio::io_service&               io_service,
+        boost::asio::io_context&               io_context,
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         boost::asio::const_buffers_1&          messageBuffer);
       // implement IpccFactoryIF
@@ -56,7 +56,7 @@ namespace lmp
       virtual IpccMsgReceiveIF* do_createIpcc(
         const boost::asio::ip::udp::endpoint&  sender_endpoint,
         NetworkIFSocketIF&                     networkIFSocket,
-        boost::asio::io_service&               io_service);
+        boost::asio::io_context&               io_context);
       virtual bool do_removeIpcc(
         const boost::asio::ip::udp::endpoint&  sender_endpoint);
       node::NodeApplicationIF&  m_node;

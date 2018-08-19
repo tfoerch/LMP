@@ -8,11 +8,18 @@
  */
 
 #include "base/ProtocolTypes.hpp"                  // for WORD
-#include "msg/Config.hpp"
+//#include "msg/ConfigAst.hpp"
 
 // http://www.boost.org/doc/libs/1_57_0/libs/ptr_container/doc/guidelines.html
 namespace lmp
 {
+  namespace msg
+  {
+    namespace ast
+    {
+      struct Config;
+    }
+  }
   namespace cc
   {
     namespace appl
@@ -30,7 +37,7 @@ namespace lmp
         lmp::DWORD  remoteNodeId) const
       { return do_isConntentionWinning(remoteNodeId); }
       inline bool isConfigAcceptable(
-        const msg::ConfigMsg&  configMsg) const
+        const msg::ast::Config&  configMsg) const
       { return do_isConfigAcceptable(configMsg); }
       inline void sendConfig()
       { do_sendConfig(); }
@@ -39,10 +46,10 @@ namespace lmp
       inline void stopSendConfig()
       { do_stopSendConfig(); }
       inline void sendConfigAck(
-        const msg::ConfigMsg&  configMsg)
+        const msg::ast::Config&  configMsg)
       { do_sendConfigAck(configMsg); }
       inline void sendConfigNack(
-        const msg::ConfigMsg&  configMsg)
+        const msg::ast::Config&  configMsg)
       { do_sendConfigNack(configMsg); }
       inline void reportTransition(
         const appl::State&   sourceState,
@@ -60,14 +67,14 @@ namespace lmp
       virtual bool do_isConntentionWinning(
         lmp::DWORD  remoteNodeId) const = 0;
       virtual bool do_isConfigAcceptable(
-        const msg::ConfigMsg&  configMsg) const = 0;
+        const msg::ast::Config&  configMsg) const = 0;
       virtual void do_sendConfig() = 0;
       virtual void do_resendConfig() = 0;
       virtual void do_stopSendConfig() = 0;
       virtual void do_sendConfigAck(
-        const msg::ConfigMsg&  configMsg) = 0;
+        const msg::ast::Config&  configMsg) = 0;
       virtual void do_sendConfigNack(
-        const msg::ConfigMsg&  configMsg) = 0;
+        const msg::ast::Config&  configMsg) = 0;
       virtual void do_reportTransition(
     	const appl::State&   sourceState,
     	const appl::Event&   event,

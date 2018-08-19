@@ -16,13 +16,13 @@ namespace lmp
     {
       bool wait(
     	const lmp::base::CheckFtorIF&     checkFtor,
-    	boost::asio::io_service&          io_service,
+    	boost::asio::io_context&          io_context,
         const std::chrono::milliseconds&  expiry_time)
       {
-        lmp::base::CheckExpiryTimerFtor  expiryTimer(io_service, expiry_time);
+        lmp::base::CheckExpiryTimerFtor  expiryTimer(io_context, expiry_time);
         while (!checkFtor() && !expiryTimer())
         {
-          io_service.run_one();
+          io_context.run_one();
         }
         return checkFtor();
       }
