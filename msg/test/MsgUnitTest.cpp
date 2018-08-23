@@ -433,9 +433,9 @@ BOOST_AUTO_TEST_CASE( config_message_struct )
       };
     lmp::msg::ast::Message expectedMessage = expectedConfigMsg;
     lmp::msg::ast::Message otherMessage;
-    std::cout << sizeof(otherMessage) << std::endl;
+    // std::cout << sizeof(otherMessage) << std::endl;
     otherMessage = expectedConfigMsg;
-    std::cout << sizeof(otherMessage) << std::endl;
+    // std::cout << sizeof(otherMessage) << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
@@ -492,7 +492,7 @@ BOOST_AUTO_TEST_CASE( config_message_spirit )
                       parsedMessage));
     BOOST_CHECK_EQUAL(parsedMessage, expectedMessage);
     BOOST_CHECK_EQUAL(lmp::msg::ast::getLength(parsedMessage), msgLength);
-    std::cout << parsedMessage << std::endl;
+    // std::cout << parsedMessage << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
@@ -548,7 +548,7 @@ BOOST_AUTO_TEST_CASE( config_ack_message_spirit )
                       parsedMessage));
     BOOST_CHECK_EQUAL(parsedMessage, expectedMessage);
     BOOST_CHECK_EQUAL(lmp::msg::ast::getLength(parsedMessage), msgLength);
-    std::cout << parsedMessage << std::endl;
+    // std::cout << parsedMessage << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
@@ -607,7 +607,7 @@ BOOST_AUTO_TEST_CASE( config_nack_message_spirit )
                       parsedMessage));
     BOOST_CHECK_EQUAL(parsedMessage, expectedMessage);
     BOOST_CHECK_EQUAL(lmp::msg::ast::getLength(parsedMessage), msgLength);
-    std::cout << parsedMessage << std::endl;
+    // std::cout << parsedMessage << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
@@ -652,7 +652,7 @@ BOOST_AUTO_TEST_CASE( hello_message_spirit )
                       parsedMessage));
     BOOST_CHECK_EQUAL(parsedMessage, expectedMessage);
     BOOST_CHECK_EQUAL(lmp::msg::ast::getLength(parsedMessage), msgLength);
-    std::cout << parsedMessage << std::endl;
+    // std::cout << parsedMessage << std::endl;
     unsigned char emptySpace[msgLength];
     boost::asio::mutable_buffers_1 emptyBuffer(emptySpace, msgLength);
     BufOutIterType  gen_begin = boost::asio::buffers_begin(emptyBuffer);
@@ -693,7 +693,7 @@ BOOST_AUTO_TEST_CASE( unknown_message_spirit )
 	                  last,
 	                  msgGrammar,
 	                  parsedMessage));
-	std::cout << parsedMessage << std::endl;
+	// std::cout << parsedMessage << std::endl;
 	// BOOST_CHECK_EQUAL(msgData.m_type, lmp::msg::parse::MsgType::Config);
 	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
   }
@@ -719,7 +719,7 @@ BOOST_AUTO_TEST_CASE( unknown_object_spirit )
 		              last,
 					  objGrammar,
 					  objData));
-	std::cout << objData << std::endl;
+	// std::cout << objData << std::endl;
 	// BOOST_CHECK_EQUAL(msgData.m_type, lmp::msg::parse::MsgType::Config);
 	// std::cout << static_cast<lmp::WORD>(msgData.m_type) << std::endl;
   }
