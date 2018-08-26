@@ -25,10 +25,7 @@ namespace lmp
     {
       struct Hello
       {
-        typedef
-          lmp::msg::ast::CommonHeader<MessageTypeTraits<MsgType::Hello>>  CommonHeaderType;
-        CommonHeaderType                             m_header;
-//        lmp::msg::ast::CommonHeaderFlags   m_header;
+        lmp::msg::ast::CommonHeaderFlags   m_header;
         lmp::obj::hello::ast::Hello        m_hello;
       };
       std::ostream& operator<<(

@@ -17,13 +17,6 @@ BOOST_FUSION_ADAPT_STRUCT(
   (bool,       m_LMP_restart)
 )
 
-BOOST_FUSION_ADAPT_TPL_STRUCT(
-  (MsgTypeTraits),
-  (lmp::msg::ast::CommonHeader)(MsgTypeTraits),
-  (bool,       m_controlChannelDown)
-  (bool,       m_LMP_restart)
-)
-
 BOOST_FUSION_ADAPT_STRUCT(
   lmp::msg::ast::CommonHeaderUnknownMsgType,
   (lmp::BYTE,                         m_msgType)

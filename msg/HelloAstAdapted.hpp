@@ -13,8 +13,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(
   lmp::msg::ast::Hello,
-  (lmp::msg::ast::Hello::CommonHeaderType,      m_header)
-//  (lmp::msg::ast::CommonHeaderFlags,    m_header)
+  (lmp::msg::ast::CommonHeaderFlags,    m_header)
   (lmp::obj::hello::ast::Hello,         m_hello)
 )
 

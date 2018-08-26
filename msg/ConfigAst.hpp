@@ -28,10 +28,7 @@ namespace lmp
     {
       struct Config
       {
-        typedef
-          lmp::msg::ast::CommonHeader<MessageTypeTraits<MsgType::Config>>  CommonHeaderType;
-        CommonHeaderType                             m_header;
-//        lmp::msg::ast::CommonHeaderFlags             m_header;
+        lmp::msg::ast::CommonHeaderFlags             m_header;
         lmp::obj::ccid::ast::LocalCCId               m_localCCId;
         lmp::obj::msgid::ast::MessageId              m_messageId;
         lmp::obj::nodeid::ast::LocalNodeId           m_localNodeId;

@@ -26,8 +26,7 @@ namespace lmp
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
       struct config_nack_msg_grammar : qi::grammar<Iterator,
-                                                   ast::ConfigNack(ast::CommonHeader<MessageTypeTraits<MsgType::ConfigNack>>),
-//                                                   ast::ConfigNack(ast::CommonHeaderFlags),
+                                                   ast::ConfigNack(ast::CommonHeaderFlags),
                                                    qi::locals<lmp::WORD>>
       {
         config_nack_msg_grammar();
@@ -40,8 +39,7 @@ namespace lmp
         lmp::obj::parser::message_id_ack_grammar<Iterator>        message_id_ack;
         lmp::obj::parser::hello_config_grammar<Iterator>          hello_config;
         qi::rule<Iterator,
-                 ast::ConfigNack(ast::CommonHeader<MessageTypeTraits<MsgType::ConfigNack>>),
-//                 ast::ConfigNack(ast::CommonHeaderFlags),
+                 ast::ConfigNack(ast::CommonHeaderFlags),
                  qi::locals<lmp::WORD>>                           config_nack_msg_rule;
       };
     }

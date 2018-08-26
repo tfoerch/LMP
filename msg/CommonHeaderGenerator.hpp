@@ -20,13 +20,13 @@ namespace lmp
 
       template <typename OutputIterator, MsgType msgType>
       struct common_header_grammar : karma::grammar<OutputIterator,
-                                                    ast::CommonHeader<MessageTypeTraits<msgType>>(lmp::WORD)>
+                                                    ast::CommonHeaderFlags(lmp::WORD)>
       {
         common_header_grammar();
 
-        boost::phoenix::function<lmp::msg::ast::GetFlags<MessageTypeTraits<msgType>>>   phx_getFlags;
+        boost::phoenix::function<lmp::msg::ast::GetFlags>   phx_getFlags;
         karma::rule<OutputIterator,
-                    ast::CommonHeader<MessageTypeTraits<msgType>>(lmp::WORD)>           common_header_rule;
+                    ast::CommonHeaderFlags(lmp::WORD)>      common_header_rule;
       };
 
       template <typename OutputIterator>
@@ -35,9 +35,9 @@ namespace lmp
       {
         common_header_unknown_msgType_grammar();
 
-        boost::phoenix::function<lmp::msg::ast::GetFlagsFromCommonHeaderFlags>   phx_getFlags;
+        boost::phoenix::function<lmp::msg::ast::GetFlags>        phx_getFlags;
         karma::rule<OutputIterator,
-                    ast::CommonHeaderUnknownMsgType(lmp::WORD)>                  common_header_unknown_msgType_rule;
+                    ast::CommonHeaderUnknownMsgType(lmp::WORD)>  common_header_unknown_msgType_rule;
       };
     }
   } // namespace msg

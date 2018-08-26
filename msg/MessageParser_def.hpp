@@ -46,13 +46,13 @@ namespace lmp
         message_rule =
             common_header_flags [ _a = _1 ]
             >> ( ( byte_(static_cast<typename std::underlying_type<MsgType>::type>(MsgType::Config))
-                   >> config_msg(phx_constructConfigHeader(_a)) ) |
+                   >> config_msg(_a) ) |
                  ( byte_(static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigAck))
-                   >> config_ack_msg(phx_constructConfigAckHeader(_a)) ) |
+                   >> config_ack_msg(_a) ) |
                  ( byte_(static_cast<std::underlying_type<MsgType>::type>(MsgType::ConfigNack))
-                   >>  config_nack_msg(phx_constructConfigNackHeader(_a)) ) |
+                   >>  config_nack_msg(_a) ) |
                  ( byte_(static_cast<std::underlying_type<MsgType>::type>(MsgType::Hello))
-                   >>  hello_msg(phx_constructHelloHeader(_a)) ) |
+                   >>  hello_msg(_a) ) |
                  unknown_msg(_a) ) [ _val = _1 ]
             ;
 

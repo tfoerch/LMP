@@ -30,10 +30,7 @@ namespace lmp
     {
       struct ConfigNack
       {
-        typedef
-          lmp::msg::ast::CommonHeader<MessageTypeTraits<MsgType::ConfigNack>>  CommonHeaderType;
-        CommonHeaderType                        m_header;
-//        lmp::msg::ast::CommonHeaderFlags         m_header;
+        lmp::msg::ast::CommonHeaderFlags         m_header;
         lmp::obj::ccid::ast::LocalCCId           m_localCCId;
         lmp::obj::nodeid::ast::LocalNodeId       m_localNodeId;
         lmp::obj::ccid::ast::RemoteCCId          m_remoteCCId;

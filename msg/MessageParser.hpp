@@ -34,10 +34,6 @@ namespace lmp
       {
         message_grammar();
 
-        boost::phoenix::function<ast::ConstructCommonHeader<MessageTypeTraits<MsgType::Config>>>      phx_constructConfigHeader;
-        boost::phoenix::function<ast::ConstructCommonHeader<MessageTypeTraits<MsgType::ConfigAck>>>   phx_constructConfigAckHeader;
-        boost::phoenix::function<ast::ConstructCommonHeader<MessageTypeTraits<MsgType::ConfigNack>>>  phx_constructConfigNackHeader;
-        boost::phoenix::function<ast::ConstructCommonHeader<MessageTypeTraits<MsgType::Hello>>>       phx_constructHelloHeader;
         lmp::msg::parser::common_header_flags_grammar<Iterator>    common_header_flags;
         lmp::msg::parser::config_msg_grammar<Iterator>             config_msg;
         lmp::msg::parser::config_ack_msg_grammar<Iterator>         config_ack_msg;

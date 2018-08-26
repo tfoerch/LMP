@@ -14,8 +14,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(
   lmp::msg::ast::Config,
-  (lmp::msg::ast::Config::CommonHeaderType,      m_header)
-//  (lmp::msg::ast::CommonHeaderFlags,             m_header)
+  (lmp::msg::ast::CommonHeaderFlags,             m_header)
   (lmp::obj::ccid::ast::LocalCCId,               m_localCCId)
   (lmp::obj::msgid::ast::MessageId,              m_messageId)
   (lmp::obj::nodeid::ast::LocalNodeId,           m_localNodeId)

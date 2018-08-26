@@ -25,8 +25,7 @@ namespace lmp
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
       struct config_ack_msg_grammar : qi::grammar<Iterator,
-                                                  ast::ConfigAck(ast::CommonHeader<MessageTypeTraits<MsgType::ConfigAck>>),
- //                                                 ast::ConfigAck(ast::CommonHeaderFlags),
+                                                  ast::ConfigAck(ast::CommonHeaderFlags),
                                                   qi::locals<lmp::WORD>>
       {
         config_ack_msg_grammar();
@@ -38,8 +37,7 @@ namespace lmp
         lmp::obj::parser::remote_node_id_grammar<Iterator>        remote_node_id;
         lmp::obj::parser::message_id_ack_grammar<Iterator>        message_id_ack;
         qi::rule<Iterator,
-                 ast::ConfigAck(ast::CommonHeader<MessageTypeTraits<MsgType::ConfigAck>>),
-//                 ast::ConfigAck(ast::CommonHeaderFlags),
+                 ast::ConfigAck(ast::CommonHeaderFlags),
                  qi::locals<lmp::WORD>>                           config_ack_msg_rule;
       };
     }

@@ -25,8 +25,7 @@ namespace lmp
       namespace phoenix = boost::phoenix;
       template <typename Iterator>
       struct config_msg_grammar : qi::grammar<Iterator,
-                                              ast::Config(ast::CommonHeader<MessageTypeTraits<MsgType::Config>>),
-//                                              ast::Config(ast::CommonHeaderFlags),
+                                              ast::Config(ast::CommonHeaderFlags),
                                               qi::locals<lmp::WORD>>
       {
         config_msg_grammar();
@@ -40,8 +39,7 @@ namespace lmp
         lmp::obj::parser::message_id_grammar<Iterator>                                message_id;
         lmp::obj::config::parser::config_object_sequence_grammar<Iterator>            config_object_sequence;
         qi::rule<Iterator,
-                 ast::Config(ast::CommonHeader<MessageTypeTraits<MsgType::Config>>),
-//                 ast::Config(ast::CommonHeaderFlags),
+                 ast::Config(ast::CommonHeaderFlags),
                  qi::locals<lmp::WORD>>                                               config_msg_rule;
       };
     }

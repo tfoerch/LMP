@@ -21,8 +21,7 @@ namespace lmp
       namespace qi = boost::spirit::qi;
       template <typename Iterator>
       struct hello_msg_grammar : qi::grammar<Iterator,
-                                             ast::Hello(ast::CommonHeader<MessageTypeTraits<MsgType::Hello>>),
-//                                             ast::Hello(ast::CommonHeaderFlags),
+                                             ast::Hello(ast::CommonHeaderFlags),
                                              qi::locals<lmp::WORD>>
       {
         hello_msg_grammar();
@@ -30,8 +29,7 @@ namespace lmp
         lmp::msg::parser::common_header_length_grammar<Iterator>  common_header_length;
         lmp::obj::parser::hello_grammar<Iterator>                 hello;
         qi::rule<Iterator,
-                 ast::Hello(ast::CommonHeader<MessageTypeTraits<MsgType::Hello>>),
-//                 ast::Hello(ast::CommonHeaderFlags),
+                 ast::Hello(ast::CommonHeaderFlags),
                  qi::locals<lmp::WORD>>                           hello_msg_rule;
       };
     }
