@@ -1,7 +1,7 @@
 #ifndef LMP_MSG_COMMONHEADER_PARSER_HPP_
 #define LMP_MSG_COMMONHEADER_PARSER_HPP_
 /*
- * CommonHeader.hpp
+ * CommonHeaderParser.hpp
  *
  *  Created on: 28.02.2015
  *      Author: tom

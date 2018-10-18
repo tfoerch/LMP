@@ -8,9 +8,8 @@
  */
 
 #include "UnknownMessageAstAdapted.hpp"
+#include "msg/CommonHeaderAstAdapted.hpp" // needed for CommonHeaderUnknownMsgType
 #include "UnknownMessageParser.hpp"
-#include "msg/CommonHeaderParser_def.hpp"
-#include "obj/ObjectSequenceParser_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

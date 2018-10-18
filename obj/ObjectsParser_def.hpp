@@ -8,12 +8,6 @@
  */
 
 #include "obj/ObjectsParser.hpp"
-#include "obj/ControlChannelIdCTypesParser_def.hpp"
-#include "obj/MessageIdCTypesParser_def.hpp"
-#include "obj/NodeIdCTypesParser_def.hpp"
-#include "obj/ConfigCTypesParser_def.hpp"
-#include "obj/HelloCTypesParser_def.hpp"
-#include "obj/UnknownObjectClassParser_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

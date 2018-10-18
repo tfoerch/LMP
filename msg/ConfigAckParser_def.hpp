@@ -9,12 +9,6 @@
 
 #include "ConfigAckAstAdapted.hpp"
 #include "ConfigAckParser.hpp"
-#include "msg/CommonHeaderParser_def.hpp"
-#include "obj/LocalCCIdParser_def.hpp"
-#include "obj/LocalNodeIdParser_def.hpp"
-#include "obj/RemoteCCIdParser.hpp"
-#include "obj/MessageIdAckParser_def.hpp"
-#include "obj/RemoteNodeIdParser.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

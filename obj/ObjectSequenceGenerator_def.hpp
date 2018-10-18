@@ -8,7 +8,6 @@
  */
 
 #include "obj/ObjectSequenceGenerator.hpp"
-#include "obj/ObjectsGenerator_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

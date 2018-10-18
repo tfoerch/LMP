@@ -9,13 +9,7 @@
 
 #include "ConfigNackAstAdapted.hpp"
 #include "ConfigNackGenerator.hpp"
-#include "CommonHeaderGenerator_def.hpp"
-#include "obj/LocalCCIdGenerator_def.hpp"
-#include "obj/LocalNodeIdGenerator_def.hpp"
-#include "obj/RemoteCCIdGenerator_def.hpp"
-#include "obj/MessageIdAckGenerator_def.hpp"
-#include "obj/RemoteNodeIdGenerator_def.hpp"
-#include "obj/HelloConfigGenerator_def.hpp"
+#include "CommonHeaderGenerator_def.hpp" // no explicit template instantiation
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
@@ -42,7 +36,6 @@ namespace lmp
         using phoenix::at_c;
         using qi::byte_;
         using qi::big_word;
-        using qi::attr;
         using namespace qi::labels;
 
         config_nack_msg_rule %=

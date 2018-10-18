@@ -8,7 +8,6 @@
  */
 
 #include "obj/ConfigCTypesParser.hpp"
-#include "obj/HelloConfigParser_def.hpp"
 #ifdef USE_SPIRIT_X3_PARSER
 #include "obj/UnknownConfigCTypeParser_def.hpp"
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>

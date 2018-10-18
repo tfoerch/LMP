@@ -8,7 +8,6 @@
  */
 
 #include "obj/ObjectSequenceParser.hpp"
-#include "obj/ObjectsParser_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

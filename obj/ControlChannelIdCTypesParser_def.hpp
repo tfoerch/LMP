@@ -8,8 +8,6 @@
  */
 
 #include "obj/ControlChannelIdCTypesParser.hpp"
-#include "obj/LocalCCIdParser_def.hpp"
-#include "obj/RemoteCCIdParser_def.hpp"
 #ifdef USE_SPIRIT_X3_PARSER
 #include "obj/UnknownCCIdCTypeParser_def.hpp"
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>

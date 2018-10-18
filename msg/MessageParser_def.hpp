@@ -8,12 +8,6 @@
  */
 
 #include "MessageParser.hpp"
-#include "CommonHeaderParser_def.hpp"
-#include "ConfigParser_def.hpp"
-#include "ConfigAckParser_def.hpp"
-#include "ConfigNackParser_def.hpp"
-#include "HelloParser_def.hpp"
-#include "UnknownMessageParser_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

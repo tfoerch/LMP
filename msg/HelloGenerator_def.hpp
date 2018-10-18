@@ -9,8 +9,7 @@
 
 #include "HelloAstAdapted.hpp"
 #include "HelloGenerator.hpp"
-#include "msg/CommonHeaderGenerator_def.hpp"
-#include "obj/HelloGenerator_def.hpp"
+#include "msg/CommonHeaderGenerator_def.hpp" // no explicit template instantiation
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
@@ -37,7 +36,6 @@ namespace lmp
         using phoenix::at_c;
         using qi::byte_;
         using qi::big_word;
-        using qi::attr;
         using namespace qi::labels;
 
         hello_msg_rule %=

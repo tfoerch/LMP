@@ -9,11 +9,6 @@
 
 #include "ConfigAstAdapted.hpp"
 #include "ConfigParser.hpp"
-#include "msg/CommonHeaderParser_def.hpp"
-#include "obj/LocalCCIdParser_def.hpp"
-#include "obj/MessageIdParser_def.hpp"
-#include "obj/LocalNodeIdParser_def.hpp"
-#include "obj/ConfigObjectSequenceParser_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

@@ -8,7 +8,6 @@
  */
 
 #include "obj/ConfigObjectSequenceParser.hpp"
-#include "obj/ConfigCTypesParser_def.hpp"
 #include <boost/bind.hpp>
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>

@@ -9,7 +9,6 @@
 
 #include "obj/LocalCCIdAstAdapted.hpp"
 #include "obj/LocalCCIdParser.hpp"
-#include "obj/ObjectHeaderParser_def.hpp"
 #include "obj/ObjectClassAst.hpp"
 #ifdef USE_SPIRIT_X3_PARSER
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>

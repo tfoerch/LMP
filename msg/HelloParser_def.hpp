@@ -9,8 +9,6 @@
 
 #include "HelloAstAdapted.hpp"
 #include "HelloParser.hpp"
-#include "msg/CommonHeaderParser_def.hpp"
-#include "obj/HelloParser_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

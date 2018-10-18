@@ -8,7 +8,6 @@
  */
 
 #include "obj/HelloCTypesParser.hpp"
-#include "obj/HelloParser_def.hpp"
 #ifdef USE_SPIRIT_X3_PARSER
 #include "obj/UnknownHelloCTypeParser_def.hpp"
 #include <boost/spirit/home/x3/support/utility/annotate_on_success.hpp>

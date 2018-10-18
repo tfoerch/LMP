@@ -9,13 +9,6 @@
 
 #include "ConfigNackAstAdapted.hpp"
 #include "ConfigNackParser.hpp"
-#include "msg/CommonHeaderParser_def.hpp"
-#include "obj/LocalCCIdParser_def.hpp"
-#include "obj/LocalNodeIdParser_def.hpp"
-#include "obj/RemoteCCIdParser.hpp"
-#include "obj/MessageIdAckParser_def.hpp"
-#include "obj/RemoteNodeIdParser_def.hpp"
-#include "obj/HelloConfigParser_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>

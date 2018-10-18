@@ -8,8 +8,6 @@
  */
 
 #include "obj/ConfigCTypesGenerator.hpp"
-#include "obj/HelloConfigGenerator_def.hpp"
-#include "obj/ObjectClassUnknownCTypeGenerator_def.hpp"
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
