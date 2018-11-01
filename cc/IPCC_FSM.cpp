@@ -365,7 +365,7 @@ namespace lmp
       //  +-----------+-------------+-----------+--------------------------------+----------------------+
       Row < ConfRcv   , EvCCDn      , Down      , NoAction                       , none                 >,
       Row < ConfRcv   , EvAdminDown , Down      , NoAction                       , none                 >,
-      Row < ConfRcv   , EvConfErr   , ConfRcv   , SendConfigNack                 , none                 >,
+      Row < ConfRcv   , EvNewConfErr, ConfRcv   , SendConfigNack                 , none                 >,
       Row < ConfRcv   , EvReconfig  , ConfRcv   , NoAction                       , none                 >,
       Row < ConfRcv   , EvNewConfOK , Active    , ActionSequence_
                                                   <mpl::vector<SendConfigAck,

@@ -39,6 +39,14 @@ namespace lmp
         virtual std::ostream& do_print(std::ostream& os) const = 0;
         virtual ActionType do_getType() const = 0;
       };
+      inline std::ostream& operator<<(
+        std::ostream&       os,
+        const Action&       action)
+      { return action.print(os); }
+      std::ostream& operator<<(
+        std::ostream&       os,
+        Action::ActionType  actionType);
+
       template <Action::ActionType  actionType>
       class ActionTag : public Action
       {
@@ -49,13 +57,6 @@ namespace lmp
         { os << getType(); return os; }
         virtual Action::ActionType do_getType() const { return actionType; };
       };
-      inline std::ostream& operator<<(
-        std::ostream&       os,
-        const Action&       action)
-      { return action.print(os); }
-      std::ostream& operator<<(
-        std::ostream&       os,
-        Action::ActionType  actionType);
     } // namespace appl
   } // namespace cc
 } // namespace lmp

@@ -24,6 +24,7 @@ namespace lmp
     {
       struct Config;
       struct ConfigAck;
+      struct ConfigNack;
     }
   }
   namespace cc
@@ -66,6 +67,11 @@ namespace lmp
     class EvConfErr
     {
     public:
+      explicit EvConfErr(
+        const msg::ast::ConfigNack&  configNackMsg)
+      : m_ConfigNackMsg(configNackMsg)
+      {}
+      const msg::ast::ConfigNack&  m_ConfigNackMsg;
       static lmp::cc::appl::EvConfErr  theApplEvent;
     };
     class EvNewConfOK
@@ -81,11 +87,21 @@ namespace lmp
     class EvNewConfErr
     {
     public:
+      explicit EvNewConfErr(
+        const msg::ast::Config&  configMsg)
+      : m_ConfigMsg(configMsg)
+      {}
+      const msg::ast::Config&  m_ConfigMsg;
       static lmp::cc::appl::EvNewConfErr  theApplEvent;
     };
     class EvContenWin
     {
     public:
+      explicit EvContenWin(
+        const msg::ast::Config&  configMsg)
+      : m_ConfigMsg(configMsg)
+      {}
+      const msg::ast::Config&  m_ConfigMsg;
       static lmp::cc::appl::EvContenWin  theApplEvent;
     };
     class EvContenLost

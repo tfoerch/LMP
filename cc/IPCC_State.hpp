@@ -37,6 +37,14 @@ namespace lmp
         virtual std::ostream& do_print(std::ostream& os) const = 0;
         virtual Type do_getType() const = 0;
       };
+      inline std::ostream& operator<<(
+        std::ostream&       os,
+        const State&        state)
+      { return state.print(os); }
+      std::ostream& operator<<(
+        std::ostream&       os,
+        State::Type         stType);
+
       template <State::Type  stateType>
       class StateTag : public State
       {
@@ -54,13 +62,6 @@ namespace lmp
       typedef StateTag<State::Active>     Active;
       typedef StateTag<State::Up>         Up;
       typedef StateTag<State::GoingDown>  GoingDown;
-      inline std::ostream& operator<<(
-        std::ostream&       os,
-        const State&        state)
-      { return state.print(os); }
-      std::ostream& operator<<(
-        std::ostream&       os,
-        State::Type         stType);
     } // namespace appl
   } // namespace cc
 } // namespace lmp

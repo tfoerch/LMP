@@ -441,7 +441,7 @@ namespace lmp
       	{
           {
             boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
-            m_FSM.process_event(EvNewConfErr());
+            m_FSM.process_event(EvNewConfErr(configMsg));
           }
       	}
       }
@@ -451,7 +451,7 @@ namespace lmp
         {
           {
             boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
-            m_FSM.process_event(EvContenWin());
+            m_FSM.process_event(EvContenWin(configMsg));
           }
         }
         else
@@ -476,7 +476,7 @@ namespace lmp
     {
       {
         boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
-        m_FSM.process_event(EvConfErr());
+        m_FSM.process_event(EvConfErr(configNackMsg));
       }
     }
     void IpccImpl::do_processReceivedMessage(

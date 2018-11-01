@@ -46,6 +46,14 @@ namespace lmp
         virtual std::ostream& do_print(std::ostream& os) const = 0;
         virtual EvType do_getType() const = 0;
       };
+      inline std::ostream& operator<<(
+        std::ostream&       os,
+        const Event&        event)
+      { return event.print(os); }
+      std::ostream& operator<<(
+        std::ostream&       os,
+        Event::EvType       evType);
+
       template <Event::EvType  eventType>
       class EventTag : public Event
       {
@@ -74,13 +82,6 @@ namespace lmp
       typedef EventTag<Event::EvConfRet>       EvConfRet;
       typedef EventTag<Event::EvHelloRet>      EvHelloRet;
       typedef EventTag<Event::EvDownTimer>     EvDownTimer;
-      inline std::ostream& operator<<(
-        std::ostream&       os,
-        const Event&        event)
-      { return event.print(os); }
-      std::ostream& operator<<(
-        std::ostream&       os,
-        Event::EvType       evType);
     } // namespace appl
   } // namespace cc
 } // namespace lmp
