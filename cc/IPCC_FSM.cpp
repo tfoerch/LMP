@@ -254,6 +254,8 @@ namespace lmp
       {
         template <class EVT,class FSM,class SourceState,class TargetState>
         void operator()(EVT const&, FSM&,SourceState& ,TargetState& );
+        template <class FSM,class SourceState,class TargetState>
+        void operator()(EvConfErr const& evt, FSM& fsm,SourceState& src,TargetState& tgt);
     	static lmp::cc::appl::ActionTag<lmp::cc::appl::Action::ActionSendConfig>  theActionTag;
       };
       struct StopSendConfig
@@ -282,6 +284,10 @@ namespace lmp
       {
         template <class EVT,class FSM,class SourceState,class TargetState>
         void operator()(EVT const&, FSM&,SourceState& ,TargetState& );
+        template <class FSM,class SourceState,class TargetState>
+        void operator()(EvContenLost const& evt, FSM& fsm,SourceState& src, TargetState& tgt);
+        template <class FSM,class SourceState,class TargetState>
+        void operator()(EvNewConfErr const& evt, FSM& fsm,SourceState& src, TargetState& tgt);
     	static lmp::cc::appl::ActionTag<lmp::cc::appl::Action::ActionSendConfigNack>  theActionTag;
       };
       struct SendHello
@@ -505,6 +511,12 @@ namespace lmp
       fsm.theIPCC.sendConfig();
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
     }
+    template <class FSM,class SourceState,class TargetState>
+    void cc_fsm_::SendConfig::operator()(EvConfErr const& evt, FSM& fsm,SourceState& src,TargetState& tgt)
+    {
+      fsm.theIPCC.sendConfig(evt.m_ConfigNackMsg);
+      fsm.theIPCC.reportTransition(SourceState::theApplState, EvConfErr::theApplEvent, TargetState::theApplState, theActionTag);
+    }
 
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::StopSendConfig::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
@@ -519,6 +531,7 @@ namespace lmp
       fsm.theIPCC.resendConfig();
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
     }
+
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::SendConfigAck::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {
@@ -536,11 +549,25 @@ namespace lmp
       fsm.theIPCC.sendConfigAck(evt.m_ConfigMsg);
       fsm.theIPCC.reportTransition(SourceState::theApplState, EvNewConfOK::theApplEvent, TargetState::theApplState, theActionTag);
     }
+
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::SendConfigNack::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {
       fsm.theIPCC.reportTransition(SourceState::theApplState, EVT::theApplEvent, TargetState::theApplState, theActionTag);
     }
+    template <class FSM,class SourceState,class TargetState>
+    void cc_fsm_::SendConfigNack::operator()(EvContenLost const& evt, FSM& fsm,SourceState& ,TargetState& )
+    {
+      fsm.theIPCC.sendConfigNack(evt.m_ConfigMsg);
+      fsm.theIPCC.reportTransition(SourceState::theApplState, EvContenLost::theApplEvent, TargetState::theApplState, theActionTag);
+    }
+    template <class FSM,class SourceState,class TargetState>
+    void cc_fsm_::SendConfigNack::operator()(EvNewConfErr const& evt, FSM& fsm,SourceState& src, TargetState& tgt)
+    {
+      fsm.theIPCC.sendConfigNack(evt.m_ConfigMsg);
+      fsm.theIPCC.reportTransition(SourceState::theApplState, EvContenLost::theApplEvent, TargetState::theApplState, theActionTag);
+    }
+
     template <class EVT,class FSM,class SourceState,class TargetState>
     void cc_fsm_::SendHello::operator()(EVT const&, FSM& fsm,SourceState& ,TargetState& )
     {

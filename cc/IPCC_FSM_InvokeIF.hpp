@@ -41,6 +41,9 @@ namespace lmp
       { return do_isConfigAcceptable(configMsg); }
       inline void sendConfig()
       { do_sendConfig(); }
+      inline void sendConfig(
+        const msg::ast::ConfigNack&  configNackMsg)
+      { do_sendConfig(configNackMsg); }
       inline void resendConfig()
       { do_resendConfig(); }
       inline void stopSendConfig()
@@ -69,6 +72,8 @@ namespace lmp
       virtual bool do_isConfigAcceptable(
         const msg::ast::Config&  configMsg) const = 0;
       virtual void do_sendConfig() = 0;
+      virtual void do_sendConfig(
+        const msg::ast::ConfigNack&  configNackMsg) = 0;
       virtual void do_resendConfig() = 0;
       virtual void do_stopSendConfig() = 0;
       virtual void do_sendConfigAck(

@@ -258,6 +258,7 @@ namespace lmp
       }
       return isAcceptable;
     }
+
     void IpccImpl::do_sendConfig()
     {
       std::cout << "IPCC[" << getLocalCCId() << "].sendConfig()" << std::endl;
@@ -288,6 +289,39 @@ namespace lmp
       }
       m_configSend_timer.start();
     }
+
+    void IpccImpl::do_sendConfig(
+      const msg::ast::ConfigNack&  configNackMsg)
+    {
+      std::cout << "IPCC[" << getLocalCCId() << "].sendConfig()" << std::endl;
+      // create and send Config
+      if (m_configMsg)
+      {
+        m_configMsg.release();
+      }
+      {
+        lmp::obj::config::ast::ConfigObjectSequence  configObjectSequence;
+        {
+          lmp::obj::config::ast::HelloConfig  helloConfig = { { true }, 0x009A, 0x01CF };
+          configObjectSequence.push_back(lmp::obj::config::ast::ConfigCTypes(helloConfig));
+        }
+        lmp::msg::ast::Config  configMsg =
+          { { isGoingDown(),
+              isLMPRestart() },
+            { { false }, getLocalCCId() },      // localCCId
+            { { false }, ++m_messageId },      // messageId
+            { { false }, getLocalNodeId() },      // localNodeId
+            configObjectSequence  // configObjectss
+          };
+        m_configMsg = std::make_unique<lmp::msg::ast::Config>(configMsg);
+        lmp::msg::ast::Message sendMessage = configMsg;
+        lmp::cc::UDPMsgHandler::sendMessage(m_networkIFSocket,
+                                            m_remote_endpoint,
+                                            sendMessage);
+      }
+      m_configSend_timer.start();
+    }
+
     void IpccImpl::do_resendConfig()
     {
       std::cout << "IPCC[" << getLocalCCId() << "].resendConfig()" << std::endl;
@@ -395,6 +429,12 @@ namespace lmp
     	  (*iter)->notifyTransition(*this, sourceState, event, targetState, action);
         }
       }
+//      fsm is still in sourceState
+//      const boost::optional<const lmp::cc::appl::State&>& activeState = m_FSM.getActiveState();
+//      if (activeState)
+//      {
+//        std::cout << "IPCC[" << getLocalCCId() << "].reportTransition(): fsm state = " << *activeState << std::endl;
+//      }
     }
     void IpccImpl::do_sendHello()
     {
@@ -500,14 +540,14 @@ namespace lmp
       {
         {
           boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
-          m_FSM.process_event(EvHelloRcvd());
+          m_FSM.process_event(EvHelloRcvd(helloMsg));
         }
       }
       else
       {
         {
           boost::unique_lock<boost::shared_mutex> guard(m_fsm_mutex);
-          m_FSM.process_event(EvSeqNumErr());
+          m_FSM.process_event(EvSeqNumErr(helloMsg));
         }
       }
     }

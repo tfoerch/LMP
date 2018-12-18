@@ -99,6 +99,8 @@ namespace lmp
       virtual bool do_isConfigAcceptable(
         const msg::ast::Config&  configMsg) const;
       virtual void do_sendConfig();
+      virtual void do_sendConfig(
+        const msg::ast::ConfigNack&  configNackMsg);
       virtual void do_resendConfig();
       virtual void do_stopSendConfig();
       virtual void do_sendConfigAck(

@@ -25,6 +25,7 @@ namespace lmp
       struct Config;
       struct ConfigAck;
       struct ConfigNack;
+      struct Hello;
     }
   }
   namespace cc
@@ -127,6 +128,11 @@ namespace lmp
     class EvHelloRcvd
     {
     public:
+      explicit EvHelloRcvd(
+        const msg::ast::Hello&  helloMsg)
+      : m_helloMsg(helloMsg)
+      {}
+      const msg::ast::Hello&  m_helloMsg;
       static lmp::cc::appl::EvHelloRcvd  theApplEvent;
     };
     class EvHoldTimer
@@ -137,6 +143,11 @@ namespace lmp
     class EvSeqNumErr
     {
     public:
+      explicit EvSeqNumErr(
+        const msg::ast::Hello&  helloMsg)
+      : m_helloMsg(helloMsg)
+      {}
+      const msg::ast::Hello&  m_helloMsg;
       static lmp::cc::appl::EvSeqNumErr  theApplEvent;
     };
     class EvReconfig
